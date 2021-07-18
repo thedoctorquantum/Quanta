@@ -3,34 +3,22 @@
 #include <glm/glm.hpp>
 #include <stb_image.h>
 #include <imgui.h>
-#include <GLFW/glfw3.h>
+
+using namespace Quanta;
 
 int main(int argc, char** args)
 {
-    Quanta::Log("Hello Sandbox!");
-
-    if(!glfwInit())
+    Window window = Window("Sandbox", { 640, 480 });
+        
+    while(window.Exists())
     {
-        return -1;
+        window.PollEvents();
+
+        GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 1.0f, 1.0f }, 1.0f, 0);
+        GraphicsDevice::Viewport({ 0, 0, 640, 480 });
+        
+        window.SwapBuffers();
     }
-    
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Quanta", nullptr, nullptr);
-
-    if(!window)
-    {
-        glfwTerminate();
-
-        return -1;
-    }
-
-    while(!glfwWindowShouldClose(window))
-    {
-        glfwPollEvents();
-
-        glfwSwapBuffers(window);
-    }
-
-    glfwTerminate();
 
     return 0;
 }
