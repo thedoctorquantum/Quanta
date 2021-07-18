@@ -1,2 +1,2 @@
 # Quanta
-# Cross platform game engine / framework
+Cross platform game engine / framework
