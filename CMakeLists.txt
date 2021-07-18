@@ -4,5 +4,3 @@ project("Quanta" VERSION 1.0.0)
 
 add_subdirectory("Quanta")
 add_subdirectory("Sandbox")
-
-

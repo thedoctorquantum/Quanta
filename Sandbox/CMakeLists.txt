@@ -1,4 +1,6 @@
-add_executable("Sandbox" Source/Sandbox/main.cpp)
+file(GLOB_RECURSE SOURCE Source/*.h Source/*.cpp)
+
+add_executable("Sandbox" "${SOURCE}")
 
 set_target_properties("Sandbox" PROPERTIES LINKER_LANGUAGE CXX)
 
