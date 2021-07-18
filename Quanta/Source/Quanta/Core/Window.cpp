@@ -10,11 +10,11 @@ namespace Quanta
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
         handle = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr);
 
         glfwMakeContextCurrent(handle);
-
-        glfwSwapInterval(1);
 
         gladLoadGL();
     }
@@ -30,7 +30,7 @@ namespace Quanta
     {
         return !glfwWindowShouldClose(handle);
     }
-    
+
     void Window::PollEvents() const
     {
         glfwPollEvents();

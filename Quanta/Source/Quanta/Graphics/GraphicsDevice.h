@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "Buffers/GraphicsBuffer.h"
 
 namespace Quanta
 {
@@ -15,5 +16,7 @@ namespace Quanta
 
         static void ClearBackBuffer(const glm::vec4& color, float depth, int stencil);
         static void Viewport(const glm::ivec4& viewport);
+
+        static void SetVertexBuffer(const GraphicsBuffer& buffer);
     };
 }

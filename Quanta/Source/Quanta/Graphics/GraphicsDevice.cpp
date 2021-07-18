@@ -15,4 +15,9 @@ namespace Quanta
     {
         glViewportIndexedfv(0, (float*) &viewport.x);
     }
+    
+    void GraphicsDevice::SetVertexBuffer(const GraphicsBuffer& buffer)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, buffer.GetHandle());
+    }
 }
