@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include "Window.h"
 
+#include <GLFW/glfw3.h>
+
 namespace Quanta
 {
     Window::Window(const std::string& title, glm::ivec2 size)
@@ -14,28 +16,28 @@ namespace Quanta
 
         handle = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr);
 
-        glfwMakeContextCurrent(handle);
+        glfwMakeContextCurrent((GLFWwindow*) handle);
 
         gladLoadGL();
     }
 
     Window::~Window()
     {
-        glfwDestroyWindow(handle);
+        glfwDestroyWindow((GLFWwindow*) handle);
     }
 
     bool Window::Exists() const
     {
-        return !glfwWindowShouldClose(handle);
+        return !glfwWindowShouldClose((GLFWwindow*) handle);
     }
 
     void Window::PollEvents() const
     {
         glfwPollEvents();
     }
-
+    
     void Window::SwapBuffers() const
     {
-        glfwSwapBuffers(handle);
+        glfwSwapBuffers((GLFWwindow*) handle);
     }
 };

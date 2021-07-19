@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "Window.h"
 
 namespace Quanta
@@ -16,6 +17,6 @@ namespace Quanta
         virtual void Render(float elapsed) { }
         virtual void Update(float elapsed) { }
         
-        Window* window;
+        std::shared_ptr<Window> window;
     };
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 #include <string>
-#include <GLFW/glfw3.h>
 
 namespace Quanta
 {
@@ -16,6 +16,6 @@ namespace Quanta
         void PollEvents() const;
         void SwapBuffers() const;
     private:
-        GLFWwindow* handle = nullptr;
+        void* handle;
     };
 }

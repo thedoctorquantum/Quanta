@@ -5,5 +5,5 @@
 #include "Graphics/Buffers/GraphicsBuffer.h"
 #include "Graphics/Buffers/VertexArray.h"
 #include "Graphics/Shaders/ShaderModule.h"
-#include "Graphics/Shaders/ShaderProgram.h"
+#include "Graphics/RasterPipeline.h"
 #include "Core/Window.h"

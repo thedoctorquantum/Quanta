@@ -26,7 +26,7 @@ namespace Quanta
         std::shared_ptr<GraphicsBuffer> vertexBuffer = nullptr;
         std::shared_ptr<GraphicsBuffer> indexBuffer = nullptr;
         
-        uint32_t handle = 0;
+        uint32_t handle;
         IndexType indexType = IndexType::UInt32;
     };
 }

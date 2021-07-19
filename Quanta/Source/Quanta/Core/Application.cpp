@@ -4,6 +4,6 @@ namespace Quanta
 {
     Application::Application()
     {
-
+        
     }
 }

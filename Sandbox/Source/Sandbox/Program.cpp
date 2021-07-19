@@ -1,4 +1,3 @@
-#include <glad/glad.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -79,12 +78,18 @@ int main(int argc, char** args)
     std::string vertexCode = ReadAllText("Resources/Shaders/vertex.glsl");
     std::string fragmentCode = ReadAllText("Resources/Shaders/fragment.glsl");
     
-    std::vector<std::shared_ptr<ShaderModule>> modules;
+    std::shared_ptr<RasterPipelineDescription> desc = std::make_shared<RasterPipelineDescription>();
 
-    modules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Vertex, vertexCode));
-    modules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Fragment, fragmentCode));
+    desc->ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Vertex, vertexCode));
+    desc->ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Fragment, fragmentCode));
 
-    std::shared_ptr<ShaderProgram> program = std::make_shared<ShaderProgram>(modules);
+    desc->EnableBlending = false;
+    desc->EnableDepthTesting = false;
+    desc->CullMode = FaceCullMode::Back;
+    desc->Layout = GeometryLayout::Triangle;
+    desc->Winding = GeometryWinding::CounterClockwise;
+    
+    std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(desc);
 
     while(window.Exists())
     {
@@ -93,12 +98,12 @@ int main(int argc, char** args)
         GraphicsDevice::ClearBackBuffer({ 0.0f, 0.5f, 1.0f, 1.0f }, 1.0f, 0);
         GraphicsDevice::Viewport({ 0, 0, 640, 480 });
 
-        GraphicsDevice::SetPipeline(program);
+        GraphicsDevice::SetPipeline(pipeline);
 
         GraphicsDevice::SetVertexArray(vertexArray);
 
         DrawCommand cmd;
-
+        
         cmd.Count = 3;
         cmd.IndexOffset = 0;
         cmd.InstanceCount = 1;
@@ -109,6 +114,6 @@ int main(int argc, char** args)
 
         window.SwapBuffers();
     }
-    
+
     return 0;
 }

@@ -14,6 +14,6 @@ namespace Quanta
         
         uint32_t GetHandle() const;
     private:
-        uint32_t handle = 0;
+        uint32_t handle;
     };
 }

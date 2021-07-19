@@ -24,8 +24,8 @@ namespace Quanta
         uint32_t GetSize() const;
         BufferUsage GetUsage() const;
     private:
-        uint32_t handle = 0;
-        uint32_t size = 0;
+        uint32_t handle;
+        uint32_t size;
         BufferUsage usage;
     };
 };
