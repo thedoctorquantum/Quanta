@@ -6,7 +6,7 @@ namespace Quanta
     Window::Window(const std::string& title, glm::ivec2 size)
     {
         glfwInit();
-
+        
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
@@ -22,8 +22,6 @@ namespace Quanta
     Window::~Window()
     {
         glfwDestroyWindow(handle);
-
-        glfwTerminate();
     }
 
     bool Window::Exists() const

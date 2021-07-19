@@ -109,6 +109,6 @@ int main(int argc, char** args)
 
         window.SwapBuffers();
     }
-
+    
     return 0;
 }

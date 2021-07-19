@@ -7,9 +7,11 @@ namespace Quanta
 {
     GraphicsBuffer::GraphicsBuffer(BufferUsage usage, uint32_t size)
     {        
+        this->usage = usage;
+        
         glCreateBuffers(1, &handle);
 
-        switch (usage)
+        switch(usage)
         {
         case BufferUsage::Static:
             glNamedBufferStorage(handle, size, nullptr, GL_DYNAMIC_STORAGE_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT);
