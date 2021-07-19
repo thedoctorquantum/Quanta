@@ -32,9 +32,9 @@ std::string ReadAllText(const std::string& filepath)
     return contents.str();
 }
 
-int main(int argc, char** args)
+int main()
 {
-    Window window = Window("Sandbox", { 640, 480 });
+    std::shared_ptr<Window> window = std::make_shared<Window>("Sandbox", glm::vec2(640, 480));
     
     float vertices[3 * 7] = 
     {
@@ -71,34 +71,33 @@ int main(int argc, char** args)
         .Size = sizeof(float),
         .Normalized = false
     });
-
+    
     vertexArray->SetVertexBuffer(vertexBuffer, layout);
     vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt32);
 
     std::string vertexCode = ReadAllText("Resources/Shaders/vertex.glsl");
     std::string fragmentCode = ReadAllText("Resources/Shaders/fragment.glsl");
     
-    std::shared_ptr<RasterPipelineDescription> desc = std::make_shared<RasterPipelineDescription>();
-
-    desc->ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Vertex, vertexCode));
-    desc->ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Fragment, fragmentCode));
-
-    desc->EnableBlending = false;
-    desc->EnableDepthTesting = false;
-    desc->CullMode = FaceCullMode::Back;
-    desc->Layout = GeometryLayout::Triangle;
-    desc->Winding = GeometryWinding::CounterClockwise;
-    
-    std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(desc);
-
-    while(window.Exists())
+    std::vector<std::shared_ptr<ShaderModule>> shaders = 
     {
-        window.PollEvents();
+        std::make_shared<ShaderModule>(ShaderType::Vertex, vertexCode),
+        std::make_shared<ShaderModule>(ShaderType::Fragment, fragmentCode)
+    };
+    
+    std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(shaders);
 
-        GraphicsDevice::ClearBackBuffer({ 0.0f, 0.5f, 1.0f, 1.0f }, 1.0f, 0);
-        GraphicsDevice::Viewport({ 0, 0, 640, 480 });
+    pipeline->SetPolygonFillMode(PolygonFillMode::Solid);   
+    pipeline->SetFaceCullMode(FaceCullMode::Back);
+    pipeline->SetEnableBlending(true);
+    
+    while(window->Exists())
+    {
+        window->PollEvents();
 
-        GraphicsDevice::SetPipeline(pipeline);
+        GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f, 0);
+        GraphicsDevice::Viewport({ 0.0f, 0.0f, window->GetSize().x, window->GetSize().y });
+
+        GraphicsDevice::SetRasterPipeline(pipeline);
 
         GraphicsDevice::SetVertexArray(vertexArray);
 
@@ -109,10 +108,10 @@ int main(int argc, char** args)
         cmd.InstanceCount = 1;
         cmd.StartInstance = 0;
         cmd.StartVertex = 0;
-        
+
         GraphicsDevice::DispatchDraw(cmd);
 
-        window.SwapBuffers();
+        window->SwapBuffers();
     }
 
     return 0;

@@ -1,6 +1,7 @@
-file(GLOB_RECURSE SOURCE Source/*.h Source/*.cpp)
+file(GLOB_RECURSE SOURCE Source/*.c Source/*.cpp)
+file(GLOB_RECURSE INCLUDE Source/*.h Source/*.hpp)
 
-add_library("Quanta" "${SOURCE}")
+add_library("Quanta" "${SOURCE}" "${INCLUDE}")
 
 set_target_properties("Quanta" PROPERTIES LINKER_LANGUAGE CXX)
 

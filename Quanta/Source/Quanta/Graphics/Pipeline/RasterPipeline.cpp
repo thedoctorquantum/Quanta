@@ -5,15 +5,16 @@
 
 namespace Quanta
 {
-    RasterPipeline::RasterPipeline(const std::shared_ptr<RasterPipelineDescription>& description)
+    RasterPipeline::RasterPipeline(const std::vector<std::shared_ptr<ShaderModule>>& shaderModules)
     {
-        this->description = description;
+        this->shaderModules = shaderModules;
+        this->uniformBuffers = uniformBuffers;
 
         handle = glCreateProgram();
 
-        for(int i = 0; i < description->ShaderModules.size(); i++)
+        for(int i = 0; i < shaderModules.size(); i++)
         {
-            const std::shared_ptr<ShaderModule>& shader = description->ShaderModules[i];
+            const std::shared_ptr<ShaderModule>& shader = shaderModules[i];
             
             glAttachShader(handle, shader->GetHandle());
         }
@@ -33,9 +34,9 @@ namespace Quanta
             std::cout << "Shader program " << handle << " could not link: \n" << infoLog << std::endl; 
         }
 
-        for(int i = 0; i < description->ShaderModules.size(); i++)
+        for(int i = 0; i < shaderModules.size(); i++)
         {
-            const std::shared_ptr<ShaderModule>& shader = description->ShaderModules[i];
+            const std::shared_ptr<ShaderModule>& shader = shaderModules[i];
             
             glDetachShader(handle, shader->GetHandle());
         }
@@ -48,47 +49,82 @@ namespace Quanta
     
     const std::vector<std::shared_ptr<ShaderModule>>& RasterPipeline::GetShaderModules() const
     {
-        return description->ShaderModules;
+        return shaderModules;
     }
     
     const std::vector<std::shared_ptr<GraphicsBuffer>>& RasterPipeline::GetUniformBuffers() const
     {
-        return description->UniformBuffers;
+        return uniformBuffers;
     }
 
     PolygonFillMode RasterPipeline::GetPolygonFillMode() const
     {
-        return description->FillMode;
+        return polygonFillMode;
     }
 
-    bool RasterPipeline::IsDepthTestingEnabled() const
+    void RasterPipeline::SetPolygonFillMode(PolygonFillMode value)
     {
-        return description->EnableDepthTesting;
+        polygonFillMode = value;
     }
 
-    bool RasterPipeline::IsScissorTestingEnabled() const
+    bool RasterPipeline::GetEnableDepthTesting() const
     {
-        return description->EnableScissorTesting;
+        return enableDepthTesting;
     }
 
-    bool RasterPipeline::IsBlendingEnabled() const
+    void RasterPipeline::SetEnableDepthTesting(bool value)
     {
-        return description->EnableBlending;
+        enableDepthTesting = value;
+    }
+
+    bool RasterPipeline::GetEnableScissorTesting() const
+    {
+        return enableScissorTesting;
+    }
+
+    void RasterPipeline::SetEnableScissorTesting(bool value)
+    {
+        enableScissorTesting = value;
+    }
+
+    bool RasterPipeline::GetEnableBlending() const
+    {
+        return enableBlending;
+    }
+
+    void RasterPipeline::SetEnableBlending(bool value)
+    {
+        enableBlending = value;
     }
 
     FaceCullMode RasterPipeline::GetFaceCullMode() const
     {
-        return description->CullMode;
+        return faceCullMode;
+    }
+
+    void RasterPipeline::SetFaceCullMode(FaceCullMode value)
+    {
+        faceCullMode = value;
     }
 
     GeometryLayout RasterPipeline::GetGeometryLayout() const
     {
-        return description->Layout;
+        return geometryLayout;
+    }
+
+    void RasterPipeline::SetGeometryLayout(GeometryLayout value)
+    {
+        geometryLayout = value;
     }
 
     GeometryWinding RasterPipeline::GetGeometryWinding() const
     {
-        return description->Winding;
+        return geometryWinding;
+    }
+
+    void RasterPipeline::SetGeometryWinding(GeometryWinding value)
+    {
+        geometryWinding = value;
     }
 
     uint32_t RasterPipeline::GetHandle() const

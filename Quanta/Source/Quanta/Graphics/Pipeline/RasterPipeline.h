@@ -1,32 +1,60 @@
 #pragma once
 
-#include "RasterPipelineDescription.h"
+#include <memory>
+#include <vector>
+
+#include "../Buffer/GraphicsBuffer.h"
+#include "../Shader/ShaderModule.h"
+#include "FaceCullMode.h"
+#include "GeometryLayout.h"
+#include "GeometryWinding.h"
+#include "PolygonFillMode.h"
 
 namespace Quanta
 {
     class RasterPipeline final
     {
     public:
-        RasterPipeline(const std::shared_ptr<RasterPipelineDescription>& description);
+        explicit RasterPipeline(const std::vector<std::shared_ptr<ShaderModule>>& shaderModules);
         ~RasterPipeline();
-
-        const std::shared_ptr<GraphicsBuffer>& GetModule(uint32_t index) const;
 
         const std::vector<std::shared_ptr<ShaderModule>>& GetShaderModules() const;
         const std::vector<std::shared_ptr<GraphicsBuffer>>& GetUniformBuffers() const;
 
         PolygonFillMode GetPolygonFillMode() const;
-        bool IsDepthTestingEnabled() const;
-        bool IsScissorTestingEnabled() const;
-        bool IsBlendingEnabled() const;
+        void SetPolygonFillMode(PolygonFillMode value);
+
+        bool GetEnableDepthTesting() const;
+        void SetEnableDepthTesting(bool value);
+        
+        bool GetEnableScissorTesting() const;
+        void SetEnableScissorTesting(bool value);
+        
+        bool GetEnableBlending() const;
+        void SetEnableBlending(bool value);
+        
         FaceCullMode GetFaceCullMode() const;
+        void SetFaceCullMode(FaceCullMode value);
+        
         GeometryLayout GetGeometryLayout() const;
+        void SetGeometryLayout(GeometryLayout value);
+        
         GeometryWinding GetGeometryWinding() const;
+        void SetGeometryWinding(GeometryWinding value);
 
         uint32_t GetHandle() const;
     private:
         uint32_t handle;
-
-        std::shared_ptr<RasterPipelineDescription> description;
+        
+        std::vector<std::shared_ptr<ShaderModule>> shaderModules;
+        std::vector<std::shared_ptr<GraphicsBuffer>> uniformBuffers;
+        
+        PolygonFillMode polygonFillMode = PolygonFillMode::Solid;
+        bool enableDepthTesting = false;
+        bool enableScissorTesting = false;
+        bool enableBlending = false;
+        FaceCullMode faceCullMode = FaceCullMode::None;
+        GeometryLayout geometryLayout = GeometryLayout::Triangle;
+        GeometryWinding geometryWinding = GeometryWinding::CounterClockwise;
     };
 }

@@ -26,6 +26,34 @@ namespace Quanta
         glfwDestroyWindow((GLFWwindow*) handle);
     }
 
+    glm::ivec2 Window::GetPosition() const
+    {
+        glm::ivec2 position;
+
+        glfwGetWindowPos((GLFWwindow*) handle, &position.x, &position.y);
+
+        return position;
+    }
+    
+    glm::ivec2 Window::GetSize() const
+    {
+        glm::ivec2 size;
+
+        glfwGetWindowSize((GLFWwindow*) handle, &size.x, &size.y);
+
+        return size;
+    }
+
+    glm::ivec4 Window::GetBounds() const
+    {
+        glm::ivec4 bounds;
+
+        glfwGetWindowPos((GLFWwindow*) handle, &bounds.x, &bounds.y);
+        glfwGetWindowSize((GLFWwindow*) handle, &bounds.z, &bounds.w);
+        
+        return bounds;
+    }
+
     bool Window::Exists() const
     {
         return !glfwWindowShouldClose((GLFWwindow*) handle);

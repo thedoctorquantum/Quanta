@@ -12,6 +12,11 @@ namespace Quanta
         Window(const std::string& title, glm::ivec2 size);
         ~Window();
 
+        glm::ivec2 GetPosition() const;
+        glm::ivec2 GetSize() const;
+        
+        glm::ivec4 GetBounds() const;
+
         bool Exists() const;
         void PollEvents() const;
         void SwapBuffers() const;

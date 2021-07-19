@@ -9,7 +9,7 @@ namespace Quanta
 
     static GLenum geometryType;
     static GLenum indexType;
-
+    
     void GraphicsDevice::ClearBackBuffer(const glm::vec4& color, float depth, int stencil)
     {
         glClearNamedFramebufferfv(0, GL_COLOR, 0, &color.x);
@@ -22,16 +22,58 @@ namespace Quanta
         glViewportIndexedf(0, viewport.x, viewport.y, viewport.z, viewport.w);
     }
     
-    void GraphicsDevice::SetPipeline(const std::shared_ptr<RasterPipeline>& pipeline)
+    void GraphicsDevice::SetRasterPipeline(const std::shared_ptr<RasterPipeline>& pipeline)
     {
-        if(currentRasterPipeline == pipeline) return;
-
         currentRasterPipeline = pipeline;
         
         if(currentRasterPipeline != nullptr)
         {
             glUseProgram(pipeline->GetHandle());
             
+            switch(pipeline->GetPolygonFillMode())
+            {
+            case PolygonFillMode::Solid:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+                break;
+            case PolygonFillMode::Wireframe:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                
+                break; 
+
+            case PolygonFillMode::Point:
+                glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+
+                break;
+            }
+
+            if(pipeline->GetEnableDepthTesting())
+            {
+                glEnable(GL_DEPTH_TEST);
+            }
+            else
+            {
+                glDisable(GL_DEPTH_TEST);
+            }
+
+            if(pipeline->GetEnableScissorTesting())
+            {
+                glEnable(GL_SCISSOR_TEST);
+            }
+            else
+            {
+                glDisable(GL_SCISSOR_TEST);
+            }
+
+            if(pipeline->GetEnableBlending())
+            {
+                glEnable(GL_BLEND);
+            }
+            else
+            {
+                glDisable(GL_BLEND);
+            }
+
             switch(pipeline->GetFaceCullMode())
             {
             case FaceCullMode::None:

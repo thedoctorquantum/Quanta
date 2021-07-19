@@ -7,23 +7,13 @@
 #include "Pipeline/RasterPipeline.h"
 #include "DrawCommand.h"
 
-namespace Quanta
+namespace Quanta::GraphicsDevice
 {
-    class GraphicsDevice final
-    {
-    public:
-        GraphicsDevice() = delete; 
-        ~GraphicsDevice() = delete;
+    void ClearBackBuffer(const glm::vec4& color, float depth, int stencil);
+    void Viewport(const glm::ivec4& viewport);
 
-        GraphicsDevice(const GraphicsDevice& other) = delete;
-        GraphicsDevice(const GraphicsDevice&& other) = delete;
+    void SetRasterPipeline(const std::shared_ptr<RasterPipeline>& pipeline);
+    void SetVertexArray(const std::shared_ptr<VertexArray>& vertexArray);
 
-        static void ClearBackBuffer(const glm::vec4& color, float depth, int stencil);
-        static void Viewport(const glm::ivec4& viewport);
-
-        static void SetPipeline(const std::shared_ptr<RasterPipeline>& pipeline);
-        static void SetVertexArray(const std::shared_ptr<VertexArray>& vertexArray);
-
-        static void DispatchDraw(const DrawCommand& command);
-    };
+    void DispatchDraw(const DrawCommand& command);
 }
