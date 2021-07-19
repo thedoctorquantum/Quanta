@@ -21,7 +21,7 @@ namespace Quanta
             break;
         }
     }
-
+    
     GraphicsBuffer::~GraphicsBuffer()
     {
         glDeleteBuffers(1, &handle);
@@ -45,8 +45,13 @@ namespace Quanta
     {
         glUnmapNamedBuffer(handle);
     }
+    
+    void GraphicsBuffer::SetData(const void* data, uint32_t size)
+    {
+        glNamedBufferSubData(handle, 0, size, data);
+    }
 
-    void GraphicsBuffer::SetData(void* data, uint32_t size, uint32_t offset)
+    void GraphicsBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
     {
         glNamedBufferSubData(handle, offset, size, data);
     }

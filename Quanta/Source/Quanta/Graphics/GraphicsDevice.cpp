@@ -4,6 +4,9 @@
 
 namespace Quanta
 {
+    static std::shared_ptr<VertexArray> currentVertexArray;
+    static std::shared_ptr<ShaderProgram> currentShader;
+
     void GraphicsDevice::ClearBackBuffer(const glm::vec4& color, float depth, int stencil)
     {
         glClearNamedFramebufferfv(0, GL_COLOR, 0, &color.x);
@@ -13,11 +16,50 @@ namespace Quanta
     
     void GraphicsDevice::Viewport(const glm::ivec4& viewport)
     {
-        glViewportIndexedfv(0, (float*) &viewport.x);
+        glViewportIndexedf(0, viewport.x, viewport.y, viewport.z, viewport.w);
     }
     
-    void GraphicsDevice::SetVertexBuffer(const GraphicsBuffer& buffer)
+    void GraphicsDevice::SetPipeline(const std::shared_ptr<ShaderProgram>& shader)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, buffer.GetHandle());
+        if(currentShader == shader) return;
+
+        currentShader = shader;
+        
+        if(shader != nullptr)
+        {
+            glUseProgram(shader->GetHandle());
+        }
+        else
+        {
+            glUseProgram(0);
+        }
+    }
+
+    void GraphicsDevice::SetVertexArray(const std::shared_ptr<VertexArray>& vertexArray)
+    {
+        if(currentVertexArray == vertexArray) return;
+
+        currentVertexArray = vertexArray;
+        
+        if(vertexArray != nullptr)
+        {
+            glBindVertexArray(vertexArray->GetHandle());
+        }
+        else
+        {
+            glBindVertexArray(0);
+        }
+    }
+    
+    void GraphicsDevice::DispatchDraw(const DrawCommand& command)
+    {
+        glDrawElementsInstancedBaseVertexBaseInstance(
+            GL_TRIANGLES, 
+            command.Count, 
+            GL_UNSIGNED_INT, 
+            nullptr,
+            command.InstanceCount, 
+            command.StartVertex,
+            command.StartInstance);
     }
 }

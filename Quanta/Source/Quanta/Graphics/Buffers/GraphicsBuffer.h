@@ -16,15 +16,16 @@ namespace Quanta
 
         void* MapData();
         void UnmapData();
-
-        void SetData(void* data, uint32_t size, uint32_t offset);
-
+        
+        void SetData(const void* data, uint32_t size);
+        void SetData(const void* data, uint32_t size, uint32_t offset);
+        
         uint32_t GetHandle() const;
         uint32_t GetSize() const;
         BufferUsage GetUsage() const;
     private:
-        uint32_t handle;
-        uint32_t size;
+        uint32_t handle = 0;
+        uint32_t size = 0;
         BufferUsage usage;
     };
 };

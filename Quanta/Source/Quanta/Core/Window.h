@@ -16,6 +16,6 @@ namespace Quanta
         void PollEvents() const;
         void SwapBuffers() const;
     private:
-        GLFWwindow* handle;
+        GLFWwindow* handle = nullptr;
     };
 }
