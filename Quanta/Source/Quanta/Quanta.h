@@ -1,9 +1,4 @@
 #pragma once
 
-#include "Core/Application.h" 
-#include "Graphics/GraphicsDevice.h"
-#include "Graphics/Buffers/GraphicsBuffer.h"
-#include "Graphics/Buffers/VertexArray.h"
-#include "Graphics/Shaders/ShaderModule.h"
-#include "Graphics/RasterPipeline.h"
-#include "Core/Window.h"
+#include "Core/Core.h"
+#include "Graphics/Graphics.h"

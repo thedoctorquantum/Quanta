@@ -3,9 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include "Shaders/ShaderModule.h"
-#include "Buffers/GraphicsBuffer.h"
-
+#include "../Shader/ShaderModule.h"
+#include "../Buffer/GraphicsBuffer.h"
 #include "PolygonFillMode.h"
 #include "FaceCullMode.h"
 #include "GeometryLayout.h"

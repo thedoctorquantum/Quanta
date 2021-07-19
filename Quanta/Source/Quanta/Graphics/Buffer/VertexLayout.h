@@ -3,28 +3,10 @@
 #include <vector>
 #include <stdint.h>
 
+#include "VertexElement.h"
+
 namespace Quanta
-{
-    enum class BufferPrimitive
-    {
-        Float,
-        Double, 
-        UnsignedByte,
-        Char,
-        Int16,
-        Int32,
-        UInt16,
-        UInt32
-    };
-    
-    struct VertexElement
-    {
-        BufferPrimitive Primitve = BufferPrimitive::Float;
-        uint32_t Count = 0;
-        uint32_t Size = 0;
-        bool Normalized = false;
-    };
-    
+{    
     struct VertexLayout final
     {
     public:
