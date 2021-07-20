@@ -5,11 +5,11 @@
 
 namespace Quanta
 {
-    RasterPipeline::RasterPipeline(const std::vector<std::shared_ptr<ShaderModule>>& shaderModules)
+    RasterPipeline::RasterPipeline(const RasterPipelineDescription& description)
     {
-        this->shaderModules = shaderModules;
-        this->uniformBuffers = uniformBuffers;
-
+        this->shaderModules = description.ShaderModules;
+        this->uniformBuffers = description.UniformBuffers;
+        
         handle = glCreateProgram();
 
         for(int i = 0; i < shaderModules.size(); i++)

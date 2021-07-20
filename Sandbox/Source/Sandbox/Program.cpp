@@ -3,6 +3,8 @@
 #include <sstream>
 #include <Quanta/Quanta.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <stb_image.h>
 #include <imgui.h>
 
@@ -15,7 +17,7 @@ std::string ReadAllText(const std::string& filepath)
     std::ifstream file;
 
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
+    
     try
     {
         file.open(filepath);
@@ -78,26 +80,43 @@ int main()
     std::string vertexCode = ReadAllText("Resources/Shaders/vertex.glsl");
     std::string fragmentCode = ReadAllText("Resources/Shaders/fragment.glsl");
     
-    std::vector<std::shared_ptr<ShaderModule>> shaders = 
-    {
-        std::make_shared<ShaderModule>(ShaderType::Vertex, vertexCode),
-        std::make_shared<ShaderModule>(ShaderType::Fragment, fragmentCode)
-    };
+    RasterPipelineDescription desc;
     
-    std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(shaders);
+    desc.ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Vertex, vertexCode));
+    desc.ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Fragment, fragmentCode));
 
+    std::shared_ptr<GraphicsBuffer> uniforms = std::make_shared<GraphicsBuffer>(BufferUsage::Static, sizeof(glm::mat4) * 2);
+
+    desc.UniformBuffers.emplace_back(uniforms);
+    
+    std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(desc);
+    
     pipeline->SetPolygonFillMode(PolygonFillMode::Solid);   
     pipeline->SetFaceCullMode(FaceCullMode::Back);
     pipeline->SetEnableBlending(true);
+
+    GraphicsDevice::SetRasterPipeline(pipeline);
+    
+    glm::vec3 translation;
     
     while(window->Exists())
     {
         window->PollEvents();
 
         GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f, 0);
-        GraphicsDevice::Viewport({ 0.0f, 0.0f, window->GetSize().x, window->GetSize().y });
+        GraphicsDevice::SetViewport({ 0.0f, 0.0f, window->GetSize().x, window->GetSize().y });
 
-        GraphicsDevice::SetRasterPipeline(pipeline);
+        glm::mat4 proj = glm::ortho(0.0f, (float) window->GetSize().x, 0.0f, (float) window->GetSize().y, 0.1f, 100.0f);
+
+        uniforms->SetData(&proj, sizeof(glm::mat4), sizeof(glm::mat4));
+
+        glm::mat4 model = glm::mat4(1.0f);
+
+        model = glm::translate(model, translation);
+
+        uniforms->SetData(&model, sizeof(glm::mat4));
+        
+        translation.x += 0.001f;
 
         GraphicsDevice::SetVertexArray(vertexArray);
 

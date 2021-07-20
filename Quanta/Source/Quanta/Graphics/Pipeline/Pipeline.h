@@ -5,3 +5,4 @@
 #include "GeometryWinding.h"
 #include "PolygonFillMode.h"
 #include "RasterPipeline.h"
+#include "RasterPipelineDescription.h"

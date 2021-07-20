@@ -10,7 +10,7 @@
 namespace Quanta::GraphicsDevice
 {
     void ClearBackBuffer(const glm::vec4& color, float depth, int stencil);
-    void Viewport(const glm::ivec4& viewport);
+    void SetViewport(const glm::ivec4& viewport);
 
     void SetRasterPipeline(const std::shared_ptr<RasterPipeline>& pipeline);
     void SetVertexArray(const std::shared_ptr<VertexArray>& vertexArray);

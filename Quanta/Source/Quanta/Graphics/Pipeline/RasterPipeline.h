@@ -9,13 +9,14 @@
 #include "GeometryLayout.h"
 #include "GeometryWinding.h"
 #include "PolygonFillMode.h"
+#include "RasterPipelineDescription.h"
 
 namespace Quanta
 {
     class RasterPipeline final
     {
     public:
-        explicit RasterPipeline(const std::vector<std::shared_ptr<ShaderModule>>& shaderModules);
+        explicit RasterPipeline(const RasterPipelineDescription& description);
         ~RasterPipeline();
 
         const std::vector<std::shared_ptr<ShaderModule>>& GetShaderModules() const;

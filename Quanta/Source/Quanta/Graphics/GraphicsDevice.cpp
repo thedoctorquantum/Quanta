@@ -4,8 +4,8 @@
 
 namespace Quanta
 {
-    static std::shared_ptr<VertexArray> currentVertexArray;
-    static std::shared_ptr<RasterPipeline> currentRasterPipeline;
+    static std::weak_ptr<VertexArray> currentVertexArray;
+    static std::weak_ptr<RasterPipeline> currentRasterPipeline;
 
     static GLenum geometryType;
     static GLenum indexType;
@@ -17,7 +17,7 @@ namespace Quanta
         glClearNamedFramebufferiv(0, GL_STENCIL, 0, &stencil);
     }
     
-    void GraphicsDevice::Viewport(const glm::ivec4& viewport)
+    void GraphicsDevice::SetViewport(const glm::ivec4& viewport)
     {
         glViewportIndexedf(0, viewport.x, viewport.y, viewport.z, viewport.w);
     }
@@ -26,8 +26,13 @@ namespace Quanta
     {
         currentRasterPipeline = pipeline;
         
-        if(currentRasterPipeline != nullptr)
+        if(pipeline)
         {
+            for(int i = 0; i < pipeline->GetUniformBuffers().size(); i++)
+            {
+                glBindBufferBase(GL_UNIFORM_BUFFER, i, pipeline->GetUniformBuffers()[i]->GetHandle());
+            }
+
             glUseProgram(pipeline->GetHandle());
             
             switch(pipeline->GetPolygonFillMode())
@@ -130,8 +135,6 @@ namespace Quanta
 
     void GraphicsDevice::SetVertexArray(const std::shared_ptr<VertexArray>& vertexArray)
     {
-        if(currentVertexArray == vertexArray) return;
-
         currentVertexArray = vertexArray;
         
         if(vertexArray != nullptr)
