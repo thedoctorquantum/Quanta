@@ -1,0 +1,10 @@
+[submodule "Quanta/External/glfw"]
+	path = Quanta/External/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Quanta/External/glm"]
+	path = Quanta/External/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "imgui"]
+	path = Quanta/External/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
