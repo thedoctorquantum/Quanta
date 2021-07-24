@@ -59,20 +59,20 @@ int main()
 
     VertexLayout layout;
 
-    layout.Add({ 
-        .Primitve = BufferPrimitive::Float,
-        .Count = 3,
-        .Size = sizeof(float),
-        .Normalized = false
-    });
-    
-    layout.Add({ 
-        .Primitve = BufferPrimitive::Float,
-        .Count = 4,
-        .Size = sizeof(float),
-        .Normalized = false
+    layout.Add({
+        BufferPrimitive::Float,
+        3,
+        sizeof(float),
+        false
     });
 
+    layout.Add({
+        BufferPrimitive::Float,
+        4,
+        sizeof(float),
+        false
+    });
+    
     vertexArray->SetVertexBuffer(vertexBuffer, layout);
     vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt32);
 

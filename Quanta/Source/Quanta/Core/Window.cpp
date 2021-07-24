@@ -18,7 +18,7 @@ namespace Quanta
 
             glfwSetErrorCallback([](int level, const char* message)
             {
-                std::cout << "[GLFW]: " << message << std::endl;
+                std::cout << "[GLFW]: " << message << '\n';
             });
         }
 
@@ -33,14 +33,17 @@ namespace Quanta
 
         glfwMakeContextCurrent((GLFWwindow*) handle);
 
-        gladLoadGL();
+        if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
+        {
+            std::cout << "Failed to load OpenGL\n";
+        }
         
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
 
-        glDebugMessageCallback([](GLenum source, GLenum type, uint32_t id, GLenum severity, GLsizei length, const char* message, const void* userParam) 
+        glDebugMessageCallback([](GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) 
         {
-            std::cout << "[OpenGL]: " << message << std::endl;
+            std::cout << "[OpenGL]: " << message << '\n';
         }, nullptr);
 
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);

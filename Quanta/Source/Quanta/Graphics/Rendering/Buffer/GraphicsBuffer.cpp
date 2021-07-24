@@ -1,16 +1,17 @@
-#include "GraphicsBuffer.h"
-#include "glad/glad.h"
-
+#include <glad/glad.h>
 #include <assert.h>
+
+#include "GraphicsBuffer.h"
 
 namespace Quanta
 {
-    GraphicsBuffer::GraphicsBuffer(BufferUsage usage, uint32_t size)
+    GraphicsBuffer::GraphicsBuffer(BufferUsage usage, size_t size)
     {        
         this->usage = usage;
+        this->size = size;
         
         glCreateBuffers(1, &handle);
-
+        
         switch(usage)
         {
         case BufferUsage::Static:
@@ -29,7 +30,7 @@ namespace Quanta
         glDeleteBuffers(1, &handle);
     }
 
-    void GraphicsBuffer::Resize(GraphicsBuffer& buffer, uint32_t size)
+    void GraphicsBuffer::Resize(GraphicsBuffer& buffer, size_t size)
     {
         assert(buffer.usage != BufferUsage::Static);
 
@@ -48,12 +49,12 @@ namespace Quanta
         glUnmapNamedBuffer(handle);
     }
     
-    void GraphicsBuffer::SetData(const void* data, uint32_t size)
+    void GraphicsBuffer::SetData(const void* data, size_t size)
     {
         glNamedBufferSubData(handle, 0, size, data);
     }
 
-    void GraphicsBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
+    void GraphicsBuffer::SetData(const void* data, size_t size, size_t offset)
     {
         glNamedBufferSubData(handle, offset, size, data);
     }
@@ -63,7 +64,7 @@ namespace Quanta
         return handle;
     }
 
-    uint32_t GraphicsBuffer::GetSize() const
+    size_t GraphicsBuffer::GetSize() const
     {
         return size;
     }
