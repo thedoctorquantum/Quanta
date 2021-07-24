@@ -5,6 +5,8 @@
 
 #include "../Buffer/GraphicsBuffer.h"
 #include "../Shader/ShaderModule.h"
+#include "BlendFactor.h"
+#include "BlendMode.h"
 #include "DepthTestMode.h"
 #include "FaceCullMode.h"
 #include "GeometryLayout.h"
@@ -34,9 +36,12 @@ namespace Quanta
         
         bool GetEnableScissorTesting() const;
         void SetEnableScissorTesting(bool value);
+
+        BlendMode GetBlendMode() const;
+        void SetBlendMode(BlendMode value);
         
-        bool GetEnableBlending() const;
-        void SetEnableBlending(bool value);
+        BlendFactor GetBlendFactor() const;
+        void SetBlendFactor(BlendFactor blendFactor);
         
         FaceCullMode GetFaceCullMode() const;
         void SetFaceCullMode(FaceCullMode value);
@@ -58,7 +63,8 @@ namespace Quanta
         DepthTestMode depthTestMode = DepthTestMode::None;
         bool enableDepthWriting = false;
         bool enableScissorTesting = false;
-        bool enableBlending = false;
+        BlendMode blendMode = BlendMode::None;
+        BlendFactor blendFactor = BlendFactor::One;
         FaceCullMode faceCullMode = FaceCullMode::None;
         GeometryLayout geometryLayout = GeometryLayout::Triangle;
         GeometryWinding geometryWinding = GeometryWinding::CounterClockwise;

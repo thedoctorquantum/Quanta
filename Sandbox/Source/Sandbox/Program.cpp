@@ -94,7 +94,7 @@ int main()
     pipeline->SetFaceCullMode(FaceCullMode::Back);
     pipeline->SetDepthTestMode(DepthTestMode::None);
     pipeline->SetEnableDepthWriting(true);
-    pipeline->SetEnableBlending(true);
+    pipeline->SetBlendMode(BlendMode::Add);
     
     GraphicsDevice::SetRasterPipeline(pipeline);
     

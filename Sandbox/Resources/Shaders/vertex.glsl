@@ -17,6 +17,6 @@ layout(std140, binding = 0) uniform Uniforms
 void main()
 {
     v_Out.color = a_Color;
-    
+
     gl_Position = u_Uniforms.model * vec4(a_Translation, 1.0);
 }

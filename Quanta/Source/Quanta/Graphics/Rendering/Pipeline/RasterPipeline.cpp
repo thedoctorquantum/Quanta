@@ -71,7 +71,7 @@ namespace Quanta
     {
         return depthTestMode;
     }
-    
+
     void RasterPipeline::SetDepthTestMode(DepthTestMode value)
     {
         depthTestMode = value;
@@ -97,14 +97,24 @@ namespace Quanta
         enableScissorTesting = value;
     }
 
-    bool RasterPipeline::GetEnableBlending() const
+    BlendMode RasterPipeline::GetBlendMode() const
     {
-        return enableBlending;
+        return blendMode;
     }
 
-    void RasterPipeline::SetEnableBlending(bool value)
+    void RasterPipeline::SetBlendMode(BlendMode value)
     {
-        enableBlending = value;
+        blendMode = value;
+    }
+
+    BlendFactor RasterPipeline::GetBlendFactor() const
+    {
+        return blendFactor;
+    }
+    
+    void RasterPipeline::SetBlendFactor(BlendFactor value)
+    {
+        blendFactor = value;
     }
 
     FaceCullMode RasterPipeline::GetFaceCullMode() const

@@ -111,6 +111,8 @@ namespace Quanta
             glDisable(GL_DEPTH_TEST);
         }
 
+        glDepthMask(value->GetEnableDepthWriting());
+
         if(value->GetEnableScissorTesting())
         {
             glEnable(GL_SCISSOR_TEST);
@@ -120,29 +122,78 @@ namespace Quanta
             glDisable(GL_SCISSOR_TEST);
         }
 
-        if(value->GetEnableBlending())
+        if((uint8_t) value->GetBlendMode())
         {
             glEnable(GL_BLEND);
+
+            switch(value->GetBlendMode())
+            {
+            case BlendMode::Add:
+                glBlendEquation(GL_FUNC_ADD);
+
+                break;
+            case BlendMode::Subtract:
+                glBlendEquation(GL_FUNC_SUBTRACT);
+
+                break;
+            case BlendMode::ReverseSubtract:
+                glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+
+                break;
+            }
         }
         else
         {
             glDisable(GL_BLEND);
         }
-
-        switch(value->GetFaceCullMode())
+        
+        switch(value->GetBlendFactor())
         {
-        case FaceCullMode::None:
+        case BlendFactor::Zero:
+            glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
+
+            break;
+        case BlendFactor::One:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            
+            break;
+        case BlendFactor::SourceAlpha:
+            glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+
+            break;
+        case BlendFactor::InverseSourceAlpha:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            break;
+        case BlendFactor::SourceColor:
+            glBlendFunc(GL_SRC_ALPHA, GL_SRC_COLOR);
+
+            break;
+        case BlendFactor::InverseSourceColor:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_COLOR);
+
+            break;
+        }
+
+        if((uint8_t) value->GetFaceCullMode())
+        {
+            glEnable(GL_CULL_FACE);
+
+            switch(value->GetFaceCullMode())
+            {
+            case FaceCullMode::Back:
+                glCullFace(GL_BACK);
+
+                break;
+            case FaceCullMode::Front:
+                glCullFace(GL_FRONT);
+                
+                break;
+            }
+        }
+        else
+        {
             glDisable(GL_CULL_FACE);
-
-            break;
-        case FaceCullMode::Back:
-            glEnable(GL_CULL_FACE);
-            glCullFace(GL_BACK);
-
-            break;
-        case FaceCullMode::Front:
-            glEnable(GL_CULL_FACE);
-            glCullFace(GL_FRONT);
         }
         
         switch(value->GetGeometryLayout())
@@ -183,7 +234,7 @@ namespace Quanta
     void GraphicsDevice::SetVertexArray(const std::shared_ptr<VertexArray>& value)
     {
         if(vertexArray == value.get()) return;
-        
+
         if(!value)
         {
             vertexArray = nullptr;
