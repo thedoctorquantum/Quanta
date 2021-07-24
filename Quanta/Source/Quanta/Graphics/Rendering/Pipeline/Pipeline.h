@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DepthTestMode.h"
 #include "FaceCullMode.h"
 #include "GeometryLayout.h"
 #include "GeometryWinding.h"

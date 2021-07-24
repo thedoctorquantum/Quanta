@@ -44,7 +44,7 @@ int main()
         0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
     };
     
-    uint32_t indices[3] =
+    uint8_t indices[3] =
     {
         0, 1, 2
     };
@@ -74,7 +74,7 @@ int main()
     });
     
     vertexArray->SetVertexBuffer(vertexBuffer, layout);
-    vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt32);
+    vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt8);
 
     std::string vertexCode = ReadAllText("Resources/Shaders/vertex.glsl");
     std::string fragmentCode = ReadAllText("Resources/Shaders/fragment.glsl");
@@ -90,10 +90,12 @@ int main()
     
     std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(desc);
     
-    pipeline->SetPolygonFillMode(PolygonFillMode::Solid);   
+    pipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);   
     pipeline->SetFaceCullMode(FaceCullMode::Back);
+    pipeline->SetDepthTestMode(DepthTestMode::None);
+    pipeline->SetEnableDepthWriting(true);
     pipeline->SetEnableBlending(true);
-
+    
     GraphicsDevice::SetRasterPipeline(pipeline);
     
     glm::vec3 translation = glm::vec3(0.0f);

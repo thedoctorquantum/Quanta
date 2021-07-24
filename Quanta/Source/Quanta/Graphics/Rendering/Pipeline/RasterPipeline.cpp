@@ -1,7 +1,7 @@
-#include "RasterPipeline.h"
-
 #include <iostream>
 #include <glad/glad.h>
+
+#include "RasterPipeline.h"
 
 namespace Quanta
 {
@@ -31,10 +31,10 @@ namespace Quanta
 
             glGetProgramInfoLog(handle, sizeof(infoLog), nullptr, infoLog);
 
-            std::cout << "Shader program " << handle << " could not link: \n" << infoLog << std::endl; 
+            std::cout << "Shader program " << handle << " could not link: \n" << infoLog << '\n'; 
         }
 
-        for(int i = 0; i < shaderModules.size(); i++)
+        for(size_t i = 0; i < shaderModules.size(); i++)
         {
             const std::shared_ptr<ShaderModule>& shader = shaderModules[i];
             
@@ -67,14 +67,24 @@ namespace Quanta
         polygonFillMode = value;
     }
 
-    bool RasterPipeline::GetEnableDepthTesting() const
+    DepthTestMode RasterPipeline::GetDepthTestMode() const
     {
-        return enableDepthTesting;
+        return depthTestMode;
+    }
+    
+    void RasterPipeline::SetDepthTestMode(DepthTestMode value)
+    {
+        depthTestMode = value;
     }
 
-    void RasterPipeline::SetEnableDepthTesting(bool value)
+    bool RasterPipeline::GetEnableDepthWriting() const
     {
-        enableDepthTesting = value;
+        return enableDepthWriting;
+    }
+
+    void RasterPipeline::SetEnableDepthWriting(bool value)
+    {
+        enableDepthWriting = value;
     }
 
     bool RasterPipeline::GetEnableScissorTesting() const

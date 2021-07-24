@@ -5,6 +5,7 @@
 
 #include "../Buffer/GraphicsBuffer.h"
 #include "../Shader/ShaderModule.h"
+#include "DepthTestMode.h"
 #include "FaceCullMode.h"
 #include "GeometryLayout.h"
 #include "GeometryWinding.h"
@@ -25,8 +26,11 @@ namespace Quanta
         PolygonFillMode GetPolygonFillMode() const;
         void SetPolygonFillMode(PolygonFillMode value);
 
-        bool GetEnableDepthTesting() const;
-        void SetEnableDepthTesting(bool value);
+        DepthTestMode GetDepthTestMode() const;
+        void SetDepthTestMode(DepthTestMode value);
+
+        bool GetEnableDepthWriting() const;
+        void SetEnableDepthWriting(bool value);
         
         bool GetEnableScissorTesting() const;
         void SetEnableScissorTesting(bool value);
@@ -51,7 +55,8 @@ namespace Quanta
         std::vector<std::shared_ptr<GraphicsBuffer>> uniformBuffers;
         
         PolygonFillMode polygonFillMode = PolygonFillMode::Solid;
-        bool enableDepthTesting = false;
+        DepthTestMode depthTestMode = DepthTestMode::None;
+        bool enableDepthWriting = false;
         bool enableScissorTesting = false;
         bool enableBlending = false;
         FaceCullMode faceCullMode = FaceCullMode::None;

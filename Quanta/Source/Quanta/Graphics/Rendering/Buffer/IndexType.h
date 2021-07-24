@@ -4,7 +4,7 @@ namespace Quanta
 {
     enum class IndexType
     {
-        UnsignedByte,
+        UInt8,
         UInt16,
         UInt32
     };

@@ -2,18 +2,18 @@
 
 #include <glm/glm.hpp>
 
-#include "Buffer/GraphicsBuffer.h"
-#include "Buffer/VertexArray.h"
 #include "Pipeline/RasterPipeline.h"
+#include "Buffer/VertexArray.h"
 #include "DrawCommand.h"
 
 namespace Quanta::GraphicsDevice
 {
     void ClearBackBuffer(const glm::vec4& color, float depth, int stencil);
-    void SetViewport(const glm::ivec4& viewport);
+    void SetViewport(const glm::ivec4& value);
+    void SetScissorViewport(const glm::ivec4& value);
 
-    void SetRasterPipeline(const std::shared_ptr<RasterPipeline>& pipeline);
-    void SetVertexArray(const std::shared_ptr<VertexArray>& vertexArray);
+    void SetRasterPipeline(const std::shared_ptr<RasterPipeline>& value);
+    void SetVertexArray(const std::shared_ptr<VertexArray>& value);
 
     void DispatchDraw(const DrawCommand& command);
 }
