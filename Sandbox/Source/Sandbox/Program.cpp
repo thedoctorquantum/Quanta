@@ -90,21 +90,20 @@ int main()
     
     std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(desc);
     
-    pipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);   
+    pipeline->SetPolygonFillMode(PolygonFillMode::Solid);   
     pipeline->SetFaceCullMode(FaceCullMode::Back);
     pipeline->SetDepthTestMode(DepthTestMode::None);
     pipeline->SetEnableDepthWriting(true);
     pipeline->SetBlendMode(BlendMode::Add);
     
-    GraphicsDevice::SetRasterPipeline(pipeline);
-    
     glm::vec3 translation = glm::vec3(0.0f);
+    
+    ImGuiRenderer::Initialize(*window);
     
     while(window->Exists())
     {
         window->PollEvents();
 
-        GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f, 0);
         GraphicsDevice::SetViewport({ 0.0f, 0.0f, window->GetWidth(), window->GetHeight() });
         
         translation.x += 0.001f;
@@ -119,6 +118,7 @@ int main()
 
         uniforms->SetData(&model, sizeof(glm::mat4));
         
+        GraphicsDevice::SetRasterPipeline(pipeline);
         GraphicsDevice::SetVertexArray(vertexArray);
         
         DrawCommand cmd;
@@ -131,8 +131,20 @@ int main()
 
         GraphicsDevice::DispatchDraw(cmd);
 
+        ImGuiRenderer::Begin(1.0f / 60.0f);
+        {
+            ImGui::ShowDemoWindow();
+        }
+        ImGuiRenderer::End();
+
         window->SwapBuffers();
+
+        GraphicsDevice::SetRasterPipeline(nullptr);
+
+        GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f, 0);
     }
+
+    ImGuiRenderer::Shutdown();
 
     return 0;
 }

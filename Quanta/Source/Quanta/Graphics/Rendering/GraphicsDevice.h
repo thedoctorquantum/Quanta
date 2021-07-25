@@ -15,5 +15,7 @@ namespace Quanta::GraphicsDevice
     void SetRasterPipeline(const std::shared_ptr<RasterPipeline>& value);
     void SetVertexArray(const std::shared_ptr<VertexArray>& value);
 
+    void BindTexture(uint32_t handle, uint32_t index);
+
     void DispatchDraw(const DrawCommand& command);
 }

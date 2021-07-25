@@ -32,11 +32,11 @@ namespace Quanta
 
             switch(element.Primitve)
             {
-            case BufferPrimitive::UnsignedByte:
+            case BufferPrimitive::UInt8:
                 type = GL_UNSIGNED_BYTE;
                 
                 break;
-            case BufferPrimitive::Char:
+            case BufferPrimitive::Int8:
                 type = GL_BYTE;
 
                 break;

@@ -6,8 +6,8 @@ namespace Quanta
     {
         Float,
         Double, 
-        UnsignedByte,
-        Char,
+        UInt8,
+        Int8,
         Int16,
         Int32,
         UInt16,

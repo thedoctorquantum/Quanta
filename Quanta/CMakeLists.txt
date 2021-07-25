@@ -10,6 +10,7 @@ target_include_directories("Quanta"
     
     "${CMAKE_CURRENT_SOURCE_DIR}/Source"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/glm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui"
 
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/External/stb_image"
@@ -17,6 +18,7 @@ target_include_directories("Quanta"
 
 add_library("imgui" 
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui/imconfig.h" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui/imgui_demo.cpp" 
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui/imgui_draw.cpp" 
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui/imgui_internal.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui/imgui_tables.cpp" 
@@ -29,8 +31,6 @@ add_library("imgui"
 )
 
 set_target_properties("imgui" PROPERTIES LINKER_LANGUAGE CXX)
-
-target_include_directories("imgui" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui")
 
 add_subdirectory("External/glfw")
 add_subdirectory("External/glad")

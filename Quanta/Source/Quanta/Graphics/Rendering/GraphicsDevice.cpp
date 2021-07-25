@@ -36,6 +36,16 @@ namespace Quanta
             glUseProgram(0);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+            glDisable(GL_DEPTH_TEST);
+            glDepthMask(false);
+            
+            glDisable(GL_SCISSOR_TEST);
+            glDisable(GL_BLEND);
+            glDisable(GL_CULL_FACE);
+            glFrontFace(GL_CCW);
+
             return;
         }
 
@@ -263,6 +273,11 @@ namespace Quanta
         glBindVertexArray(value->GetHandle());
 
         vertexArray = value.get();
+    }
+    
+    void GraphicsDevice::BindTexture(uint32_t handle, uint32_t index)
+    {
+        glBindTextureUnit(index, handle);
     }
     
     void GraphicsDevice::DispatchDraw(const DrawCommand& command)
