@@ -37,6 +37,8 @@ int main()
 {
     std::shared_ptr<Window> window = std::make_shared<Window>("Sandbox", glm::vec2(640, 480));
 
+    window->SetState(WindowState::Maximized);
+
     float vertices[3 * 7] = 
     {
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
@@ -106,8 +108,6 @@ int main()
 
         GraphicsDevice::SetViewport({ 0.0f, 0.0f, window->GetWidth(), window->GetHeight() });
         
-        translation.x += 0.001f;
-
         glm::mat4 proj = glm::ortho(0.0f, (float) window->GetWidth(), 0.0f, (float) window->GetHeight(), 0.1f, 100.0f);
 
         uniforms->SetData(&proj, sizeof(glm::mat4), sizeof(glm::mat4));
@@ -134,6 +134,7 @@ int main()
         ImGuiRenderer::Begin(1.0f / 60.0f);
         {
             ImGui::ShowDemoWindow();
+            ImGui::ShowMetricsWindow();
         }
         ImGuiRenderer::End();
 

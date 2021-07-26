@@ -26,7 +26,43 @@ namespace Quanta
     static ImGuiContext* context;
     static ImGuiIO* io;
 
-    void ImGuiRenderer::Initialize(const Window& window)
+    void OnKeyDown(Key key)
+    {
+        io->KeysDown[(int32_t) key] = true;
+    }
+
+    void OnKeyUp(Key key)
+    {
+        io->KeysDown[(int32_t) key] = false;
+    }
+
+    void OnMouseDown(MouseButton button)
+    {
+        io->MouseDown[(int32_t) button] = true;
+    }
+
+    void OnMouseUp(MouseButton button)
+    {
+        io->MouseDown[(int32_t) button] = false;
+    }
+    
+    void OnMouseMove(glm::vec2 position)
+    {
+        io->MousePos = *(ImVec2*) &position;
+    }
+
+    void OnMouseScroll(glm::vec2 scroll)
+    {
+        io->MouseWheel = scroll.y;
+        io->MouseWheelH = scroll.x;
+    }
+
+    void OnCharacterDown(char character)
+    {
+        io->AddInputCharacter(character);
+    }
+    
+    void ImGuiRenderer::Initialize(Window& window)
     {
         currentWindow = (Window*) &window;
 
@@ -41,6 +77,14 @@ namespace Quanta
         io->BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
         io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
+        window.AddKeyDownCallback(OnKeyDown);
+        window.AddKeyUpCallback(OnKeyUp);
+        window.AddMouseDownCallback(OnMouseDown);
+        window.AddMouseUpCallback(OnMouseUp);
+        window.AddMouseMoveCallback(OnMouseMove);
+        window.AddMouseScrollCallback(OnMouseScroll);
+        window.AddCharacterDownCallback(OnCharacterDown);
+        
         std::string vertexSource =
             R"(
             #version 450 core
@@ -105,8 +149,8 @@ namespace Quanta
 
         vertexArray = std::make_shared<VertexArray>();
 
-        vertexBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Dynamic, 1000 * sizeof(ImDrawVert));
-        indexBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Dynamic, 1000 * sizeof(uint16_t));
+        vertexBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Dynamic, 0 * sizeof(ImDrawVert));
+        indexBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Dynamic, 0 * sizeof(uint16_t));
 
         VertexLayout layout;
 
@@ -144,6 +188,26 @@ namespace Quanta
         io->Fonts->SetTexID((void*) (size_t) fontTexture->GetHandle());
 
         io->Fonts->ClearTexData();
+
+        io->KeyMap[ImGuiKey_Tab] = (int) Key::Tab;
+        io->KeyMap[ImGuiKey_LeftArrow] = (int) Key::Left;
+        io->KeyMap[ImGuiKey_RightArrow] = (int) Key::Right;
+        io->KeyMap[ImGuiKey_UpArrow] = (int) Key::Up;
+        io->KeyMap[ImGuiKey_DownArrow] = (int) Key::Down;
+        io->KeyMap[ImGuiKey_PageUp] = (int) Key::PageUp;
+        io->KeyMap[ImGuiKey_PageDown] = (int) Key::PageDown;
+        io->KeyMap[ImGuiKey_Home] = (int) Key::Home;
+        io->KeyMap[ImGuiKey_End] = (int) Key::End;
+        io->KeyMap[ImGuiKey_Delete] = (int) Key::Delete;
+        io->KeyMap[ImGuiKey_Backspace] = (int) Key::Backspace;
+        io->KeyMap[ImGuiKey_Enter] = (int) Key::Enter;
+        io->KeyMap[ImGuiKey_Escape] = (int) Key::Escape;
+        io->KeyMap[ImGuiKey_A] = (int) Key::A;
+        io->KeyMap[ImGuiKey_C] = (int) Key::C;
+        io->KeyMap[ImGuiKey_V] = (int) Key::V;
+        io->KeyMap[ImGuiKey_X] = (int) Key::X;
+        io->KeyMap[ImGuiKey_Y] = (int) Key::Y;
+        io->KeyMap[ImGuiKey_Z] = (int) Key::Z;
     }
 
     void ImGuiRenderer::Shutdown()
@@ -187,12 +251,12 @@ namespace Quanta
 
         if(totalVertexBuffersize > vertexBuffer->GetSize())
         {
-            GraphicsBuffer::Resize(*vertexBuffer, totalVertexBuffersize);
+            GraphicsBuffer::Resize(*vertexBuffer, totalVertexBuffersize * 2);
         }
-
+    
         if(totalIndexBufferSize > indexBuffer->GetSize())
         {
-            GraphicsBuffer::Resize(*indexBuffer, totalIndexBufferSize);
+            GraphicsBuffer::Resize(*indexBuffer, totalIndexBufferSize * 2);
         }
         
         size_t vertexOffset = 0;

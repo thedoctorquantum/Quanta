@@ -1,13 +1,13 @@
-#include "Window.h"
-
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Window.h"
+
 namespace Quanta
 {
     static uint32_t instanceCount;
-    
+
     Window::Window(const std::string& title, glm::ivec2 size)
     {
         instanceCount++;
@@ -30,6 +30,63 @@ namespace Quanta
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
         handle = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, nullptr);
+
+        glfwSetWindowUserPointer((GLFWwindow*) handle, this);
+
+        glfwSetKeyCallback((GLFWwindow*) handle, [](GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods)
+        {
+            Window* _this = (Window*) glfwGetWindowUserPointer(window);
+
+            switch(action)
+            {
+            case GLFW_PRESS:
+                _this->onKeyDown((Key) key);
+                
+                break;
+            case GLFW_RELEASE:
+                _this->onKeyUp((Key) key);
+
+                break;
+            }
+        });
+
+        glfwSetCharCallback((GLFWwindow*) handle, [](GLFWwindow* window, uint32_t character)
+        {
+            Window* _this = (Window*) glfwGetWindowUserPointer(window);
+
+            _this->onCharacterDown((char) character);
+        });
+
+        glfwSetMouseButtonCallback((GLFWwindow*) handle, [](GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
+        {
+            Window* _this = (Window*) glfwGetWindowUserPointer(window);
+
+            switch(action)
+            {
+            case GLFW_PRESS:
+                _this->onMouseDown((MouseButton) button);
+                
+                break;
+            case GLFW_RELEASE:
+                _this->onMouseUp((MouseButton) button);
+
+                break;
+            }
+        });
+
+		glfwSetCursorPosCallback((GLFWwindow*) handle, [](GLFWwindow* window, double xPos, double yPos)
+		{
+            Window* _this = (Window*) glfwGetWindowUserPointer(window);
+
+            _this->onMouseMove({ (float) xPos, (float) yPos });
+		});
+
+        glfwSetScrollCallback((GLFWwindow*) handle, [](GLFWwindow* window, double xOffset, double yOffset)
+        {
+            Window* _this = (Window*) glfwGetWindowUserPointer(window);
+
+            _this->onMouseScroll({ (float) xOffset, (float) yOffset });
+        });
 
         glfwMakeContextCurrent((GLFWwindow*) handle);
 
@@ -60,12 +117,70 @@ namespace Quanta
             glfwTerminate();
         }
     }
-
-    glm::ivec2 Window::GetPosition() const
+    
+    void Window::AddKeyDownCallback(Event<Key>::Handler handler)
     {
-        glm::ivec2 position;
+        onKeyDown += handler;
+    }
 
-        glfwGetWindowPos((GLFWwindow*) handle, &position.x, &position.y);
+    void Window::AddKeyUpCallback(Event<Key>::Handler handler)
+    {
+        onKeyUp += handler;
+    }
+
+    void Window::AddMouseDownCallback(Event<MouseButton>::Handler handler)
+    {
+        onMouseDown += handler;
+    }
+    
+    void Window::AddMouseUpCallback(Event<MouseButton>::Handler handler)
+    {
+        onMouseUp += handler;
+    }
+
+    void Window::AddMouseMoveCallback(Event<glm::vec2>::Handler handler)
+    {
+        onMouseMove += handler;
+    }
+
+    void Window::AddMouseScrollCallback(Event<glm::vec2>::Handler handler)
+    {
+        onMouseScroll += handler;
+    }
+
+    void Window::AddCharacterDownCallback(Event<char>::Handler handler)
+    {
+        onCharacterDown += handler;
+    }
+
+    WindowState Window::GetState() const
+    {
+        return state;
+    }
+    
+    void Window::SetState(WindowState value)
+    {
+        state = value;
+
+        switch(value)
+        {
+        case WindowState::Maximized:
+            glfwMaximizeWindow((GLFWwindow*) handle);
+
+            break;
+        case WindowState::Minimized:
+            
+            break;
+        default:
+            break;
+        }
+    }
+
+    glm::uvec2 Window::GetPosition() const
+    {
+        glm::uvec2 position;
+
+        glfwGetWindowPos((GLFWwindow*) handle, (int*) &position.x, (int*) &position.y);
 
         return position;
     }
@@ -79,31 +194,31 @@ namespace Quanta
         return size;
     }
 
-    glm::ivec4 Window::GetBounds() const
+    glm::uvec4 Window::GetBounds() const
     {
-        glm::ivec4 bounds;
+        glm::uvec4 bounds;
 
-        glfwGetWindowPos((GLFWwindow*) handle, &bounds.x, &bounds.y);
-        glfwGetWindowSize((GLFWwindow*) handle, &bounds.z, &bounds.w);
+        glfwGetWindowPos((GLFWwindow*) handle, (int*) &bounds.x, (int*) &bounds.y);
+        glfwGetWindowSize((GLFWwindow*) handle, (int*) &bounds.z, (int*) &bounds.w);
         
         return bounds;
     }
 
-    int32_t Window::GetX() const
+    uint32_t Window::GetX() const
     {
-        int32_t x;
+        uint32_t x;
 
-        glfwGetWindowPos((GLFWwindow*) handle, &x, nullptr);
+        glfwGetWindowPos((GLFWwindow*) handle, (int*) &x, nullptr);
 
         return x;
     }
 
-    void Window::SetX(int32_t value)
+    void Window::SetX(uint32_t value)
     {
         glfwSetWindowPos((GLFWwindow*) handle, value, GetY());
     }
 
-    int32_t Window::GetY() const
+    uint32_t Window::GetY() const
     {
         int32_t y;
 
@@ -112,7 +227,7 @@ namespace Quanta
         return y;
     }
 
-    void Window::SetY(int32_t value)
+    void Window::SetY(uint32_t value)
     {
         glfwSetWindowPos((GLFWwindow*) handle, GetX(), value);
     }

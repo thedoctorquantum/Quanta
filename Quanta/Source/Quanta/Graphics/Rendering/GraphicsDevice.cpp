@@ -286,7 +286,7 @@ namespace Quanta
             geometryLayout, 
             command.Count, 
             indexType, 
-            nullptr,
+            (void*) command.IndexOffset,
             command.InstanceCount, 
             command.StartVertex,
             command.StartInstance);

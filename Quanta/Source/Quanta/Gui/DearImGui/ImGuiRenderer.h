@@ -4,7 +4,7 @@
 
 namespace Quanta::ImGuiRenderer
 {
-    void Initialize(const Window& window);
+    void Initialize(Window& window);
     void Shutdown();
 
     void Begin(float elapsed);
