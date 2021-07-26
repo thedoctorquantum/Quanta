@@ -145,7 +145,6 @@ namespace Quanta
         pipeline->SetBlendMode(BlendMode::Add);
         pipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
         pipeline->SetEnableScissorTesting(true);
-        pipeline->SetPolygonFillMode(PolygonFillMode::Solid);
 
         vertexArray = std::make_shared<VertexArray>();
 

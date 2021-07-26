@@ -92,12 +92,12 @@ int main()
     
     std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(desc);
     
-    pipeline->SetPolygonFillMode(PolygonFillMode::Solid);   
+    pipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);   
     pipeline->SetFaceCullMode(FaceCullMode::Back);
     pipeline->SetDepthTestMode(DepthTestMode::None);
     pipeline->SetEnableDepthWriting(true);
     pipeline->SetBlendMode(BlendMode::Add);
-    
+
     glm::vec3 translation = glm::vec3(0.0f);
     
     ImGuiRenderer::Initialize(*window);
