@@ -22,6 +22,10 @@ namespace Quanta
         explicit RasterPipeline(const RasterPipelineDescription& description);
         ~RasterPipeline();
 
+        RasterPipeline(const RasterPipeline&) = delete;
+
+        RasterPipeline& operator=(const RasterPipeline&) = delete; 
+
         const std::vector<std::shared_ptr<ShaderModule>>& GetShaderModules() const;
         const std::vector<std::shared_ptr<GraphicsBuffer>>& GetUniformBuffers() const;
 

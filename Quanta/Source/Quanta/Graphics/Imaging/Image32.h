@@ -18,7 +18,9 @@ namespace Quanta
         
         Image32(Image32&& other) noexcept;
 
-        Image32(const Image32& other) = delete;
+        Image32(const Image32&) = delete;
+
+        Image32& operator=(const Image32&) = delete;
         
         static std::shared_ptr<Image32> FromFile(const std::string& filepath);
 

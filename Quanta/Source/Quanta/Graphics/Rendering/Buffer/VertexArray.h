@@ -14,6 +14,10 @@ namespace Quanta
         VertexArray();
         ~VertexArray();
 
+        VertexArray(const VertexArray&) = delete;
+
+        VertexArray& operator=(VertexArray&) = delete;
+
         void SetVertexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, const VertexLayout& layout);
         void SetIndexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, IndexType type);
         

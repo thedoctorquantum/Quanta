@@ -6,10 +6,10 @@
 #include <glm/glm.hpp>
 #include <functional>
 
-#include "Event.h"
 #include "WindowState.h"
-#include "../Input/Key.h"
-#include "../Input/MouseButton.h"
+#include "../Event.h"
+#include "../../Input/Key.h"
+#include "../../Input/MouseButton.h"
 
 namespace Quanta
 {
@@ -18,6 +18,10 @@ namespace Quanta
     public:
         Window(const std::string& title, glm::ivec2 size);
         ~Window();
+        
+        Window(const Window&) = delete;
+
+        Window& operator=(const Window&) = delete;
 
         void AddKeyDownCallback(Event<Key>::Handler handler);
         void AddKeyUpCallback(Event<Key>::Handler handler);

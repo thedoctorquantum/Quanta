@@ -14,6 +14,10 @@ namespace Quanta
         Texture2D(uint32_t width, uint32_t height);
         ~Texture2D();
 
+        Texture2D(const Texture2D&) = delete;
+        
+        Texture2D& operator=(Texture2D&) = delete;
+
         static std::shared_ptr<Texture2D> FromFile(const std::string& filepath);
         
         static std::shared_ptr<Texture2D> FromImage(const Image32& image);
