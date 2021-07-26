@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Core/Window.h"
+#include "../../Core/Windowing/Window.h"
 
 namespace Quanta::ImGuiRenderer
 {
