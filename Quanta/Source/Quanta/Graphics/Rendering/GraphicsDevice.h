@@ -4,6 +4,7 @@
 
 #include "Pipeline/RasterPipeline.h"
 #include "Buffer/VertexArray.h"
+#include "Texture/Texture2D.h"
 #include "GraphicsApi.h"
 #include "DrawCommand.h"
 
@@ -24,7 +25,7 @@ namespace Quanta
         static void SetRasterPipeline(const std::shared_ptr<RasterPipeline>& value);
         static void SetVertexArray(const std::shared_ptr<VertexArray>& value);
 
-        static void BindTexture(uint32_t handle, uint32_t index);
+        static void BindTexture2D(const Texture2D& texture, uint32_t index);
 
         static void DispatchDraw(const DrawCommand& command);
     private:
@@ -35,7 +36,7 @@ namespace Quanta
         virtual void InternalSetRasterPipeline(const std::shared_ptr<RasterPipeline>& value) = 0;
         virtual void InternalSetVertexArray(const std::shared_ptr<VertexArray>& value) = 0;
 
-        virtual void InternalBindTexture(uint32_t handle, uint32_t index) = 0;
+        virtual void InternalBindTexture2D(const Texture2D& texture, uint32_t index) = 0;
 
         virtual void InternalDispatchDraw(const DrawCommand& command) = 0;
     };

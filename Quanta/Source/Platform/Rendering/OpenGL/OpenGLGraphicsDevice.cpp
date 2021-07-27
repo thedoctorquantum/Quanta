@@ -5,6 +5,7 @@
 #include "OpenGLGraphicsBuffer.h"
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLRasterPipeline.h"
+#include "OpenGLTexture2D.h"
 
 namespace Quanta
 {
@@ -296,9 +297,11 @@ namespace Quanta
         this->vertexArray = openglValue;
     }
     
-    void OpenGLGraphicsDevice::InternalBindTexture(uint32_t handle, uint32_t index)
+    void OpenGLGraphicsDevice::InternalBindTexture2D(const Texture2D& texture, uint32_t index)
     {
-        glBindTextureUnit(index, handle);
+        OpenGLTexture2D& glTexture = (OpenGLTexture2D&) texture;
+
+        glBindTextureUnit(index, glTexture.GetHandle());
     }
     
     void OpenGLGraphicsDevice::InternalDispatchDraw(const DrawCommand& command)

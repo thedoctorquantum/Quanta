@@ -25,7 +25,7 @@ namespace Quanta
         void InternalSetRasterPipeline(const std::shared_ptr<RasterPipeline>& value) override;
         void InternalSetVertexArray(const std::shared_ptr<VertexArray>& value) override;
 
-        void InternalBindTexture(uint32_t handle, uint32_t index) override;
+        void InternalBindTexture2D(const Texture2D& texture, uint32_t index) override;
 
         void InternalDispatchDraw(const DrawCommand& command) override;
     };

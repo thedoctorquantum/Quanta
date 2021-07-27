@@ -180,11 +180,11 @@ namespace Quanta
 
         io->Fonts->GetTexDataAsRGBA32(&pixels, (int*) &width, (int*) &height);
 
-        fontTexture = std::make_shared<Texture2D>(width, height);
+        fontTexture = Texture2D::Create(width, height);
 
         fontTexture->SetData(pixels);
 
-        io->Fonts->SetTexID((void*) (size_t) fontTexture->GetHandle());
+        io->Fonts->SetTexID(fontTexture.get());
 
         io->Fonts->ClearTexData();
 
@@ -281,8 +281,10 @@ namespace Quanta
             {
                 ImDrawCmd& command = commands[j];
 
-                GraphicsDevice::BindTexture((uint32_t) (size_t) command.TextureId, 0);
+                Texture2D* texture = (Texture2D*) command.TextureId;
 
+                GraphicsDevice::BindTexture2D(*texture, 0);
+                
                 GraphicsDevice::SetScissorViewport({
                      (uint32_t) command.ClipRect.x, 
                      (uint32_t) (currentWindow->GetHeight() - command.ClipRect.w), 

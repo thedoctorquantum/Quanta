@@ -59,9 +59,9 @@ namespace Quanta
         state.device->InternalSetVertexArray(value);
     }
     
-    void GraphicsDevice::BindTexture(uint32_t handle, uint32_t index)
+    void GraphicsDevice::BindTexture2D(const Texture2D& texture, uint32_t index)
     {
-        state.device->InternalBindTexture(handle, index);
+        state.device->InternalBindTexture2D(texture, index);
     }
     
     void GraphicsDevice::DispatchDraw(const DrawCommand& command)

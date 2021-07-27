@@ -8,30 +8,20 @@
 
 namespace Quanta
 {
-    class Texture2D final
+    class Texture2D
     {
     public:
-        Texture2D(uint32_t width, uint32_t height);
-        ~Texture2D();
-
-        Texture2D(const Texture2D&) = delete;
-        
-        Texture2D& operator=(Texture2D&) = delete;
+        static std::shared_ptr<Texture2D> Create(uint32_t width, uint32_t height);
 
         static std::shared_ptr<Texture2D> FromFile(const std::string& filepath);
         
         static std::shared_ptr<Texture2D> FromImage(const Image32& image);
         static std::shared_ptr<Image32> ToImage(const Texture2D& texture);
             
-        void SetData(const void* data);
-        void GetData(void* data) const;
-
-        uint32_t GetHandle() const;
-        uint32_t GetWidth() const;
-        uint32_t GetHeight() const;
-    private:
-        uint32_t handle;
-        uint32_t width;
-        uint32_t height;
+        virtual void SetData(const void* data) = 0;
+        virtual void GetData(void* data) const = 0;
+        
+        virtual uint32_t GetWidth() const = 0;
+        virtual uint32_t GetHeight() const = 0;
     };
 }
