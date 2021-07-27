@@ -1,8 +1,5 @@
-#define STB_IMAGE_IMPLEMENTATION
-
 #include <glad/glad.h>
 #include <iostream>
-#include <stb_image.h>
 
 #include "Texture2D.h"
 #include "../GraphicsDevice.h"

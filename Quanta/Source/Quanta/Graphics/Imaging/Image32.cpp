@@ -53,7 +53,7 @@ namespace Quanta
 
             return nullptr;
         }
-        
+
         return std::make_shared<Image32>((Color32*) data, width, height);
     }
 

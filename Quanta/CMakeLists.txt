@@ -11,9 +11,6 @@ target_include_directories("Quanta"
     "${CMAKE_CURRENT_SOURCE_DIR}/Source"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/glm"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui"
-
-    PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/External/stb_image"
 )
 
 add_library("imgui" 
@@ -34,9 +31,16 @@ set_target_properties("imgui" PROPERTIES LINKER_LANGUAGE CXX)
 
 add_subdirectory("External/glfw")
 add_subdirectory("External/glad")
+add_subdirectory("External/stb_image")
 
 target_link_libraries("Quanta" 
-    PRIVATE "glfw"
-    PRIVATE "glad"
-    PUBLIC "imgui"
+    PUBLIC 
+    
+    "imgui"
+    
+    PRIVATE 
+
+    "glfw"
+    "glad"
+    "stb_image"
 )
