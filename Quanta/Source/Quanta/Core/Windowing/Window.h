@@ -1,10 +1,8 @@
 #pragma once
 
-#include <vector>
 #include <string>
 #include <stdint.h>
 #include <glm/glm.hpp>
-#include <functional>
 
 #include "WindowState.h"
 #include "../Event.h"
@@ -13,64 +11,44 @@
 
 namespace Quanta
 {
-    class Window final
+    class Window
     {
     public:
-        Window(const std::string& title, glm::ivec2 size);
-        ~Window();
+        static std::shared_ptr<Window> Create();
         
-        Window(const Window&) = delete;
+        virtual void AddKeyDownCallback(Event<Key>::Handler handler) = 0;
+        virtual void AddKeyUpCallback(Event<Key>::Handler handler) = 0;
 
-        Window& operator=(const Window&) = delete;
+        virtual void AddMouseDownCallback(Event<MouseButton>::Handler handler) = 0;
+        virtual void AddMouseUpCallback(Event<MouseButton>::Handler handler) = 0;
 
-        void AddKeyDownCallback(Event<Key>::Handler handler);
-        void AddKeyUpCallback(Event<Key>::Handler handler);
+        virtual void AddMouseMoveCallback(Event<glm::vec2>::Handler handler) = 0;
+        virtual void AddMouseScrollCallback(Event<glm::vec2>::Handler handler) = 0;
 
-        void AddMouseDownCallback(Event<MouseButton>::Handler handler);
-        void AddMouseUpCallback(Event<MouseButton>::Handler handler);
-
-        void AddMouseMoveCallback(Event<glm::vec2>::Handler handler);
-        void AddMouseScrollCallback(Event<glm::vec2>::Handler handler);
-
-        void AddCharacterDownCallback(Event<char>::Handler handler);
+        virtual void AddCharacterDownCallback(Event<char>::Handler handler) = 0;
         
-        WindowState GetState() const;
-        void SetState(WindowState value);
+        virtual WindowState GetState() const = 0;
+        virtual void SetState(WindowState value) = 0;
         
-        glm::uvec2 GetPosition() const;
-        glm::uvec2 GetSize() const;
+        virtual glm::uvec2 GetPosition() const = 0;
+        virtual glm::uvec2 GetSize() const = 0;
         
-        glm::uvec4 GetBounds() const;
+        virtual glm::uvec4 GetBounds() const = 0;
 
-        uint32_t GetX() const;
-        void SetX(uint32_t value);
+        virtual uint32_t GetX() const = 0;
+        virtual void SetX(uint32_t value) = 0;
 
-        uint32_t GetY() const;
-        void SetY(uint32_t value);
+        virtual uint32_t GetY() const = 0;
+        virtual void SetY(uint32_t value) = 0;
 
-        uint32_t GetWidth() const;
-        void SetWidth(uint32_t value);
+        virtual uint32_t GetWidth() const = 0;
+        virtual void SetWidth(uint32_t value) = 0;
         
-        uint32_t GetHeight() const;
-        void SetHeight(uint32_t value);
+        virtual uint32_t GetHeight() const = 0;
+        virtual void SetHeight(uint32_t value) = 0;
 
-        bool Exists() const;
-        void PollEvents() const;
-        void SwapBuffers() const;
-    private:
-        void* handle;
-
-        WindowState state;
-
-        Event<Key> onKeyDown;
-        Event<Key> onKeyUp;
-
-        Event<MouseButton> onMouseDown;
-        Event<MouseButton> onMouseUp;
-
-        Event<glm::vec2> onMouseMove;
-        Event<glm::vec2> onMouseScroll;
-
-        Event<char> onCharacterDown; 
+        virtual bool Exists() const = 0;
+        virtual void PollEvents() const = 0;
+        virtual void SwapBuffers() const = 0;
     };
 }

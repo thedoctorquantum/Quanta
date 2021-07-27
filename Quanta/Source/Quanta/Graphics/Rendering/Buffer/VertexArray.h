@@ -8,29 +8,17 @@
 
 namespace Quanta
 {
-    class VertexArray final 
+    class VertexArray 
     {
     public:
-        VertexArray();
-        ~VertexArray();
+        static std::shared_ptr<VertexArray> Create();
 
-        VertexArray(const VertexArray&) = delete;
-
-        VertexArray& operator=(VertexArray&) = delete;
-
-        void SetVertexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, const VertexLayout& layout);
-        void SetIndexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, IndexType type);
+        virtual void SetVertexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, const VertexLayout& layout) = 0;
+        virtual void SetIndexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, IndexType type) = 0;
         
-        const std::shared_ptr<GraphicsBuffer>& GetVertexBuffer() const;
-        const std::shared_ptr<GraphicsBuffer>& GetIndexBuffer() const;
+        virtual const std::shared_ptr<GraphicsBuffer>& GetVertexBuffer() const = 0;
+        virtual const std::shared_ptr<GraphicsBuffer>& GetIndexBuffer() const = 0;
         
-        uint32_t GetHandle() const;
-        IndexType GetIndexType() const;
-    private:
-        std::shared_ptr<GraphicsBuffer> vertexBuffer = nullptr;
-        std::shared_ptr<GraphicsBuffer> indexBuffer = nullptr;
-        
-        uint32_t handle;
-        IndexType indexType = IndexType::UInt32;
+        virtual IndexType GetIndexType() const = 0;
     };
 }

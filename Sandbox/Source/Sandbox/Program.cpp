@@ -35,7 +35,9 @@ std::string ReadAllText(const std::string& filepath)
 
 int main()
 {
-    std::shared_ptr<Window> window = std::make_shared<Window>("Sandbox", glm::vec2(640, 480));
+    std::shared_ptr<Window> window = Window::Create();
+    
+    GraphicsDevice::Initialize(GraphicsApi::OpenGL);
 
     window->SetState(WindowState::Maximized);
 
@@ -51,10 +53,10 @@ int main()
         0, 1, 2
     };
 
-    std::shared_ptr<VertexArray> vertexArray = std::make_shared<VertexArray>();
+    std::shared_ptr<VertexArray> vertexArray = VertexArray::Create();
 
-    std::shared_ptr<GraphicsBuffer> vertexBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Static, sizeof(vertices));
-    std::shared_ptr<GraphicsBuffer> indexBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Static, sizeof(indices));
+    std::shared_ptr<GraphicsBuffer> vertexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(vertices));
+    std::shared_ptr<GraphicsBuffer> indexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(indices));
     
     vertexBuffer->SetData(vertices, sizeof(vertices));
     indexBuffer->SetData(indices, sizeof(indices));
@@ -83,14 +85,14 @@ int main()
     
     RasterPipelineDescription desc;
     
-    desc.ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Vertex, vertexCode));
-    desc.ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Fragment, fragmentCode));
-
-    std::shared_ptr<GraphicsBuffer> uniforms = std::make_shared<GraphicsBuffer>(BufferUsage::Static, sizeof(glm::mat4) * 2);
+    desc.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Vertex, vertexCode));
+    desc.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Fragment, fragmentCode));
+    
+    std::shared_ptr<GraphicsBuffer> uniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::mat4) * 2);
 
     desc.UniformBuffers.emplace_back(uniforms);
     
-    std::shared_ptr<RasterPipeline> pipeline = std::make_shared<RasterPipeline>(desc);
+    std::shared_ptr<RasterPipeline> pipeline = RasterPipeline::Create(desc);
     
     pipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);   
     pipeline->SetFaceCullMode(FaceCullMode::Back);
@@ -99,15 +101,15 @@ int main()
     pipeline->SetBlendMode(BlendMode::Add);
 
     glm::vec3 translation = glm::vec3(0.0f);
-    
+
     ImGuiRenderer::Initialize(*window);
-    
+
     while(window->Exists())
     {
         window->PollEvents();
 
         GraphicsDevice::SetViewport({ 0.0f, 0.0f, window->GetWidth(), window->GetHeight() });
-        
+
         glm::mat4 proj = glm::ortho(0.0f, (float) window->GetWidth(), 0.0f, (float) window->GetHeight(), 0.1f, 100.0f);
 
         uniforms->SetData(&proj, sizeof(glm::mat4), sizeof(glm::mat4));
@@ -146,6 +148,8 @@ int main()
     }
 
     ImGuiRenderer::Shutdown();
+
+    GraphicsDevice::DeInitialize();
 
     return 0;
 }

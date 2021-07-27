@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
 #include "../Buffer/GraphicsBuffer.h"
 #include "../Shader/ShaderModule.h"
@@ -16,61 +15,42 @@
 
 namespace Quanta
 {
-    class RasterPipeline final
+    class RasterPipeline
     {
     public:
-        explicit RasterPipeline(const RasterPipelineDescription& description);
-        ~RasterPipeline();
+        static std::shared_ptr<RasterPipeline> Create(const RasterPipelineDescription& description);
 
-        RasterPipeline(const RasterPipeline&) = delete;
+        virtual const std::shared_ptr<ShaderModule>& GetShaderModule(size_t index) const = 0;
+        virtual const std::shared_ptr<GraphicsBuffer>& GetUniformBuffer(size_t index) const = 0;
 
-        RasterPipeline& operator=(const RasterPipeline&) = delete; 
+        virtual size_t GetShaderModuleCount() const = 0;
+        virtual size_t GetUniformBufferCount() const = 0;
 
-        const std::vector<std::shared_ptr<ShaderModule>>& GetShaderModules() const;
-        const std::vector<std::shared_ptr<GraphicsBuffer>>& GetUniformBuffers() const;
+        virtual PolygonFillMode GetPolygonFillMode() const = 0;
+        virtual void SetPolygonFillMode(PolygonFillMode value) = 0;
 
-        PolygonFillMode GetPolygonFillMode() const;
-        void SetPolygonFillMode(PolygonFillMode value);
+        virtual DepthTestMode GetDepthTestMode() const = 0;
+        virtual void SetDepthTestMode(DepthTestMode value) = 0;
 
-        DepthTestMode GetDepthTestMode() const;
-        void SetDepthTestMode(DepthTestMode value);
-
-        bool GetEnableDepthWriting() const;
-        void SetEnableDepthWriting(bool value);
+        virtual bool GetEnableDepthWriting() const = 0;
+        virtual void SetEnableDepthWriting(bool value) = 0;
         
-        bool GetEnableScissorTesting() const;
-        void SetEnableScissorTesting(bool value);
+        virtual bool GetEnableScissorTesting() const = 0;
+        virtual void SetEnableScissorTesting(bool value) = 0;
 
-        BlendMode GetBlendMode() const;
-        void SetBlendMode(BlendMode value);
+        virtual BlendMode GetBlendMode() const = 0;
+        virtual void SetBlendMode(BlendMode value) = 0;
         
-        BlendFactor GetBlendFactor() const;
-        void SetBlendFactor(BlendFactor blendFactor);
+        virtual BlendFactor GetBlendFactor() const = 0;
+        virtual void SetBlendFactor(BlendFactor blendFactor) = 0;
         
-        FaceCullMode GetFaceCullMode() const;
-        void SetFaceCullMode(FaceCullMode value);
+        virtual FaceCullMode GetFaceCullMode() const = 0;
+        virtual void SetFaceCullMode(FaceCullMode value) = 0;
         
-        GeometryLayout GetGeometryLayout() const;
-        void SetGeometryLayout(GeometryLayout value);
+        virtual GeometryLayout GetGeometryLayout() const = 0;
+        virtual void SetGeometryLayout(GeometryLayout value) = 0;
         
-        GeometryWinding GetGeometryWinding() const;
-        void SetGeometryWinding(GeometryWinding value);
-
-        uint32_t GetHandle() const;
-    private:
-        uint32_t handle;
-        
-        std::vector<std::shared_ptr<ShaderModule>> shaderModules;
-        std::vector<std::shared_ptr<GraphicsBuffer>> uniformBuffers;
-        
-        PolygonFillMode polygonFillMode = PolygonFillMode::Solid;
-        DepthTestMode depthTestMode = DepthTestMode::None;
-        bool enableDepthWriting = false;
-        bool enableScissorTesting = false;
-        BlendMode blendMode = BlendMode::None;
-        BlendFactor blendFactor = BlendFactor::One;
-        FaceCullMode faceCullMode = FaceCullMode::None;
-        GeometryLayout geometryLayout = GeometryLayout::Triangle;
-        GeometryWinding geometryWinding = GeometryWinding::CounterClockwise;
+        virtual GeometryWinding GetGeometryWinding() const = 0;
+        virtual void SetGeometryWinding(GeometryWinding value) = 0;
     };
 }

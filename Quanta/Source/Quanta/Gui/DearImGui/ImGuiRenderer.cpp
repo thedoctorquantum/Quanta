@@ -14,12 +14,12 @@
 
 namespace Quanta
 {
-    static std::shared_ptr<RasterPipeline> pipeline;
-    static std::shared_ptr<VertexArray> vertexArray;
-    static std::shared_ptr<GraphicsBuffer> vertexBuffer;
-    static std::shared_ptr<GraphicsBuffer> indexBuffer;
-    static std::shared_ptr<GraphicsBuffer> uniformBuffer;
-    static std::shared_ptr<Texture2D> fontTexture;
+    static std::shared_ptr<RasterPipeline> pipeline = nullptr;
+    static std::shared_ptr<VertexArray> vertexArray = nullptr;
+    static std::shared_ptr<GraphicsBuffer> vertexBuffer = nullptr;
+    static std::shared_ptr<GraphicsBuffer> indexBuffer = nullptr;
+    static std::shared_ptr<GraphicsBuffer> uniformBuffer = nullptr;
+    static std::shared_ptr<Texture2D> fontTexture = nullptr;
 
     static Window* currentWindow;
 
@@ -130,26 +130,26 @@ namespace Quanta
             {
                 a_Fragment = v_In.color * texture(u_Sampler, v_In.uv);
             })";
-        
-        uniformBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Static, sizeof(glm::mat4));
+
+        uniformBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::mat4));
 
         RasterPipelineDescription pipelineDescription;
 
-        pipelineDescription.ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Vertex, vertexSource));
-        pipelineDescription.ShaderModules.emplace_back(std::make_shared<ShaderModule>(ShaderType::Fragment, fragmentSource));
+        pipelineDescription.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Vertex, vertexSource));
+        pipelineDescription.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Fragment, fragmentSource));
 
         pipelineDescription.UniformBuffers.emplace_back(uniformBuffer);
         
-        pipeline = std::make_shared<RasterPipeline>(pipelineDescription);
-
+        pipeline = RasterPipeline::Create(pipelineDescription);
+        
         pipeline->SetBlendMode(BlendMode::Add);
         pipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
         pipeline->SetEnableScissorTesting(true);
 
-        vertexArray = std::make_shared<VertexArray>();
+        vertexArray = VertexArray::Create();
 
-        vertexBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Dynamic, 0 * sizeof(ImDrawVert));
-        indexBuffer = std::make_shared<GraphicsBuffer>(BufferUsage::Dynamic, 0 * sizeof(uint16_t));
+        vertexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0 * sizeof(ImDrawVert));
+        indexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0 * sizeof(uint16_t));
 
         VertexLayout layout;
 

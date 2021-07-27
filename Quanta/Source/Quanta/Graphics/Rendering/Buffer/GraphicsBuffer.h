@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -7,29 +8,20 @@
 
 namespace Quanta
 {
-    class GraphicsBuffer final
+    class GraphicsBuffer 
     {
     public:
-        GraphicsBuffer(BufferUsage usage, size_t size);
-        ~GraphicsBuffer();
-        
-        GraphicsBuffer(const GraphicsBuffer&) = delete; 
-        GraphicsBuffer& operator=(const GraphicsBuffer&) = delete;
+        static std::shared_ptr<GraphicsBuffer> Create(BufferUsage usage, size_t size);
         
         static void Resize(GraphicsBuffer& buffer, size_t size);
 
-        void* MapData();
-        void UnmapData();
+        virtual void* MapData() = 0;
+        virtual void UnmapData() = 0;
         
-        void SetData(const void* data, size_t size);
-        void SetData(const void* data, size_t size, size_t offset);
+        virtual void SetData(const void* data, size_t size) = 0;
+        virtual void SetData(const void* data, size_t size, size_t offset) = 0;
         
-        uint32_t GetHandle() const;
-        size_t GetSize() const;
-        BufferUsage GetUsage() const;
-    private:
-        uint32_t handle;
-        size_t size;
-        BufferUsage usage;
+        virtual size_t GetSize() const = 0;
+        virtual BufferUsage GetUsage() const = 0;
     };
-};
+}

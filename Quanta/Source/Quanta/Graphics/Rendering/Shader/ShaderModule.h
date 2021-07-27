@@ -1,23 +1,15 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "ShaderType.h"
 
 namespace Quanta
 {
-    class ShaderModule final
+    class ShaderModule
     {
     public:
-        ShaderModule(ShaderType type, const std::string& source);
-        ~ShaderModule();
-
-        ShaderModule(const ShaderModule&) = delete;
-
-        ShaderModule& operator=(const ShaderModule&) = delete;
-        
-        uint32_t GetHandle() const;
-    private:
-        uint32_t handle;
+        static std::shared_ptr<ShaderModule> Create(ShaderType type, const std::string& source);
     };
 }
