@@ -110,7 +110,7 @@ int main()
     glm::vec3 translation = glm::vec3(0.0f);
 
     ImGuiRenderer::Initialize(*window);
-
+    
     std::shared_ptr<Texture2D> texture = Texture2D::FromFile("Resources/Textures/wood_floor.png");
 
     while(window->Exists())
@@ -148,6 +148,8 @@ int main()
         {
             ImGui::ShowDemoWindow();
             ImGui::ShowMetricsWindow();
+
+            ImGui::DragFloat3("Pos", &translation.x, 0.025f);
         }
         ImGuiRenderer::End();
 

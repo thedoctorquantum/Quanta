@@ -8,3 +8,6 @@
 	path = Quanta/External/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+[submodule "Quanta/External/openal-soft"]
+	path = Quanta/External/openal-soft
+	url = https://github.com/kcat/openal-soft.git
