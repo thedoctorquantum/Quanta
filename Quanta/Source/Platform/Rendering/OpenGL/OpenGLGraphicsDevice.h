@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 
 #include "../../../Quanta/Graphics/Rendering/GraphicsDevice.h"
+#include "OpenGLRasterPipeline.h"
 #include "OpenGLVertexArray.h"
 
 namespace Quanta
@@ -13,10 +14,9 @@ namespace Quanta
         OpenGLGraphicsDevice();
     private:
         OpenGLVertexArray* vertexArray = nullptr;
-        RasterPipeline* rasterPipeline = nullptr;
+        OpenGLRasterPipeline* rasterPipeline = nullptr;
 
         GLenum geometryLayout = 0;
-        GLenum indexType = 0;    
         
         void InternalClearBackBuffer(const glm::vec4& color, float depth, int stencil) override;
         void InternalSetViewport(const glm::ivec4& value) override;

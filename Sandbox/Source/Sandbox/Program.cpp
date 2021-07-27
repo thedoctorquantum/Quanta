@@ -41,11 +41,11 @@ int main()
 
     window->SetState(WindowState::Maximized);
 
-    float vertices[3 * 7] = 
+    float vertices[3 * 9] = 
     {
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-        0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f
     };
     
     uint8_t indices[3] =
@@ -76,7 +76,14 @@ int main()
         sizeof(float),
         false
     });
-    
+
+    layout.Add({
+        BufferPrimitive::Float,
+        2,
+        sizeof(float),
+        false
+    });
+
     vertexArray->SetVertexBuffer(vertexBuffer, layout);
     vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt8);
 
@@ -94,7 +101,7 @@ int main()
     
     std::shared_ptr<RasterPipeline> pipeline = RasterPipeline::Create(desc);
     
-    pipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);   
+    pipeline->SetPolygonFillMode(PolygonFillMode::Solid);   
     pipeline->SetFaceCullMode(FaceCullMode::Back);
     pipeline->SetDepthTestMode(DepthTestMode::None);
     pipeline->SetEnableDepthWriting(true);
@@ -103,6 +110,8 @@ int main()
     glm::vec3 translation = glm::vec3(0.0f);
 
     ImGuiRenderer::Initialize(*window);
+
+    std::shared_ptr<Texture2D> texture = Texture2D::FromFile("Resources/Textures/wood_floor.png");
 
     while(window->Exists())
     {
@@ -122,6 +131,8 @@ int main()
         
         GraphicsDevice::SetRasterPipeline(pipeline);
         GraphicsDevice::SetVertexArray(vertexArray);
+
+        GraphicsDevice::BindTexture2D(*texture, 0);
         
         DrawCommand cmd;
         

@@ -18,8 +18,10 @@ namespace Quanta
 
         glDebugMessageCallback([](GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) 
         {
+            OpenGLGraphicsDevice* _this = (OpenGLGraphicsDevice*) userParam;
+
             std::cout << "[OpenGL]: " << message << '\n';
-        }, nullptr);
+        }, this);
 
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);
     }
@@ -258,9 +260,9 @@ namespace Quanta
             break;
         }
 
-        rasterPipeline = value.get();
+        rasterPipeline = &glPipeline;
     }
-
+    
     void OpenGLGraphicsDevice::InternalSetVertexArray(const std::shared_ptr<VertexArray>& value)
     {
         if(vertexArray == value.get()) return;
@@ -275,22 +277,6 @@ namespace Quanta
 
             return;
         }
-
-        switch(openglValue->GetIndexType())
-        {
-        case IndexType::UInt8:
-            indexType = GL_UNSIGNED_BYTE;
-
-            break;  
-        case IndexType::UInt16: 
-            indexType = GL_UNSIGNED_SHORT;
-
-            break;
-        case IndexType::UInt32:
-            indexType = GL_UNSIGNED_INT;
-
-            break;
-        }
         
         glBindVertexArray(openglValue->GetHandle());
 
@@ -299,7 +285,7 @@ namespace Quanta
     
     void OpenGLGraphicsDevice::InternalBindTexture2D(const Texture2D& texture, uint32_t index)
     {
-        OpenGLTexture2D& glTexture = (OpenGLTexture2D&) texture;
+        const OpenGLTexture2D& glTexture = (const OpenGLTexture2D&) texture;
 
         glBindTextureUnit(index, glTexture.GetHandle());
     }
@@ -309,7 +295,7 @@ namespace Quanta
         glDrawElementsInstancedBaseVertexBaseInstance(
             geometryLayout, 
             command.Count, 
-            indexType, 
+            vertexArray->GetOpenGLIndexType(), 
             (void*) command.IndexOffset,
             command.InstanceCount, 
             command.StartVertex,

@@ -69,6 +69,22 @@ namespace Quanta
         indexType = type;
 
         glVertexArrayElementBuffer(handle, glBuffer.GetHandle());
+
+        switch(indexType)
+        {
+        case IndexType::UInt8:
+            openglIndexType = GL_UNSIGNED_BYTE;
+
+            break;  
+        case IndexType::UInt16: 
+            openglIndexType = GL_UNSIGNED_SHORT;
+
+            break;
+        case IndexType::UInt32:
+            openglIndexType = GL_UNSIGNED_INT;
+
+            break;
+        }
     }
     
     const std::shared_ptr<GraphicsBuffer>& OpenGLVertexArray::GetVertexBuffer() const
@@ -81,13 +97,18 @@ namespace Quanta
         return indexBuffer;
     }
 
+    IndexType OpenGLVertexArray::GetIndexType() const
+    {
+        return indexType;
+    }
+
     uint32_t OpenGLVertexArray::GetHandle() const
     {
         return handle;
     }
-
-    IndexType OpenGLVertexArray::GetIndexType() const
+    
+    GLenum OpenGLVertexArray::GetOpenGLIndexType() const
     {
-        return indexType;
+        return openglIndexType;
     }
 }

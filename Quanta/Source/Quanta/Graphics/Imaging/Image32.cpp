@@ -45,15 +45,15 @@ namespace Quanta
         int32_t height;
         int32_t channels;
 
-        uint8_t* data = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
+        uint8_t* data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 
         if(!data)
         {
-            std::cout << "Could not load image '" << filepath << "'\n";
+            std::cout << "Could not load image '" << filepath << "': " << stbi_failure_reason() << '\n';
 
             return nullptr;
         }
-
+        
         return std::make_shared<Image32>((Color32*) data, width, height);
     }
 
