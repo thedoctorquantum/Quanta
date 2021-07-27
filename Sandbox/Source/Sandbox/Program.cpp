@@ -38,8 +38,15 @@ int main()
     std::shared_ptr<Window> window = Window::Create();
     
     GraphicsDevice::Initialize(GraphicsApi::OpenGL);
+    AudioDevice::Initialize(AudioApi::OpenAL);
 
     window->SetState(WindowState::Maximized);
+
+    std::shared_ptr<AudioBuffer> audioBuf = AudioBuffer::FromFile("Resources/Sounds/bounce.wav");
+
+    std::shared_ptr<AudioSource> audioSource = AudioSource::Create();
+
+    AudioDevice::Play(*audioSource, *audioBuf);
 
     float vertices[3 * 9] = 
     {
@@ -163,6 +170,7 @@ int main()
     ImGuiRenderer::Shutdown();
 
     GraphicsDevice::DeInitialize();
+    AudioDevice::DeInitialize();
 
     return 0;
 }

@@ -29,10 +29,11 @@ add_library("imgui"
 
 set_target_properties("imgui" PROPERTIES LINKER_LANGUAGE CXX)
 
-add_subdirectory("External/glfw")
 add_subdirectory("External/glad")
-add_subdirectory("External/stb_image")
+add_subdirectory("External/glfw")
+add_subdirectory("External/libsndfile")
 add_subdirectory("External/openal-soft")
+add_subdirectory("External/stb_image")
 
 target_link_libraries("Quanta" 
     PUBLIC 
@@ -45,4 +46,5 @@ target_link_libraries("Quanta"
     "glad"
     "stb_image"
     "OpenAL"
+    "sndfile"
 )

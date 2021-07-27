@@ -11,3 +11,6 @@
 [submodule "Quanta/External/openal-soft"]
 	path = Quanta/External/openal-soft
 	url = https://github.com/kcat/openal-soft.git
+[submodule "Quanta/External/libsndfile"]
+	path = Quanta/External/libsndfile
+	url = https://github.com/libsndfile/libsndfile.git
