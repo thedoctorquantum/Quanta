@@ -25,8 +25,12 @@ namespace Quanta
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+        
+        #ifndef NDEBUG
+            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+        #else
+            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, false);
+        #endif
 
         handle = glfwCreateWindow(640, 480, "Window", nullptr, nullptr);
 

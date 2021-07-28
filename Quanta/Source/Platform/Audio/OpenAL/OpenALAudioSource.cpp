@@ -19,7 +19,7 @@ namespace Quanta
     {
         return translation;
     }
-    
+
     void OpenALAudioSource::SetTranslation(const glm::vec3& value)
     {
         translation = value;

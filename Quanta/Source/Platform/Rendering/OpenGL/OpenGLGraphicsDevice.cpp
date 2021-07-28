@@ -13,17 +13,44 @@ namespace Quanta
     {
         gladLoadGL();
         
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+#ifndef NDEBUG
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
 
-        glDebugMessageCallback([](GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) 
-        {
-            OpenGLGraphicsDevice* _this = (OpenGLGraphicsDevice*) userParam;
+            glDebugMessageCallback([](GLenum source, GLenum type, uint32_t id, GLenum severity, GLsizei length, const char* message, const void* userParam) 
+            {
+                OpenGLGraphicsDevice* _this = (OpenGLGraphicsDevice*) userParam;
+                
+                const char* severityString = "Notification";
 
-            std::cout << "[OpenGL]: " << message << '\n';
-        }, this);
+                switch(severity)
+                {
+                case GL_DEBUG_SEVERITY_NOTIFICATION:
+                    severityString = "Notification";
 
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);
+                    break;
+                case GL_DEBUG_SEVERITY_LOW:
+                    severityString = "Low";
+
+                    break;
+                case GL_DEBUG_SEVERITY_MEDIUM:
+                    severityString = "Medium";
+
+                    break;
+                case GL_DEBUG_SEVERITY_HIGH:
+                    severityString = "High";
+
+                    break;
+                }
+
+                std::cout << "[GraphicsApi=OpenGL] [" << id << "] [" << severityString << "]: " << message << '\n';
+            }, this);
+
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);
+#else
+            glDisable(GL_DEBUG_OUTPUT);
+            glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+#endif
     }
     
     void OpenGLGraphicsDevice::InternalClearBackBuffer(const glm::vec4& color, float depth, int stencil)

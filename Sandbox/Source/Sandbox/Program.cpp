@@ -27,7 +27,7 @@ std::string ReadAllText(const std::string& filepath)
     }
     catch(const std::exception& exception)
     {
-        std::cerr << exception.what() << std::endl;
+        std::cerr << exception.what() << '\n';
     }
     
     return contents.str();
@@ -42,12 +42,6 @@ int main()
 
     window->SetState(WindowState::Maximized);
 
-    std::shared_ptr<AudioBuffer> audioBuf = AudioBuffer::FromFile("Resources/Sounds/bounce.wav");
-
-    std::shared_ptr<AudioSource> audioSource = AudioSource::Create();
-
-    AudioDevice::Play(*audioSource, *audioBuf);
-
     float vertices[3 * 9] = 
     {
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -59,7 +53,7 @@ int main()
     {
         0, 1, 2
     };
-
+        
     std::shared_ptr<VertexArray> vertexArray = VertexArray::Create();
 
     std::shared_ptr<GraphicsBuffer> vertexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(vertices));
@@ -67,7 +61,7 @@ int main()
     
     vertexBuffer->SetData(vertices, sizeof(vertices));
     indexBuffer->SetData(indices, sizeof(indices));
-
+    
     VertexLayout layout;
 
     layout.Add({
@@ -76,7 +70,7 @@ int main()
         sizeof(float),
         false
     });
-
+    
     layout.Add({
         BufferPrimitive::Float,
         4,
@@ -93,7 +87,7 @@ int main()
 
     vertexArray->SetVertexBuffer(vertexBuffer, layout);
     vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt8);
-
+    
     std::string vertexCode = ReadAllText("Resources/Shaders/vertex.glsl");
     std::string fragmentCode = ReadAllText("Resources/Shaders/fragment.glsl");
     
@@ -112,7 +106,7 @@ int main()
     pipeline->SetFaceCullMode(FaceCullMode::Back);
     pipeline->SetDepthTestMode(DepthTestMode::None);
     pipeline->SetEnableDepthWriting(true);
-    pipeline->SetBlendMode(BlendMode::Add);
+    pipeline->SetBlendMode(BlendMode::Add);     
 
     glm::vec3 translation = glm::vec3(0.0f);
 
@@ -120,8 +114,12 @@ int main()
     
     std::shared_ptr<Texture2D> texture = Texture2D::FromFile("Resources/Textures/wood_floor.png");
 
+    float time = 0;
+    
     while(window->Exists())
     {
+        time += 0.0167f;
+
         window->PollEvents();
 
         GraphicsDevice::SetViewport({ 0.0f, 0.0f, window->GetWidth(), window->GetHeight() });
@@ -133,7 +131,7 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
 
         model = glm::translate(model, translation);
-
+        
         uniforms->SetData(&model, sizeof(glm::mat4));
         
         GraphicsDevice::SetRasterPipeline(pipeline);
@@ -144,10 +142,6 @@ int main()
         DrawCommand cmd;
         
         cmd.Count = 3;
-        cmd.IndexOffset = 0;
-        cmd.InstanceCount = 1;
-        cmd.StartInstance = 0;
-        cmd.StartVertex = 0;
 
         GraphicsDevice::DispatchDraw(cmd);
 

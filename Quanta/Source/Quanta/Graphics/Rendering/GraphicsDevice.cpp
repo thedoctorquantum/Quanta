@@ -10,7 +10,7 @@ namespace Quanta
         GraphicsDevice* device = nullptr;
         GraphicsApi api = GraphicsApi::OpenGL;
     } static state;
-
+    
     GraphicsApi GraphicsDevice::GetApi()
     {
         return state.api;
