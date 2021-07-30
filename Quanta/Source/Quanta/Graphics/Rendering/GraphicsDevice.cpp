@@ -38,17 +38,7 @@ namespace Quanta
     {
         state.device->InternalClearBackBuffer(color, depth, stencil);
     }
-    
-    void GraphicsDevice::SetViewport(const glm::ivec4& viewport)
-    {
-        state.device->InternalSetViewport(viewport);
-    }
-
-    void GraphicsDevice::SetScissorViewport(const glm::ivec4& viewport)
-    {
-        state.device->InternalSetScissorViewport(viewport);
-    }
-    
+        
     void GraphicsDevice::SetRasterPipeline(const std::shared_ptr<RasterPipeline>& value)
     {
         state.device->InternalSetRasterPipeline(value);
@@ -59,11 +49,11 @@ namespace Quanta
         state.device->InternalSetVertexArray(value);
     }
     
-    void GraphicsDevice::BindTexture2D(const Texture2D& texture, uint32_t index)
+    void GraphicsDevice::BindSampler2D(const Sampler2D& sampler, uint32_t index)
     {
-        state.device->InternalBindTexture2D(texture, index);
+        state.device->InternalBindSampler2D(sampler, index);
     }
-    
+
     void GraphicsDevice::DispatchDraw(const DrawCommand& command)
     {
         state.device->InternalDispatchDraw(command);

@@ -6,10 +6,10 @@ namespace Quanta
 {
     OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
     {
-        glCreateTextures(GL_TEXTURE_2D, 1, &handle);
-        
         this->width = width;
         this->height = height;
+
+        glCreateTextures(GL_TEXTURE_2D, 1, &handle);
 
         glTextureStorage2D(handle, 1, GL_RGBA8, width, height);
     }
@@ -38,7 +38,7 @@ namespace Quanta
     {
         return height;
     }
-
+    
     uint32_t OpenGLTexture2D::GetHandle() const
     {
         return handle;

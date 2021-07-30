@@ -27,5 +27,4 @@ target_link_libraries("Quanta"
     "stb_image"
     "OpenAL"
     "sndfile"
-    "shaderc_shared"
 )

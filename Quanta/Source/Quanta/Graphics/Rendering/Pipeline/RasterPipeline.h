@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <glm/glm.hpp>
 
 #include "../Buffer/GraphicsBuffer.h"
 #include "../Shader/ShaderModule.h"
@@ -25,6 +26,12 @@ namespace Quanta
 
         virtual size_t GetShaderModuleCount() const = 0;
         virtual size_t GetUniformBufferCount() const = 0;
+
+        virtual const glm::uvec4& GetViewport() const = 0;
+        virtual void SetViewport(const glm::uvec4& value) = 0;
+
+        virtual const glm::uvec4& GetScissorViewport() const = 0;
+        virtual void SetScissorViewport(const glm::uvec4& value) = 0;
 
         virtual PolygonFillMode GetPolygonFillMode() const = 0;
         virtual void SetPolygonFillMode(PolygonFillMode value) = 0;

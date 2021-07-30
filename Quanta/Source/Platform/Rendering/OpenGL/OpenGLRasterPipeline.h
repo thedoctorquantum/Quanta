@@ -20,6 +20,12 @@ namespace Quanta
         size_t GetShaderModuleCount() const override;
         size_t GetUniformBufferCount() const override;
 
+        const glm::uvec4& GetViewport() const override;
+        void SetViewport(const glm::uvec4& value) override;
+
+        const glm::uvec4& GetScissorViewport() const override;
+        void SetScissorViewport(const glm::uvec4& value) override;
+
         PolygonFillMode GetPolygonFillMode() const override;
         void SetPolygonFillMode(PolygonFillMode value) override;
 
@@ -49,11 +55,16 @@ namespace Quanta
 
         uint32_t GetHandle() const;
     private:
-        uint32_t handle;
+        uint32_t handle = 0;
+
+        size_t instanceId = 0;
         
         std::vector<std::shared_ptr<ShaderModule>> shaderModules;
         std::vector<std::shared_ptr<GraphicsBuffer>> uniformBuffers;
         
+        glm::uvec4 viewport = { };
+        glm::uvec4 scissorViewport = { };
+
         PolygonFillMode polygonFillMode = PolygonFillMode::Solid;
         DepthTestMode depthTestMode = DepthTestMode::None;
         bool enableDepthWriting = false;

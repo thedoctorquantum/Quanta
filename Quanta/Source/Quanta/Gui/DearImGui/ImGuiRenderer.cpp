@@ -10,7 +10,8 @@
 #include "../../Graphics/Rendering/Buffer/VertexArray.h"
 #include "../../Graphics/Rendering/Pipeline/RasterPipeline.h"
 #include "../../Graphics/Rendering/GraphicsDevice.h"
-#include "../../Graphics/Rendering/Texture/Texture.h"
+#include "../../Graphics/Rendering/Texture/Texture2D.h"
+#include "../../Graphics/Rendering/Texture/Sampler2D.h"
 
 namespace Quanta
 {
@@ -20,7 +21,8 @@ namespace Quanta
     static std::shared_ptr<GraphicsBuffer> indexBuffer = nullptr;
     static std::shared_ptr<GraphicsBuffer> uniformBuffer = nullptr;
     static std::shared_ptr<Texture2D> fontTexture = nullptr;
-
+    static std::shared_ptr<Sampler2D> fontSampler = nullptr;
+ 
     static Window* currentWindow;
 
     static ImGuiContext* context;
@@ -184,7 +186,9 @@ namespace Quanta
 
         fontTexture->SetData(pixels);
 
-        io->Fonts->SetTexID(fontTexture.get());
+        fontSampler = Sampler2D::Create(fontTexture);
+
+        io->Fonts->SetTexID(fontSampler.get());
 
         io->Fonts->ClearTexData();
 
@@ -217,6 +221,7 @@ namespace Quanta
         indexBuffer.reset((GraphicsBuffer*) nullptr);
         uniformBuffer.reset((GraphicsBuffer*) nullptr);
         fontTexture.reset((Texture2D*) nullptr);
+        fontSampler.reset((Sampler2D*) nullptr);
     }
 
     void ImGuiRenderer::Begin(float elapsed)
@@ -224,6 +229,8 @@ namespace Quanta
         io->DisplaySize = ImVec2((float) currentWindow->GetWidth(), (float) currentWindow->GetHeight());
         io->DeltaTime = elapsed;
         io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+
+        pipeline->SetViewport({ 0.0f, 0.0f, currentWindow->GetWidth(), currentWindow->GetHeight() });
 
         ImGui::NewFrame();
     }
@@ -260,7 +267,7 @@ namespace Quanta
         
         size_t vertexOffset = 0;
         size_t indexOffset = 0;
-
+        
         size_t startVertex = 0;
 
         DrawCommand drawCommand;
@@ -281,17 +288,17 @@ namespace Quanta
             {
                 ImDrawCmd& command = commands[j];
 
-                Texture2D* texture = (Texture2D*) command.TextureId;
+                Sampler2D* sampler = (Sampler2D*) command.TextureId;
 
-                GraphicsDevice::BindTexture2D(*texture, 0);
-                
-                GraphicsDevice::SetScissorViewport({
+                GraphicsDevice::BindSampler2D(*sampler, 0);
+
+                pipeline->SetScissorViewport({
                      (uint32_t) command.ClipRect.x, 
                      (uint32_t) (currentWindow->GetHeight() - command.ClipRect.w), 
                      (uint32_t) (command.ClipRect.z - command.ClipRect.x),
                      (uint32_t) (command.ClipRect.w - command.ClipRect.y) 
                 });
-
+                
                 drawCommand.Count = command.ElemCount;
                 drawCommand.IndexOffset = indexOffset;
                 drawCommand.StartVertex = startVertex;

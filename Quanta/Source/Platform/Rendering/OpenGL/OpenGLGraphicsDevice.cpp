@@ -6,6 +6,7 @@
 #include "OpenGLGraphicsDevice.h"
 #include "OpenGLRasterPipeline.h"
 #include "OpenGLTexture2D.h"
+#include "OpenGLSampler2D.h"
 
 namespace Quanta
 {
@@ -59,17 +60,7 @@ namespace Quanta
         glClearNamedFramebufferfv(0, GL_DEPTH, 0, &depth);
         glClearNamedFramebufferiv(0, GL_STENCIL, 0, &stencil);
     }
-
-    void OpenGLGraphicsDevice::InternalSetViewport(const glm::ivec4& viewport)
-    {
-        glViewportIndexedf(0, viewport.x, viewport.y, viewport.z, viewport.w);
-    }
-
-    void OpenGLGraphicsDevice::InternalSetScissorViewport(const glm::ivec4& viewport)
-    {
-        glScissorIndexed(0, viewport.x, viewport.y, viewport.z, viewport.w);
-    }
-
+    
     void OpenGLGraphicsDevice::InternalSetRasterPipeline(const std::shared_ptr<RasterPipeline>& value)
     {
         if(!value)
@@ -107,7 +98,7 @@ namespace Quanta
 
             glUseProgram(glPipeline.GetHandle());
         }
-        
+
         switch(value->GetPolygonFillMode())
         {
         case PolygonFillMode::Solid:
@@ -310,13 +301,15 @@ namespace Quanta
         this->vertexArray = openglValue;
     }
     
-    void OpenGLGraphicsDevice::InternalBindTexture2D(const Texture2D& texture, uint32_t index)
+    void OpenGLGraphicsDevice::InternalBindSampler2D(const Sampler2D& sampler, uint32_t index)
     {
-        const OpenGLTexture2D& glTexture = (const OpenGLTexture2D&) texture;
-
+        const OpenGLSampler2D& glSampler = (const OpenGLSampler2D&) sampler;
+        const OpenGLTexture2D& glTexture = (const OpenGLTexture2D&) sampler.GetTexture();
+        
         glBindTextureUnit(index, glTexture.GetHandle());
+        glBindSampler(index, glSampler.GetHandle());
     }
-    
+
     void OpenGLGraphicsDevice::InternalDispatchDraw(const DrawCommand& command)
     {
         glDrawElementsInstancedBaseVertexBaseInstance(

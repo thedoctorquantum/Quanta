@@ -114,15 +114,17 @@ int main()
     
     std::shared_ptr<Texture2D> texture = Texture2D::FromFile("Resources/Textures/wood_floor.png");
 
+    std::shared_ptr<Sampler2D> sampler = Sampler2D::Create(texture);
+
     float time = 0;
     
     while(window->Exists())
     {
         time += 0.0167f;
-
+        
         window->PollEvents();
 
-        GraphicsDevice::SetViewport({ 0.0f, 0.0f, window->GetWidth(), window->GetHeight() });
+        pipeline->SetViewport({ 0.0f, 0.0f, window->GetWidth(), window->GetHeight() });
 
         glm::mat4 proj = glm::ortho(0.0f, (float) window->GetWidth(), 0.0f, (float) window->GetHeight(), 0.1f, 100.0f);
 
@@ -136,13 +138,13 @@ int main()
         
         GraphicsDevice::SetRasterPipeline(pipeline);
         GraphicsDevice::SetVertexArray(vertexArray);
+                
+        GraphicsDevice::BindSampler2D(*sampler, 0);
 
-        GraphicsDevice::BindTexture2D(*texture, 0);
-        
         DrawCommand cmd;
         
         cmd.Count = 3;
-
+        
         GraphicsDevice::DispatchDraw(cmd);
 
         ImGuiRenderer::Begin(1.0f / 60.0f);

@@ -6,11 +6,15 @@
 
 namespace Quanta
 {
+    static size_t instanceCount = 0;
+
     OpenGLRasterPipeline::OpenGLRasterPipeline(const RasterPipelineDescription& description)
     {
         this->shaderModules = description.ShaderModules;
         this->uniformBuffers = description.UniformBuffers;
         
+        instanceCount++;
+
         handle = glCreateProgram();
 
         for(int i = 0; i < shaderModules.size(); i++)
@@ -49,6 +53,8 @@ namespace Quanta
     
     OpenGLRasterPipeline::~OpenGLRasterPipeline()
     {
+        instanceCount--;
+
         glDeleteProgram(handle);
     }
 
@@ -62,6 +68,30 @@ namespace Quanta
         return uniformBuffers[index];
     }
     
+    const glm::uvec4& OpenGLRasterPipeline::GetViewport() const
+    {
+        return viewport;
+    }
+
+    void OpenGLRasterPipeline::SetViewport(const glm::uvec4& value)
+    {
+        viewport = value;
+
+        glViewport(viewport.x, viewport.y, viewport.z, viewport.w);
+    }
+
+    const glm::uvec4& OpenGLRasterPipeline::GetScissorViewport() const
+    {
+        return scissorViewport;
+    }
+    
+    void OpenGLRasterPipeline::SetScissorViewport(const glm::uvec4& value)
+    {
+        scissorViewport = value;
+    
+        glScissor(value.x, value.y, value.z, value.w);
+    } 
+
     size_t OpenGLRasterPipeline::GetShaderModuleCount() const
     {
         return shaderModules.size();
