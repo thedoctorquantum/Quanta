@@ -188,6 +188,9 @@ namespace Quanta
 
         fontSampler = Sampler2D::Create(fontTexture);
 
+        fontSampler->SetMagnification(FilterMode::Nearest);
+        fontSampler->SetMinification(FilterMode::Nearest);
+
         io->Fonts->SetTexID(fontSampler.get());
 
         io->Fonts->ClearTexData();

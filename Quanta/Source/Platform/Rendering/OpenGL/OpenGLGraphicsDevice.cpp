@@ -304,7 +304,7 @@ namespace Quanta
     void OpenGLGraphicsDevice::InternalBindSampler2D(const Sampler2D& sampler, uint32_t index)
     {
         const OpenGLSampler2D& glSampler = (const OpenGLSampler2D&) sampler;
-        const OpenGLTexture2D& glTexture = (const OpenGLTexture2D&) sampler.GetTexture();
+        const OpenGLTexture2D& glTexture = (const OpenGLTexture2D&) *sampler.GetTexture();
         
         glBindTextureUnit(index, glTexture.GetHandle());
         glBindSampler(index, glSampler.GetHandle());

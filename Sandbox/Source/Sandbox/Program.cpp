@@ -112,9 +112,12 @@ int main()
 
     ImGuiRenderer::Initialize(*window);
     
-    std::shared_ptr<Texture2D> texture = Texture2D::FromFile("Resources/Textures/wood_floor.png");
-
+    std::shared_ptr<Texture2D> texture = Texture2D::FromFile("Resources/Textures/tileset.png");
+    
     std::shared_ptr<Sampler2D> sampler = Sampler2D::Create(texture);
+    
+    sampler->SetMagnification(FilterMode::Linear);
+    sampler->SetMinification(FilterMode::Linear);
 
     float time = 0;
     
@@ -153,6 +156,26 @@ int main()
             ImGui::ShowMetricsWindow();
 
             ImGui::DragFloat3("Pos", &translation.x, 0.025f);
+
+            ImGui::Begin("Sampler2D");
+            {
+                if(ImGui::Button("Toggle Filter Mode"))
+                {
+                    if(sampler->GetMagnification() == FilterMode::Linear)
+                    {
+                        sampler->SetMagnification(FilterMode::Nearest);
+                        sampler->SetMinification(FilterMode::Nearest);
+                    }
+                    else
+                    {
+                        sampler->SetMagnification(FilterMode::Linear);
+                        sampler->SetMinification(FilterMode::Linear);
+                    }
+                }
+
+                ImGui::Image(sampler.get(), ImVec2((float) texture->GetWidth(), (float) texture->GetHeight()));
+            }
+            ImGui::End();
         }
         ImGuiRenderer::End();
 
