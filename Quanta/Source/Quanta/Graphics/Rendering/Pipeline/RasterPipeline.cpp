@@ -3,7 +3,6 @@
 
 #include "RasterPipeline.h"
 #include "../GraphicsDevice.h"
-
 #include "../../../../Platform/Rendering/OpenGL/OpenGLRasterPipeline.h"
 
 namespace Quanta

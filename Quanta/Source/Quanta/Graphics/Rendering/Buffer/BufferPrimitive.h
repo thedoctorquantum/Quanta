@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Quanta
 {
-    enum class BufferPrimitive
+    enum class BufferPrimitive : uint8_t
     {
         Float,
         Double, 

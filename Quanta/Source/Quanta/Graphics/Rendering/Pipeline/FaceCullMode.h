@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Quanta
 {
-    enum class FaceCullMode
+    enum class FaceCullMode : uint8_t
     {
         None,
         Front,
