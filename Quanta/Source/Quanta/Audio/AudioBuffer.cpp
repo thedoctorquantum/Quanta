@@ -87,4 +87,6 @@ namespace Quanta
 
         return audioBuffer;
     }
+    
+    AudioBuffer::~AudioBuffer() = default;
 }

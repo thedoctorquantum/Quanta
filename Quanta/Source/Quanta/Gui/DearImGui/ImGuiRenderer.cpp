@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include "ImGuiRenderer.h"
-
 #include "../../Graphics/Rendering/Buffer/GraphicsBuffer.h"
 #include "../../Graphics/Rendering/Buffer/VertexArray.h"
 #include "../../Graphics/Rendering/Pipeline/RasterPipeline.h"
@@ -15,69 +14,74 @@
 
 namespace Quanta
 {
-    static std::shared_ptr<RasterPipeline> pipeline = nullptr;
-    static std::shared_ptr<VertexArray> vertexArray = nullptr;
-    static std::shared_ptr<GraphicsBuffer> vertexBuffer = nullptr;
-    static std::shared_ptr<GraphicsBuffer> indexBuffer = nullptr;
-    static std::shared_ptr<GraphicsBuffer> uniformBuffer = nullptr;
-    static std::shared_ptr<Texture2D> fontTexture = nullptr;
-    static std::shared_ptr<Sampler2D> fontSampler = nullptr;
- 
-    static Window* currentWindow;
+    struct State
+    {
+        std::shared_ptr<RasterPipeline> pipeline = nullptr;
+        std::shared_ptr<VertexArray> vertexArray = nullptr;
+        std::shared_ptr<GraphicsBuffer> vertexBuffer = nullptr;
+        std::shared_ptr<GraphicsBuffer> indexBuffer = nullptr;
+        std::shared_ptr<GraphicsBuffer> uniformBuffer = nullptr;
+        std::shared_ptr<Texture2D> fontTexture = nullptr;
+        std::shared_ptr<Sampler2D> fontSampler = nullptr;
+    
+        Window* window = nullptr;
 
-    static ImGuiContext* context;
-    static ImGuiIO* io;
+        ImGuiContext* context = nullptr;
+        ImGuiIO* io = nullptr;
+    } static* state;
 
     void OnKeyDown(Key key)
     {
-        io->KeysDown[(int32_t) key] = true;
+       state->io->KeysDown[(int32_t) key] = true;
     }
 
     void OnKeyUp(Key key)
     {
-        io->KeysDown[(int32_t) key] = false;
+        state->io->KeysDown[(int32_t) key] = false;
     }
 
     void OnMouseDown(MouseButton button)
     {
-        io->MouseDown[(int32_t) button] = true;
+        state->io->MouseDown[(int32_t) button] = true;
     }
 
     void OnMouseUp(MouseButton button)
     {
-        io->MouseDown[(int32_t) button] = false;
+        state->io->MouseDown[(int32_t) button] = false;
     }
     
     void OnMouseMove(glm::vec2 position)
     {
-        io->MousePos = *(ImVec2*) &position;
+        state->io->MousePos = *(ImVec2*) &position;
     }
 
     void OnMouseScroll(glm::vec2 scroll)
     {
-        io->MouseWheel = scroll.y;
-        io->MouseWheelH = scroll.x;
+        state->io->MouseWheel = scroll.y;
+        state->io->MouseWheelH = scroll.x;
     }
 
     void OnCharacterDown(char character)
     {
-        io->AddInputCharacter(character);
+        state->io->AddInputCharacter(character);
     }
     
     void ImGuiRenderer::Initialize(Window& window)
     {
-        currentWindow = (Window*) &window;
+        state = new State;
 
-        context = ImGui::CreateContext();
+        state->window = (Window*) &window;
 
-        ImGui::SetCurrentContext(context);
+        state->context = ImGui::CreateContext();
 
-        io = &ImGui::GetIO();
+        ImGui::SetCurrentContext(state->context);
 
-        io->Fonts->AddFontDefault();
+        state->io = &ImGui::GetIO();
 
-        io->BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
-        io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        state->io->Fonts->AddFontDefault();
+
+        state->io->BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
+        state->io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
         window.AddKeyDownCallback(OnKeyDown);
         window.AddKeyUpCallback(OnKeyUp);
@@ -133,25 +137,25 @@ namespace Quanta
                 a_Fragment = v_In.color * texture(u_Sampler, v_In.uv);
             })";
 
-        uniformBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::mat4));
+        state->uniformBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::mat4));
 
         RasterPipelineDescription pipelineDescription;
 
         pipelineDescription.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Vertex, vertexSource));
         pipelineDescription.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Fragment, fragmentSource));
 
-        pipelineDescription.UniformBuffers.emplace_back(uniformBuffer);
+        pipelineDescription.UniformBuffers.emplace_back(state->uniformBuffer);
         
-        pipeline = RasterPipeline::Create(pipelineDescription);
+        state->pipeline = RasterPipeline::Create(pipelineDescription);
         
-        pipeline->SetBlendMode(BlendMode::Add);
-        pipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
-        pipeline->SetEnableScissorTesting(true);
+        state->pipeline->SetBlendMode(BlendMode::Add);
+        state->pipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
+        state->pipeline->SetEnableScissorTesting(true);
 
-        vertexArray = VertexArray::Create();
+        state->vertexArray = VertexArray::Create();
 
-        vertexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0 * sizeof(ImDrawVert));
-        indexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0 * sizeof(uint16_t));
+        state->vertexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0 * sizeof(ImDrawVert));
+        state->indexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0 * sizeof(uint16_t));
 
         VertexLayout layout;
 
@@ -173,67 +177,61 @@ namespace Quanta
             true
         });
 
-        vertexArray->SetVertexBuffer(vertexBuffer, layout);
-        vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt16);
+        state->vertexArray->SetVertexBuffer(state->vertexBuffer, layout);
+        state->vertexArray->SetIndexBuffer(state->indexBuffer, IndexType::UInt16);
 
         uint8_t* pixels;
         uint32_t width;
         uint32_t height;
 
-        io->Fonts->GetTexDataAsRGBA32(&pixels, (int*) &width, (int*) &height);
+        state->io->Fonts->GetTexDataAsRGBA32(&pixels, (int*) &width, (int*) &height);
 
-        fontTexture = Texture2D::Create(width, height);
+        state->fontTexture = Texture2D::Create(width, height);
 
-        fontTexture->SetData(pixels);
+        state->fontTexture->SetData(pixels);
 
-        fontSampler = Sampler2D::Create(fontTexture);
+        state->fontSampler = Sampler2D::Create(state->fontTexture);
 
-        fontSampler->SetMagnification(FilterMode::Nearest);
-        fontSampler->SetMinification(FilterMode::Nearest);
+        state->fontSampler->SetMagnification(FilterMode::Nearest);
+        state->fontSampler->SetMinification(FilterMode::Nearest);
 
-        io->Fonts->SetTexID(fontSampler.get());
+        state->io->Fonts->SetTexID(state->fontSampler.get());
 
-        io->Fonts->ClearTexData();
+        state->io->Fonts->ClearTexData();
 
-        io->KeyMap[ImGuiKey_Tab] = (int) Key::Tab;
-        io->KeyMap[ImGuiKey_LeftArrow] = (int) Key::Left;
-        io->KeyMap[ImGuiKey_RightArrow] = (int) Key::Right;
-        io->KeyMap[ImGuiKey_UpArrow] = (int) Key::Up;
-        io->KeyMap[ImGuiKey_DownArrow] = (int) Key::Down;
-        io->KeyMap[ImGuiKey_PageUp] = (int) Key::PageUp;
-        io->KeyMap[ImGuiKey_PageDown] = (int) Key::PageDown;
-        io->KeyMap[ImGuiKey_Home] = (int) Key::Home;
-        io->KeyMap[ImGuiKey_End] = (int) Key::End;
-        io->KeyMap[ImGuiKey_Delete] = (int) Key::Delete;
-        io->KeyMap[ImGuiKey_Backspace] = (int) Key::Backspace;
-        io->KeyMap[ImGuiKey_Enter] = (int) Key::Enter;
-        io->KeyMap[ImGuiKey_Escape] = (int) Key::Escape;
-        io->KeyMap[ImGuiKey_A] = (int) Key::A;
-        io->KeyMap[ImGuiKey_C] = (int) Key::C;
-        io->KeyMap[ImGuiKey_V] = (int) Key::V;
-        io->KeyMap[ImGuiKey_X] = (int) Key::X;
-        io->KeyMap[ImGuiKey_Y] = (int) Key::Y;
-        io->KeyMap[ImGuiKey_Z] = (int) Key::Z;
+        state->io->KeyMap[ImGuiKey_Tab] = (int) Key::Tab;
+        state->io->KeyMap[ImGuiKey_LeftArrow] = (int) Key::Left;
+        state->io->KeyMap[ImGuiKey_RightArrow] = (int) Key::Right;
+        state->io->KeyMap[ImGuiKey_UpArrow] = (int) Key::Up;
+        state->io->KeyMap[ImGuiKey_DownArrow] = (int) Key::Down;
+        state->io->KeyMap[ImGuiKey_PageUp] = (int) Key::PageUp;
+        state->io->KeyMap[ImGuiKey_PageDown] = (int) Key::PageDown;
+        state->io->KeyMap[ImGuiKey_Home] = (int) Key::Home;
+        state->io->KeyMap[ImGuiKey_End] = (int) Key::End;
+        state->io->KeyMap[ImGuiKey_Delete] = (int) Key::Delete;
+        state->io->KeyMap[ImGuiKey_Backspace] = (int) Key::Backspace;
+        state->io->KeyMap[ImGuiKey_Enter] = (int) Key::Enter;
+        state->io->KeyMap[ImGuiKey_Escape] = (int) Key::Escape;
+        state->io->KeyMap[ImGuiKey_A] = (int) Key::A;
+        state->io->KeyMap[ImGuiKey_C] = (int) Key::C;
+        state->io->KeyMap[ImGuiKey_V] = (int) Key::V;
+        state->io->KeyMap[ImGuiKey_X] = (int) Key::X;
+        state->io->KeyMap[ImGuiKey_Y] = (int) Key::Y;
+        state->io->KeyMap[ImGuiKey_Z] = (int) Key::Z;
     }
 
     void ImGuiRenderer::Shutdown()
     {
-        pipeline.reset((RasterPipeline*) nullptr);
-        vertexArray.reset((VertexArray*) nullptr);
-        vertexBuffer.reset((GraphicsBuffer*) nullptr);
-        indexBuffer.reset((GraphicsBuffer*) nullptr);
-        uniformBuffer.reset((GraphicsBuffer*) nullptr);
-        fontTexture.reset((Texture2D*) nullptr);
-        fontSampler.reset((Sampler2D*) nullptr);
+        delete state;
     }
 
     void ImGuiRenderer::Begin(float elapsed)
     {
-        io->DisplaySize = ImVec2((float) currentWindow->GetWidth(), (float) currentWindow->GetHeight());
-        io->DeltaTime = elapsed;
-        io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+        state->io->DisplaySize = ImVec2((float) state->window->GetWidth(), (float) state->window->GetHeight());
+        state->io->DeltaTime = elapsed;
+        state->io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 
-        pipeline->SetViewport({ 0.0f, 0.0f, currentWindow->GetWidth(), currentWindow->GetHeight() });
+        state->pipeline->SetViewport({ 0.0f, 0.0f, state->window->GetWidth(), state->window->GetHeight() });
 
         ImGui::NewFrame();
     }
@@ -246,26 +244,26 @@ namespace Quanta
 
         if(!drawData->CmdListsCount) return;
 
-        drawData->ScaleClipRects(io->DisplayFramebufferScale);
+        drawData->ScaleClipRects(state->io->DisplayFramebufferScale);
 
-        glm::mat4 matrix = glm::ortho(0.0f, io->DisplaySize.x, io->DisplaySize.y, 0.0f, -1.0f, 1.0f);
+        glm::mat4 matrix = glm::ortho(0.0f, state->io->DisplaySize.x, state->io->DisplaySize.y, 0.0f, -1.0f, 1.0f);
 
-        uniformBuffer->SetData(&matrix, sizeof(glm::mat4));
+        state->uniformBuffer->SetData(&matrix, sizeof(glm::mat4));
 
-        GraphicsDevice::SetRasterPipeline(pipeline);
-        GraphicsDevice::SetVertexArray(vertexArray);
+        GraphicsDevice::SetRasterPipeline(state->pipeline);
+        GraphicsDevice::SetVertexArray(state->vertexArray);
 
         size_t totalVertexBuffersize = drawData->TotalVtxCount * sizeof(ImDrawVert);
         size_t totalIndexBufferSize = drawData->TotalIdxCount * sizeof(uint16_t);
 
-        if(totalVertexBuffersize > vertexBuffer->GetSize())
+        if(totalVertexBuffersize > state->vertexBuffer->GetSize())
         {
-            GraphicsBuffer::Resize(*vertexBuffer, totalVertexBuffersize * 2);
+            GraphicsBuffer::Resize(*state->vertexBuffer, totalVertexBuffersize * 2);
         }
     
-        if(totalIndexBufferSize > indexBuffer->GetSize())
+        if(totalIndexBufferSize > state->indexBuffer->GetSize())
         {
-            GraphicsBuffer::Resize(*indexBuffer, totalIndexBufferSize * 2);
+            GraphicsBuffer::Resize(*state->indexBuffer, totalIndexBufferSize * 2);
         }
         
         size_t vertexOffset = 0;
@@ -284,8 +282,8 @@ namespace Quanta
             size_t vertexBufferSize = drawList->VtxBuffer.Size * sizeof(ImDrawVert);
             size_t indexBufferSize = drawList->IdxBuffer.Size * sizeof(uint16_t);
 
-            vertexBuffer->SetData(drawList->VtxBuffer.Data, vertexBufferSize, vertexOffset);
-            indexBuffer->SetData(drawList->IdxBuffer.Data, indexBufferSize, indexOffset);
+            state->vertexBuffer->SetData(drawList->VtxBuffer.Data, vertexBufferSize, vertexOffset);
+            state->indexBuffer->SetData(drawList->IdxBuffer.Data, indexBufferSize, indexOffset);
 
             for(int32_t j = 0; j < commands.Size; j++)
             {
@@ -295,9 +293,9 @@ namespace Quanta
 
                 GraphicsDevice::BindSampler2D(*sampler, 0);
 
-                pipeline->SetScissorViewport({
+                state->pipeline->SetScissorViewport({
                      (uint32_t) command.ClipRect.x, 
-                     (uint32_t) (currentWindow->GetHeight() - command.ClipRect.w), 
+                     (uint32_t) (state->window->GetHeight() - command.ClipRect.w), 
                      (uint32_t) (command.ClipRect.z - command.ClipRect.x),
                      (uint32_t) (command.ClipRect.w - command.ClipRect.y) 
                 });

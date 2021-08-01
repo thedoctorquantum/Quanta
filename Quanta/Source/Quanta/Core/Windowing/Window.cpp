@@ -7,4 +7,6 @@ namespace Quanta
     {
         return std::make_unique<GlfwWindow>();
     }
+
+    Window::~Window() = default;
 };

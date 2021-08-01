@@ -11,5 +11,7 @@ namespace Quanta
     {
     public:
         static std::shared_ptr<ShaderModule> Create(ShaderType type, const std::string& source);
+
+        virtual ~ShaderModule() = 0;
     };
 }

@@ -7,4 +7,6 @@ namespace Quanta
     {
         return std::make_shared<OpenGLVertexArray>();
     }
+    
+    VertexArray::~VertexArray() = default;
 }

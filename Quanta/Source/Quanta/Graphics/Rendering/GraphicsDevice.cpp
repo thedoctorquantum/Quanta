@@ -53,6 +53,11 @@ namespace Quanta
     {
         state.device->InternalBindSampler2D(sampler, index);
     }
+    
+    void GraphicsDevice::BindSampler3D(const Sampler3D& sampler, uint32_t index)
+    {
+        state.device->InternalBindSampler3D(sampler, index);
+    }
 
     void GraphicsDevice::DispatchDraw(const DrawCommand& command)
     {

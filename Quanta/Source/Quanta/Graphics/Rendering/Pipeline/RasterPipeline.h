@@ -21,6 +21,8 @@ namespace Quanta
     public:
         static std::shared_ptr<RasterPipeline> Create(const RasterPipelineDescription& description);
 
+        virtual ~RasterPipeline() = 0;
+
         virtual const std::shared_ptr<ShaderModule>& GetShaderModule(size_t index) const = 0;
         virtual const std::shared_ptr<GraphicsBuffer>& GetUniformBuffer(size_t index) const = 0;
 

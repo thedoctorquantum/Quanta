@@ -16,4 +16,6 @@ namespace Quanta
 
         return nullptr;
     }
+
+    ShaderModule::~ShaderModule() = default;
 }

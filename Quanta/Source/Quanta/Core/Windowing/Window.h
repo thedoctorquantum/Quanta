@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <stdint.h>
+#include <cstdint>
 #include <glm/glm.hpp>
 
 #include "WindowState.h"
@@ -15,6 +15,8 @@ namespace Quanta
     {
     public:
         static std::shared_ptr<Window> Create();
+
+        virtual ~Window() = 0;
         
         virtual void AddKeyDownCallback(Event<Key>::Handler handler) = 0;
         virtual void AddKeyUpCallback(Event<Key>::Handler handler) = 0;

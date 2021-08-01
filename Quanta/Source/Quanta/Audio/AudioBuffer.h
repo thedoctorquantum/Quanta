@@ -14,6 +14,8 @@ namespace Quanta
 
         static std::shared_ptr<AudioBuffer> FromFile(const std::string& filepath);
 
+        virtual ~AudioBuffer() = 0;
+
         virtual void SetData(const void* data, size_t size, size_t frequency, SoundFormat format) = 0;
 
         virtual size_t GetSize() const = 0;

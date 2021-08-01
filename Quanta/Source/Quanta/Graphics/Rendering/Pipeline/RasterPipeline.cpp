@@ -11,10 +11,12 @@ namespace Quanta
     {
         switch(GraphicsDevice::GetApi())
         {
-        case GraphicsApi::OpenGL:
+        case GraphicsApi::OpenGL: 
             return std::make_shared<OpenGLRasterPipeline>(description);
         }
         
         return nullptr;
     } 
+
+    RasterPipeline::~RasterPipeline() = default;
 }

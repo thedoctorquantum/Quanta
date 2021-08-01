@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
+    OpenGLTexture2D::OpenGLTexture2D(size_t width, size_t height)
     {
         this->width = width;
         this->height = height;
@@ -29,12 +29,12 @@ namespace Quanta
         glGetTextureSubImage(handle, 0, 0, 0, 0, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, width * height, data);
     }
 
-    uint32_t OpenGLTexture2D::GetWidth() const
+    size_t OpenGLTexture2D::GetWidth() const
     {
         return width;
     }
 
-    uint32_t OpenGLTexture2D::GetHeight() const
+    size_t OpenGLTexture2D::GetHeight() const
     {
         return height;
     }

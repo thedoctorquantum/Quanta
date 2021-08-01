@@ -1,18 +1,28 @@
 #include <iostream>
 #include <glad/glad.h>
 
+#include "OpenGLGraphicsDevice.h"
 #include "OpenGLVertexArray.h"
 #include "OpenGLGraphicsBuffer.h"
-#include "OpenGLGraphicsDevice.h"
 #include "OpenGLRasterPipeline.h"
 #include "OpenGLTexture2D.h"
+#include "OpenGLTexture3D.h"
 #include "OpenGLSampler2D.h"
+#include "OpenGLSampler3D.h"
 
 namespace Quanta
 {
+    static void BindSampler(uint32_t texture, uint32_t sampler, uint32_t index)
+    {
+        glBindTextureUnit(index, texture);
+        glBindSampler(index, sampler);
+    }
+
     OpenGLGraphicsDevice::OpenGLGraphicsDevice()
     {
         gladLoadGL();
+
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (int*) &maxTextureSlots);
         
 #ifndef NDEBUG
             glEnable(GL_DEBUG_OUTPUT);
@@ -286,7 +296,7 @@ namespace Quanta
         if(vertexArray == value.get()) return;
 
         OpenGLVertexArray* openglValue = (OpenGLVertexArray*) value.get();
-
+        
         if(!openglValue)
         {
             vertexArray = nullptr;
@@ -306,8 +316,15 @@ namespace Quanta
         const OpenGLSampler2D& glSampler = (const OpenGLSampler2D&) sampler;
         const OpenGLTexture2D& glTexture = (const OpenGLTexture2D&) *sampler.GetTexture();
         
-        glBindTextureUnit(index, glTexture.GetHandle());
-        glBindSampler(index, glSampler.GetHandle());
+        BindSampler(glTexture.GetHandle(), glSampler.GetHandle(), index);
+    }
+
+    void OpenGLGraphicsDevice::InternalBindSampler3D(const Sampler3D& sampler, uint32_t index)
+    {
+        const OpenGLSampler3D& glSampler = (const OpenGLSampler3D&) sampler;
+        const OpenGLTexture3D& glTexture = (const OpenGLTexture3D&) *sampler.GetTexture();
+
+        BindSampler(glTexture.GetHandle(), glSampler.GetHandle(), index);
     }
 
     void OpenGLGraphicsDevice::InternalDispatchDraw(const DrawCommand& command)

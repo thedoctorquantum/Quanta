@@ -14,4 +14,6 @@ namespace Quanta
         
         return nullptr;
     }
+    
+    Sampler2D::~Sampler2D() = default;
 }

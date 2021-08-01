@@ -27,4 +27,6 @@ namespace Quanta
             break;
         }
     }
+    
+    GraphicsBuffer::~GraphicsBuffer() = default;
 }

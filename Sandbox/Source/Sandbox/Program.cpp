@@ -53,7 +53,7 @@ int main()
     {
         0, 1, 2
     };
-        
+
     std::shared_ptr<VertexArray> vertexArray = VertexArray::Create();
 
     std::shared_ptr<GraphicsBuffer> vertexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(vertices));
@@ -84,7 +84,7 @@ int main()
         sizeof(float),
         false
     });
-
+    
     vertexArray->SetVertexBuffer(vertexBuffer, layout);
     vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt8);
     
@@ -115,9 +115,32 @@ int main()
     std::shared_ptr<Texture2D> texture = Texture2D::FromFile("Resources/Textures/tileset.png");
     
     std::shared_ptr<Sampler2D> sampler = Sampler2D::Create(texture);
-    
+        
     sampler->SetMagnification(FilterMode::Linear);
     sampler->SetMinification(FilterMode::Linear);
+
+    std::shared_ptr<Texture3D> tex3d = Texture3D::Create(10, 10, 10);
+
+    std::shared_ptr<Sampler3D> sampler3d = Sampler3D::Create(tex3d);
+
+    sampler3d->SetMagnification(FilterMode::Nearest);
+    sampler3d->SetMinification(FilterMode::Nearest);
+
+    sampler3d->SetWrapModeX(WrapMode::MirroredRepeat);
+    sampler3d->SetWrapModeY(WrapMode::MirroredRepeat);
+    sampler3d->SetWrapModeZ(WrapMode::MirroredRepeat);
+
+    std::vector<std::shared_ptr<Image32>> images =
+    {
+        Image32::FromFile("Resources/Textures/Skybox/right.png"),
+        Image32::FromFile("Resources/Textures/Skybox/left.png"),
+        Image32::FromFile("Resources/Textures/Skybox/top.png"),
+        Image32::FromFile("Resources/Textures/Skybox/bottom.png"),
+        Image32::FromFile("Resources/Textures/Skybox/back.png"),
+        Image32::FromFile("Resources/Textures/Skybox/front.png")
+    };
+
+    std::shared_ptr<CubeMap> cubeMap = CubeMap::FromImages(images);
 
     float time = 0;
     
@@ -141,7 +164,8 @@ int main()
         
         GraphicsDevice::SetRasterPipeline(pipeline);
         GraphicsDevice::SetVertexArray(vertexArray);
-                
+        
+        GraphicsDevice::BindSampler3D(*sampler3d, 0);
         GraphicsDevice::BindSampler2D(*sampler, 0);
 
         DrawCommand cmd;

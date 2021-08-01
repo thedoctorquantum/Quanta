@@ -15,6 +15,8 @@ namespace Quanta
         
         static void Resize(GraphicsBuffer& buffer, size_t size);
 
+        virtual ~GraphicsBuffer() = 0;
+
         virtual void* MapData() = 0;
         virtual void UnmapData() = 0;
         
