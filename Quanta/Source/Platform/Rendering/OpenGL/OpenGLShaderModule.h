@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../Quanta/Graphics/Rendering/Shader/ShaderModule.h"
+#include <Quanta/Graphics/Rendering/Shader/ShaderModule.h>
 
 namespace Quanta
 {

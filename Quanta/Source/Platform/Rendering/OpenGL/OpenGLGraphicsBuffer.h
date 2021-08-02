@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../Quanta/Graphics/Rendering/Buffer/GraphicsBuffer.h"
+#include <Quanta/Graphics/Rendering/Buffer/GraphicsBuffer.h>
 
 namespace Quanta
 {

@@ -1,8 +1,7 @@
 #pragma once
 
+#include <Quanta/Core/Windowing/Window.h>
 #include <GLFW/glfw3.h>
-
-#include "../../../Quanta/Core/Windowing/Window.h"
 
 namespace Quanta
 {

@@ -7,8 +7,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 
-using namespace Quanta;
-
 std::string ReadAllText(const std::string& filepath)
 {
     std::stringstream contents;
@@ -30,17 +28,17 @@ std::string ReadAllText(const std::string& filepath)
         std::cerr << exception.what() << '\n';
     }
     
-    return contents.str();
+    return std::move(contents.str());
 }
 
-int main()
+int main(int argc, char** argv)
 {
-    std::shared_ptr<Window> window = Window::Create();
+    std::shared_ptr<Quanta::Window> window = Quanta::Window::Create();
     
-    GraphicsDevice::Initialize(GraphicsApi::OpenGL);
-    AudioDevice::Initialize(AudioApi::OpenAL);
+    Quanta::GraphicsDevice::Initialize(Quanta::GraphicsApi::OpenGL);
+    Quanta::AudioDevice::Initialize(Quanta::AudioApi::OpenAL);
 
-    window->SetState(WindowState::Maximized);
+    window->SetState(Quanta::WindowState::Maximized);
 
     float vertices[3 * 9] = 
     {
@@ -54,93 +52,93 @@ int main()
         0, 1, 2
     };
 
-    std::shared_ptr<VertexArray> vertexArray = VertexArray::Create();
+    std::shared_ptr<Quanta::VertexArray> vertexArray = Quanta::VertexArray::Create();
 
-    std::shared_ptr<GraphicsBuffer> vertexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(vertices));
-    std::shared_ptr<GraphicsBuffer> indexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(indices));
+    std::shared_ptr<Quanta::GraphicsBuffer> vertexBuffer = Quanta::GraphicsBuffer::Create(Quanta::BufferUsage::Static, sizeof(vertices));
+    std::shared_ptr<Quanta::GraphicsBuffer> indexBuffer = Quanta::GraphicsBuffer::Create(Quanta::BufferUsage::Static, sizeof(indices));
     
     vertexBuffer->SetData(vertices, sizeof(vertices));
     indexBuffer->SetData(indices, sizeof(indices));
     
-    VertexLayout layout;
+    Quanta::VertexLayout layout;
 
     layout.Add({
-        BufferPrimitive::Float,
+        Quanta::BufferPrimitive::Float,
         3,
         sizeof(float),
         false
     });
     
     layout.Add({
-        BufferPrimitive::Float,
+        Quanta::BufferPrimitive::Float,
         4,
         sizeof(float),
         false
     });
-
+    
     layout.Add({
-        BufferPrimitive::Float,
+        Quanta::BufferPrimitive::Float,
         2,
         sizeof(float),
         false
     });
     
     vertexArray->SetVertexBuffer(vertexBuffer, layout);
-    vertexArray->SetIndexBuffer(indexBuffer, IndexType::UInt8);
+    vertexArray->SetIndexBuffer(indexBuffer, Quanta::IndexType::UInt8);
     
     std::string vertexCode = ReadAllText("Resources/Shaders/vertex.glsl");
     std::string fragmentCode = ReadAllText("Resources/Shaders/fragment.glsl");
     
-    RasterPipelineDescription desc;
+    Quanta::RasterPipelineDescription desc;
     
-    desc.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Vertex, vertexCode));
-    desc.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Fragment, fragmentCode));
+    desc.ShaderModules.emplace_back(Quanta::ShaderModule::Create(Quanta::ShaderType::Vertex, vertexCode));
+    desc.ShaderModules.emplace_back(Quanta::ShaderModule::Create(Quanta::ShaderType::Pixel, fragmentCode));
     
-    std::shared_ptr<GraphicsBuffer> uniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::mat4) * 2);
+    std::shared_ptr<Quanta::GraphicsBuffer> uniforms = Quanta::GraphicsBuffer::Create(Quanta::BufferUsage::Static, sizeof(glm::mat4) * 2);
 
     desc.UniformBuffers.emplace_back(uniforms);
     
-    std::shared_ptr<RasterPipeline> pipeline = RasterPipeline::Create(desc);
+    std::shared_ptr<Quanta::RasterPipeline> pipeline = Quanta::RasterPipeline::Create(desc);
     
-    pipeline->SetPolygonFillMode(PolygonFillMode::Solid);   
-    pipeline->SetFaceCullMode(FaceCullMode::Back);
-    pipeline->SetDepthTestMode(DepthTestMode::None);
+    pipeline->SetPolygonFillMode(Quanta::PolygonFillMode::Solid);   
+    pipeline->SetFaceCullMode(Quanta::FaceCullMode::Back);
+    pipeline->SetDepthTestMode(Quanta::DepthTestMode::None);
     pipeline->SetEnableDepthWriting(true);
-    pipeline->SetBlendMode(BlendMode::Add);     
+    pipeline->SetBlendMode(Quanta::BlendMode::Add);     
 
     glm::vec3 translation = glm::vec3(0.0f);
 
-    ImGuiRenderer::Initialize(*window);
+    Quanta::ImGuiRenderer::Initialize(*window);
     
-    std::shared_ptr<Texture2D> texture = Texture2D::FromFile("Resources/Textures/tileset.png");
+    std::shared_ptr<Quanta::Texture2D> texture = Quanta::Texture2D::FromFile("Resources/Textures/tileset.png");
     
-    std::shared_ptr<Sampler2D> sampler = Sampler2D::Create(texture);
+    std::shared_ptr<Quanta::Sampler2D> sampler = Quanta::Sampler2D::Create(texture);
         
-    sampler->SetMagnification(FilterMode::Linear);
-    sampler->SetMinification(FilterMode::Linear);
+    sampler->SetMagnification(Quanta::FilterMode::Linear);
+    sampler->SetMinification(Quanta::FilterMode::Linear);
 
-    std::shared_ptr<Texture3D> tex3d = Texture3D::Create(10, 10, 10);
+    std::shared_ptr<Quanta::Texture3D> tex3d = Quanta::Texture3D::Create(10, 10, 10);
 
-    std::shared_ptr<Sampler3D> sampler3d = Sampler3D::Create(tex3d);
+    std::shared_ptr<Quanta::Sampler3D> sampler3d = Quanta::Sampler3D::Create(tex3d);
 
-    sampler3d->SetMagnification(FilterMode::Nearest);
-    sampler3d->SetMinification(FilterMode::Nearest);
+    sampler3d->SetMagnification(Quanta::FilterMode::Nearest);
+    sampler3d->SetMinification(Quanta::FilterMode::Nearest);
 
-    sampler3d->SetWrapModeX(WrapMode::MirroredRepeat);
-    sampler3d->SetWrapModeY(WrapMode::MirroredRepeat);
-    sampler3d->SetWrapModeZ(WrapMode::MirroredRepeat);
+    sampler3d->SetWrapModeX(Quanta::WrapMode::MirroredRepeat);
+    sampler3d->SetWrapModeY(Quanta::WrapMode::MirroredRepeat);
+    sampler3d->SetWrapModeZ(Quanta::WrapMode::MirroredRepeat);
 
-    std::vector<std::shared_ptr<Image32>> images =
+    std::vector<std::shared_ptr<Quanta::Image32>> images =
     {
-        Image32::FromFile("Resources/Textures/Skybox/right.png"),
-        Image32::FromFile("Resources/Textures/Skybox/left.png"),
-        Image32::FromFile("Resources/Textures/Skybox/top.png"),
-        Image32::FromFile("Resources/Textures/Skybox/bottom.png"),
-        Image32::FromFile("Resources/Textures/Skybox/back.png"),
-        Image32::FromFile("Resources/Textures/Skybox/front.png")
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/right.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/left.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/top.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/bottom.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/back.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
     };
 
-    std::shared_ptr<CubeMap> cubeMap = CubeMap::FromImages(images);
+    std::shared_ptr<Quanta::CubeMap> cubeMap = Quanta::CubeMap::FromImages(images);
 
     float time = 0;
     
@@ -162,19 +160,19 @@ int main()
         
         uniforms->SetData(&model, sizeof(glm::mat4));
         
-        GraphicsDevice::SetRasterPipeline(pipeline);
-        GraphicsDevice::SetVertexArray(vertexArray);
+        Quanta::GraphicsDevice::SetRasterPipeline(pipeline);
+        Quanta::GraphicsDevice::SetVertexArray(vertexArray);
         
-        GraphicsDevice::BindSampler3D(*sampler3d, 0);
-        GraphicsDevice::BindSampler2D(*sampler, 0);
+        Quanta::GraphicsDevice::BindSampler3D(*sampler3d, 0);
+        Quanta::GraphicsDevice::BindSampler2D(*sampler, 0);
 
-        DrawCommand cmd;
+        Quanta::DrawCommand cmd;
         
         cmd.Count = 3;
         
-        GraphicsDevice::DispatchDraw(cmd);
+        Quanta::GraphicsDevice::DispatchDraw(cmd);
 
-        ImGuiRenderer::Begin(1.0f / 60.0f);
+        Quanta::ImGuiRenderer::Begin(1.0f / 60.0f);
         {
             ImGui::ShowDemoWindow();
             ImGui::ShowMetricsWindow();
@@ -185,15 +183,15 @@ int main()
             {
                 if(ImGui::Button("Toggle Filter Mode"))
                 {
-                    if(sampler->GetMagnification() == FilterMode::Linear)
+                    if(sampler->GetMagnification() == Quanta::FilterMode::Linear)
                     {
-                        sampler->SetMagnification(FilterMode::Nearest);
-                        sampler->SetMinification(FilterMode::Nearest);
+                        sampler->SetMagnification(Quanta::FilterMode::Nearest);
+                        sampler->SetMinification(Quanta::FilterMode::Nearest);
                     }
                     else
                     {
-                        sampler->SetMagnification(FilterMode::Linear);
-                        sampler->SetMinification(FilterMode::Linear);
+                        sampler->SetMagnification(Quanta::FilterMode::Linear);
+                        sampler->SetMinification(Quanta::FilterMode::Linear);
                     }
                 }
 
@@ -201,19 +199,19 @@ int main()
             }
             ImGui::End();
         }
-        ImGuiRenderer::End();
+        Quanta::ImGuiRenderer::End();
 
         window->SwapBuffers();
 
-        GraphicsDevice::SetRasterPipeline(nullptr);
+        Quanta::GraphicsDevice::SetRasterPipeline(nullptr);
 
-        GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f, 0);
+        Quanta::GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f, 0);
     }
 
-    ImGuiRenderer::Shutdown();
+    Quanta::ImGuiRenderer::Shutdown();
 
-    GraphicsDevice::DeInitialize();
-    AudioDevice::DeInitialize();
+    Quanta::GraphicsDevice::DeInitialize();
+    Quanta::AudioDevice::DeInitialize();
 
     return 0;
 }

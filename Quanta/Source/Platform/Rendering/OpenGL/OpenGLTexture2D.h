@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../Quanta/Graphics/Rendering/Texture/Texture2D.h"
+#include <Quanta/Graphics/Rendering/Texture/Texture2D.h>
 
 namespace Quanta
 {

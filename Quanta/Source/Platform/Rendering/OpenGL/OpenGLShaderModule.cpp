@@ -15,7 +15,7 @@ namespace Quanta
             target = GL_VERTEX_SHADER;
             
             break;
-        case ShaderType::Fragment:
+        case ShaderType::Pixel:
             target = GL_FRAGMENT_SHADER;
 
             break;

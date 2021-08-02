@@ -1,8 +1,8 @@
 #pragma once
 
+#include <Quanta/Graphics/Rendering/GraphicsDevice.h>
 #include <glad/glad.h>
 
-#include "../../../Quanta/Graphics/Rendering/GraphicsDevice.h"
 #include "OpenGLRasterPipeline.h"
 #include "OpenGLVertexArray.h"
 

@@ -1,9 +1,8 @@
 #pragma once
 
+#include <Quanta/Audio/AudioDevice.h>
 #include <al.h>
 #include <AL/alc.h>
-
-#include "../../../Quanta/Audio/AudioDevice.h"
 
 namespace Quanta
 {

@@ -1,7 +1,7 @@
 #pragma once
 
+#include <Quanta/Graphics/Rendering/Buffer/VertexArray.h>
 #include <glad/glad.h>
-#include "../../../Quanta/Graphics/Rendering/Buffer/VertexArray.h"
 
 namespace Quanta
 {

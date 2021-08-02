@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../Quanta/Graphics/Rendering/Texture/CubeMap.h"
+#include <Quanta/Graphics/Rendering/Texture/CubeMap.h>
 
 namespace Quanta
 {

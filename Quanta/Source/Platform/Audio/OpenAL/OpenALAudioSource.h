@@ -1,8 +1,7 @@
 #pragma once
 
-#include <stdint.h>
-
-#include "../../../Quanta/Audio/AudioSource.h"
+#include <Quanta/Audio/AudioSource.h>
+#include <cstdint>
 
 namespace Quanta
 {

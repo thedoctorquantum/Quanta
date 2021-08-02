@@ -1,8 +1,7 @@
 #pragma once
 
+#include <Quanta/Audio/AudioBuffer.h>
 #include <al.h>
-
-#include "../../../Quanta/Audio/AudioBuffer.h"
 
 namespace Quanta
 {

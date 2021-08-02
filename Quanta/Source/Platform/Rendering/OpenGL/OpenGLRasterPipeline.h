@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../Quanta/Graphics/Rendering/Pipeline/RasterPipeline.h"
+#include <Quanta/Graphics/Rendering/Pipeline/RasterPipeline.h>
 
 namespace Quanta
 {
