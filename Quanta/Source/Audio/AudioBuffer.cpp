@@ -2,7 +2,7 @@
 #include <Quanta/Audio/AudioDevice.h>
 #include <sndfile.h>
 
-#include "../Platform/Audio/OpenAL/OpenALAudioBuffer.h"
+#include "../Platform/OpenAL/OpenALAudioBuffer.h"
 
 namespace Quanta
 {

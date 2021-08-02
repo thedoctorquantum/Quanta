@@ -1,6 +1,6 @@
 #include <Quanta/Core/Windowing/Window.h>
 
-#include "../../Platform/Windowing/Glfw/GlfwWindow.h"
+#include "../../Platform/Glfw/GlfwWindow.h"
 
 namespace Quanta
 {

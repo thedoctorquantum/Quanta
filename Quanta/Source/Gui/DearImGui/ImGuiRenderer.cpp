@@ -1,10 +1,10 @@
 #include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
-#include <Quanta/Graphics/Rendering/Buffer/GraphicsBuffer.h>
-#include <Quanta/Graphics/Rendering/Buffer/VertexArray.h>
-#include <Quanta/Graphics/Rendering/Pipeline/RasterPipeline.h>
-#include <Quanta/Graphics/Rendering/GraphicsDevice.h>
-#include <Quanta/Graphics/Rendering/Texture/Texture2D.h>
-#include <Quanta/Graphics/Rendering/Texture/Sampler2D.h>
+#include <Quanta/Graphics/Buffer/GraphicsBuffer.h>
+#include <Quanta/Graphics/Buffer/VertexArray.h>
+#include <Quanta/Graphics/Pipeline/RasterPipeline.h>
+#include <Quanta/Graphics/GraphicsDevice.h>
+#include <Quanta/Graphics/Texture/Texture2D.h>
+#include <Quanta/Graphics/Texture/Sampler2D.h>
 #include <memory>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

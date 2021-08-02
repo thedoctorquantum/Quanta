@@ -1,6 +1,6 @@
 #include <Quanta/Audio/AudioDevice.h>
 
-#include "../Platform/Audio/OpenAL/OpenALAudioDevice.h"
+#include "../Platform/OpenAL/OpenALAudioDevice.h"
 
 namespace Quanta
 {

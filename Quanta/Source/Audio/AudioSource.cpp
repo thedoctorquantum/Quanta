@@ -1,7 +1,7 @@
 #include <Quanta/Audio/AudioSource.h>
 #include <Quanta/Audio/AudioDevice.h>
 
-#include "../Platform/Audio/OpenAL/OpenALAudioSource.h"
+#include "../Platform/OpenAL/OpenALAudioSource.h"
 
 namespace Quanta
 {
