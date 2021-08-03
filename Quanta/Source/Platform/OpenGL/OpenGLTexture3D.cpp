@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 
 #include "OpenGLTexture3D.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
@@ -11,6 +12,8 @@ namespace Quanta
         this->depth = depth;
 
         glCreateTextures(GL_TEXTURE_3D, 1, &handle);
+        
+        DEBUG_ASSERT(handle != 0);
 
         glTextureStorage3D(handle, 1, GL_RGBA8, width, height, depth);
     }

@@ -111,7 +111,7 @@ int main(int argc, char** argv)
     Quanta::ImGuiRenderer::Initialize(*window);
     
     std::shared_ptr<Quanta::Texture2D> texture = Quanta::Texture2D::FromFile("Resources/Textures/tileset.png");
-    
+
     std::shared_ptr<Quanta::Sampler2D> sampler = Quanta::Sampler2D::Create(texture);
         
     sampler->SetMagnification(Quanta::FilterMode::Linear);
@@ -126,13 +126,13 @@ int main(int argc, char** argv)
         Quanta::Image32::FromFile("Resources/Textures/Skybox/back.png"),
         Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
     };
-    
+
     std::shared_ptr<Quanta::CubeMap> cubeMap = Quanta::CubeMap::FromImages(images);
 
     std::shared_ptr<Quanta::SamplerCube> cubeSampler = Quanta::SamplerCube::Create(cubeMap);
 
     cubeSampler->SetIsSeamless(true);
-
+    
     float time = 0;
     
     while(window->Exists())
@@ -159,7 +159,6 @@ int main(int argc, char** argv)
         Quanta::GraphicsDevice::SetVertexArray(vertexArray);
 
         Quanta::GraphicsDevice::BindSampler(*sampler, 0);
-        Quanta::GraphicsDevice::BindSampler(*cubeSampler, 0);
 
         Quanta::DrawCommand cmd;
         

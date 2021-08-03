@@ -1,15 +1,18 @@
 #include <glad/glad.h>
 
 #include "OpenGLGraphicsBuffer.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
     OpenGLGraphicsBuffer::OpenGLGraphicsBuffer(BufferUsage usage, size_t size)
-    {        
+    {       
         this->usage = usage;
         this->size = size;
         
         glCreateBuffers(1, &handle);
+        
+        DEBUG_ASSERT(handle != 0);
 
         switch(usage)
         {
@@ -21,6 +24,8 @@ namespace Quanta
             glNamedBufferData(handle, size, nullptr, GL_DYNAMIC_DRAW);
 
             break;
+        default:
+            DEBUG_FAILURE_MESSAGE("GraphicsBuffer usage is not supported!");
         }
     }
     
@@ -28,9 +33,11 @@ namespace Quanta
     {
         glDeleteBuffers(1, &handle);
     }
-
+    
     void OpenGLGraphicsBuffer::Resize(OpenGLGraphicsBuffer& buffer, size_t size)
     {
+        DEBUG_ASSERT(buffer.GetUsage() != BufferUsage::Static);
+
         glNamedBufferData(buffer.handle, size, nullptr, GL_DYNAMIC_DRAW);
 
         buffer.size = size;

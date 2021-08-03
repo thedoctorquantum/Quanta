@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 
 #include "OpenGLTexture2D.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
@@ -10,6 +11,8 @@ namespace Quanta
         this->height = height;
 
         glCreateTextures(GL_TEXTURE_2D, 1, &handle);
+
+        DEBUG_ASSERT(handle != 0);
 
         glTextureStorage2D(handle, 1, GL_RGBA8, width, height);
     }

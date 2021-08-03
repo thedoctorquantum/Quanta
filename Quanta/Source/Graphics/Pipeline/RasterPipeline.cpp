@@ -4,6 +4,7 @@
 #include <Quanta/Graphics/GraphicsDevice.h>
 
 #include "../../Platform/OpenGL/OpenGLRasterPipeline.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
@@ -14,6 +15,8 @@ namespace Quanta
         case GraphicsApi::OpenGL: 
             return std::make_shared<OpenGLRasterPipeline>(description);
         }
+
+        DEBUG_FAILURE_MESSAGE("GraphicsApi not supported");
         
         return nullptr;
     } 

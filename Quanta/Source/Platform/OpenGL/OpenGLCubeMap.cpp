@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 
 #include "OpenGLCubeMap.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
@@ -11,6 +12,8 @@ namespace Quanta
         
         glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &handle);
 
+        DEBUG_ASSERT(handle != 0);
+        
         glTextureStorage2D(handle, 1, GL_RGBA8, width, height);
     }
     

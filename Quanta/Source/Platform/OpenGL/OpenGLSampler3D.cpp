@@ -2,14 +2,19 @@
 
 #include "OpenGLSampler3D.h"
 #include "GLEnumConversions.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
     OpenGLSampler3D::OpenGLSampler3D(const std::shared_ptr<Texture3D>& texture)
     {
+        DEBUG_ASSERT(texture != nullptr);
+
         this->texture = texture;
 
         glCreateSamplers(1, &handle);
+
+        DEBUG_ASSERT(handle != 0);
         
         glSamplerParameteri(handle, GL_TEXTURE_MAG_FILTER, FilterModeToGLenum(magnification));
         glSamplerParameteri(handle, GL_TEXTURE_MIN_FILTER, FilterModeToGLenum(minification));

@@ -11,6 +11,8 @@
 #include <imgui.h>
 #include <iostream>
 
+#include "../../Debugging/Validation.h"
+
 namespace Quanta
 {
     struct State
@@ -240,6 +242,8 @@ namespace Quanta
         ImGui::Render();
 
         ImDrawData* drawData = ImGui::GetDrawData();
+
+        DEBUG_ASSERT(drawData != nullptr);
 
         if(!drawData->CmdListsCount) return;
 

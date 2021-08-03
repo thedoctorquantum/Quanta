@@ -2,12 +2,15 @@
 #include <alc.h>
 
 #include "OpenALAudioSource.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
     OpenALAudioSource::OpenALAudioSource()
     {
         alGenSources(1, &handle);
+
+        DEBUG_ASSERT(handle != 0);
     }
 
     OpenALAudioSource::~OpenALAudioSource()
@@ -19,7 +22,7 @@ namespace Quanta
     {
         return translation;
     }
-
+    
     void OpenALAudioSource::SetTranslation(const glm::vec3& value)
     {
         translation = value;

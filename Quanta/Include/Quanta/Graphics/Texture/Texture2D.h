@@ -18,7 +18,7 @@ namespace Quanta
         static std::shared_ptr<Texture2D> FromImage(const Image32& image);
         static std::shared_ptr<Image32> ToImage(const Texture2D& texture);
         
-        virtual ~Texture2D() = default;
+        virtual ~Texture2D() = 0;
 
         virtual void SetData(const void* data) = 0;
         virtual void GetData(void* data) const = 0;

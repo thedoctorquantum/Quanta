@@ -2,10 +2,15 @@
 #include <iostream>
 #include <Quanta/Graphics/Imaging/Image32.h>
 
+#include "../../Debugging/Validation.h"
+
 namespace Quanta
 {
     Image32::Image32(size_t width, size_t height)
     {
+        DEBUG_ASSERT(width != 0);
+        DEBUG_ASSERT(height != 0);
+
         data = new Color32[width * height];
 
         this->width = width;
@@ -14,8 +19,11 @@ namespace Quanta
 
     Image32::Image32(Color32* data, size_t width, size_t height)
     {
-        this->data = data;
+        DEBUG_ASSERT(data != nullptr);   
+        DEBUG_ASSERT(width != 0);
+        DEBUG_ASSERT(height != 0);
 
+        this->data = data;
         this->width = width;
         this->height = height;
     }
@@ -45,13 +53,8 @@ namespace Quanta
         int32_t channels;
 
         uint8_t* data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-
-        if(!data)
-        {
-            std::cout << "Could not load image '" << filepath << "': " << stbi_failure_reason() << '\n';
-
-            return nullptr;
-        }
+        
+        DEBUG_ASSERT(data != nullptr);
 
         return std::make_shared<Image32>((Color32*) data, width, height);
     }
@@ -75,16 +78,23 @@ namespace Quanta
 
     Color32& Image32::operator[](size_t index)
     {
+        DEBUG_ASSERT(index < width * height);
+
         return data[index];
     }
     
     const Color32& Image32::operator[](size_t index) const
     {
+        DEBUG_ASSERT(index < width * height);
+
         return data[index];
     }
 
     Color32& Image32::operator()(size_t x, size_t y)
     {
+        DEBUG_ASSERT(x < width);
+        DEBUG_ASSERT(y < height);
+
         return data[x + width * y];
     }
     
@@ -92,7 +102,7 @@ namespace Quanta
     {
         return this->operator()(x, y);
     }
-
+    
     const Color32* Image32::GetData() const
     {
         return data;

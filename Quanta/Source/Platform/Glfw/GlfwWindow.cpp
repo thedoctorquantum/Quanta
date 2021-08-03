@@ -2,10 +2,11 @@
 #include <glad/glad.h>
 
 #include "GlfwWindow.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
-    static uint32_t instanceCount;
+    static uint32_t instanceCount = 0;
 
     GlfwWindow::GlfwWindow()
     {
@@ -13,7 +14,9 @@ namespace Quanta
 
         if(instanceCount == 1)
         {
-            glfwInit();
+            bool isInitialized = glfwInit();
+
+            DEBUG_ASSERT(isInitialized);
 
             glfwSetErrorCallback([](int level, const char* message)
             {
@@ -33,6 +36,8 @@ namespace Quanta
         #endif
 
         handle = glfwCreateWindow(640, 480, "Window", nullptr, nullptr);
+        
+        DEBUG_ASSERT(handle != nullptr);
 
         glfwSetWindowUserPointer(handle, this);
 
@@ -157,10 +162,11 @@ namespace Quanta
 
             break;
         case WindowState::Minimized:
+            DEBUG_WARNING("WindowState::Minimized is not currently implemented");
             
             break;
         default:
-            break;
+            DEBUG_FAILURE_MESSAGE("value was out of range");
         }
     }
 

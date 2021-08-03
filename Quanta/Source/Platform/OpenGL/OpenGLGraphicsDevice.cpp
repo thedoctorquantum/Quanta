@@ -11,6 +11,7 @@
 #include "OpenGLSampler3D.h"
 #include "OpenGLCubeMap.h"
 #include "OpenGLSamplerCube.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
@@ -22,7 +23,9 @@ namespace Quanta
 
     OpenGLGraphicsDevice::OpenGLGraphicsDevice()
     {
-        gladLoadGL();
+        bool isLoaded = gladLoadGL();
+
+        DEBUG_ASSERT(isLoaded);
 
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (int*) &maxTextureSlots);
         
@@ -95,7 +98,9 @@ namespace Quanta
             return;
         }
 
-        OpenGLRasterPipeline& glPipeline = (OpenGLRasterPipeline&) *value;
+        OpenGLRasterPipeline* glPipeline = (OpenGLRasterPipeline*) value.get();
+
+        DEBUG_ASSERT(glPipeline != nullptr);
 
         if(rasterPipeline != value.get())
         {
@@ -108,7 +113,7 @@ namespace Quanta
                 glBindBufferBase(GL_UNIFORM_BUFFER, i, glBuffer->GetHandle());
             }
 
-            glUseProgram(glPipeline.GetHandle());
+            glUseProgram(glPipeline->GetHandle());
         }
 
         switch(value->GetPolygonFillMode())
@@ -290,7 +295,7 @@ namespace Quanta
             break;
         }
 
-        rasterPipeline = &glPipeline;
+        rasterPipeline = glPipeline;
     }
     
     void OpenGLGraphicsDevice::InternalSetVertexArray(const std::shared_ptr<VertexArray>& value)
@@ -315,26 +320,35 @@ namespace Quanta
     
     void OpenGLGraphicsDevice::InternalBindSampler(const Sampler2D& sampler, size_t index)
     {
-        const OpenGLSampler2D& glSampler = (const OpenGLSampler2D&) sampler;
-        const OpenGLTexture2D& glTexture = (const OpenGLTexture2D&) *sampler.GetTexture();
+        const OpenGLSampler2D* glSampler = (const OpenGLSampler2D*) &sampler;
+        const OpenGLTexture2D* glTexture = (const OpenGLTexture2D*) sampler.GetTexture().get();
         
-        BindSamplerHandle(glTexture.GetHandle(), glSampler.GetHandle(), index);
+        DEBUG_ASSERT(glSampler != nullptr);
+        DEBUG_ASSERT(glTexture != nullptr);
+
+        BindSamplerHandle(glTexture->GetHandle(), glSampler->GetHandle(), index);
     }
 
     void OpenGLGraphicsDevice::InternalBindSampler(const Sampler3D& sampler, size_t index)
     {
-        const OpenGLSampler3D& glSampler = (const OpenGLSampler3D&) sampler;
-        const OpenGLTexture3D& glTexture = (const OpenGLTexture3D&) *sampler.GetTexture();
+        const OpenGLSampler3D* glSampler = (const OpenGLSampler3D*) &sampler;
+        const OpenGLTexture3D* glTexture = (const OpenGLTexture3D*) sampler.GetTexture().get();
 
-        BindSamplerHandle(glTexture.GetHandle(), glSampler.GetHandle(), index);
+        DEBUG_ASSERT(glSampler != nullptr);
+        DEBUG_ASSERT(glTexture != nullptr);
+
+        BindSamplerHandle(glTexture->GetHandle(), glSampler->GetHandle(), index);
     }
     
     void OpenGLGraphicsDevice::InternalBindSampler(const SamplerCube& sampler, size_t index)
     {
-        const OpenGLSamplerCube& glSampler = (const OpenGLSamplerCube&) sampler;
-        const OpenGLCubeMap& glTexture = (const OpenGLCubeMap&) *sampler.GetTexture();
+        const OpenGLSamplerCube* glSampler = (const OpenGLSamplerCube*) &sampler;
+        const OpenGLCubeMap* glTexture = (const OpenGLCubeMap*) sampler.GetTexture().get();
 
-        BindSamplerHandle(glTexture.GetHandle(), glSampler.GetHandle(), index);
+        DEBUG_ASSERT(glSampler != nullptr);
+        DEBUG_ASSERT(glTexture != nullptr);
+
+        BindSamplerHandle(glTexture->GetHandle(), glSampler->GetHandle(), index);
     }
 
     void OpenGLGraphicsDevice::InternalDispatchDraw(const DrawCommand& command)

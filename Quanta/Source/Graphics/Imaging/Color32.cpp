@@ -1,5 +1,7 @@
 #include <Quanta/Graphics/Imaging/Color32.h>
 
+#include "../../Debugging/Validation.h"
+
 namespace Quanta
 {
     Color32::Color32(uint32_t value)
@@ -17,11 +19,15 @@ namespace Quanta
 
     uint8_t& Color32::operator[](size_t index)
     {
+        DEBUG_ASSERT(index < 3);
+        
         return RedGreenBlueAlpha[index];
     }
-
+    
     const uint8_t& Color32::operator[](size_t index) const
     {
+        DEBUG_ASSERT(index < 3);
+
         return RedGreenBlueAlpha[index];
     }
 }

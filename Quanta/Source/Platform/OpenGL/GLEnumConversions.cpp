@@ -1,4 +1,5 @@
 #include "GLEnumConversions.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
@@ -14,6 +15,8 @@ namespace Quanta
         case FilterMode::LinearMipMapNearest: return GL_LINEAR_MIPMAP_NEAREST;
         }
 
+        DEBUG_FAILURE_MESSAGE("mode is not supported!");
+
         return 0;
     }
     
@@ -26,6 +29,8 @@ namespace Quanta
         case WrapMode::ClampToEdge: return GL_CLAMP_TO_EDGE;
         case WrapMode::ClampToBorder: return GL_CLAMP_TO_BORDER;
         }
+
+        DEBUG_FAILURE_MESSAGE("mode is not supported!");
 
         return 0;
     }

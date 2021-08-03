@@ -1,9 +1,13 @@
 #include <Quanta/Graphics/Buffer/VertexLayout.h>
 
+#include "../../Debugging/Validation.h"
+
 namespace Quanta
 {
     const VertexElement& VertexLayout::operator[](uint32_t index) const
     {
+        DEBUG_ASSERT(index < elements.size());
+        
         return elements[index];            
     }
     

@@ -3,19 +3,20 @@
 
 #include "OpenGLRasterPipeline.h"
 #include "OpenGLShaderModule.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
-    static size_t instanceCount = 0;
-
     OpenGLRasterPipeline::OpenGLRasterPipeline(const RasterPipelineDescription& description)
     {
+        DEBUG_ASSERT(description.ShaderModules.size() >= 2);
+        
         this->shaderModules = description.ShaderModules;
         this->uniformBuffers = description.UniformBuffers;
         
-        instanceCount++;
-
         handle = glCreateProgram();
+
+        DEBUG_ASSERT(handle != 0);
 
         for(int i = 0; i < shaderModules.size(); i++)
         {
@@ -28,6 +29,7 @@ namespace Quanta
     
         glLinkProgram(handle);
 
+#if DEBUG
         int success;
 
         glGetProgramiv(handle, GL_LINK_STATUS, &success);
@@ -38,8 +40,9 @@ namespace Quanta
 
             glGetProgramInfoLog(handle, sizeof(infoLog), nullptr, infoLog);
 
-            std::cout << "Shader program " << handle << " could not link: \n" << infoLog << '\n'; 
+            DEBUG_FAILURE_MESSAGE(infoLog);
         }
+#endif
         
         for(size_t i = 0; i < shaderModules.size(); i++)
         {
@@ -53,8 +56,6 @@ namespace Quanta
     
     OpenGLRasterPipeline::~OpenGLRasterPipeline()
     {
-        instanceCount--;
-
         glDeleteProgram(handle);
     }
 

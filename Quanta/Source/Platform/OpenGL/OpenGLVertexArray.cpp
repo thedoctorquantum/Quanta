@@ -2,12 +2,15 @@
 
 #include "OpenGLVertexArray.h"
 #include "OpenGLGraphicsBuffer.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
     OpenGLVertexArray::OpenGLVertexArray()
     {
         glCreateVertexArrays(1, &handle);
+
+        DEBUG_ASSERT(handle != 0);
     }
     
     OpenGLVertexArray::~OpenGLVertexArray()
@@ -17,11 +20,17 @@ namespace Quanta
     
     void OpenGLVertexArray::SetVertexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, const VertexLayout& layout)
     {
+        DEBUG_ASSERT(buffer != nullptr);
+        DEBUG_ASSERT(layout.GetCount() != 0);
+        DEBUG_ASSERT(layout.GetStride() != 0);
+
         vertexBuffer = buffer;
 
-        OpenGLGraphicsBuffer& glBuffer = (OpenGLGraphicsBuffer&) *buffer;
+        OpenGLGraphicsBuffer* glBuffer = (OpenGLGraphicsBuffer*) buffer.get();
 
-        glVertexArrayVertexBuffer(handle, 0, glBuffer.GetHandle(), 0, layout.GetStride());
+        DEBUG_ASSERT(glBuffer != nullptr);
+
+        glVertexArrayVertexBuffer(handle, 0, glBuffer->GetHandle(), 0, layout.GetStride());
 
         uint32_t offset = 0;
 
@@ -49,6 +58,8 @@ namespace Quanta
                 type = GL_DOUBLE;
 
                 break;
+            default:
+                DEBUG_FAILURE_MESSAGE("element.Primitive was out of range");
             }
             
             glEnableVertexArrayAttrib(handle, i);
@@ -63,14 +74,17 @@ namespace Quanta
     
     void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, IndexType type)
     {
-        OpenGLGraphicsBuffer& glBuffer = (OpenGLGraphicsBuffer&) *buffer;
+        DEBUG_ASSERT(buffer != nullptr);
+
+        OpenGLGraphicsBuffer* glBuffer = (OpenGLGraphicsBuffer*) buffer.get();
+
+        DEBUG_ASSERT(glBuffer != nullptr);
 
         indexBuffer = buffer;
-        indexType = type;
 
-        glVertexArrayElementBuffer(handle, glBuffer.GetHandle());
+        glVertexArrayElementBuffer(handle, glBuffer->GetHandle());
 
-        switch(indexType)
+        switch(type)
         {
         case IndexType::UInt8:
             openglIndexType = GL_UNSIGNED_BYTE;
@@ -84,7 +98,11 @@ namespace Quanta
             openglIndexType = GL_UNSIGNED_INT;
 
             break;
+        default: 
+            DEBUG_FAILURE_MESSAGE("type was out of range");
         }
+        
+        indexType = type;
     }
     
     const std::shared_ptr<GraphicsBuffer>& OpenGLVertexArray::GetVertexBuffer() const

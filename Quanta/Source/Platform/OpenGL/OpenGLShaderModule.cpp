@@ -2,11 +2,15 @@
 #include <glad/glad.h>
 
 #include "OpenGLShaderModule.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
     OpenGLShaderModule::OpenGLShaderModule(ShaderType type, const std::string& source)
     {
+        DEBUG_ASSERT(source.length() != 0);
+        DEBUG_ASSERT(source.c_str() != nullptr);
+        
         GLenum target;
         
         switch(type)
@@ -27,9 +31,13 @@ namespace Quanta
             target = GL_COMPUTE_SHADER;
 
             break;
+        default:
+            DEBUG_FAILURE_MESSAGE("ShaderType out of range");
         }
         
         handle = glCreateShader(target);
+        
+        DEBUG_ASSERT(handle != 0);
 
         const char* sourcePointer = source.c_str();
         int32_t length = source.length();
@@ -37,6 +45,7 @@ namespace Quanta
         glShaderSource(handle, 1, &sourcePointer, &length);
         glCompileShader(handle);
 
+#if DEBUG
         int success;
 
         glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
@@ -47,8 +56,9 @@ namespace Quanta
 
             glGetShaderInfoLog(handle, sizeof(infoLog), nullptr, infoLog);
 
-            std::cout << "Shader Compilation Failed:\n" << infoLog << std::endl;
+            DEBUG_FAILURE_MESSAGE(infoLog);
         }
+#endif
     };
 
     OpenGLShaderModule::~OpenGLShaderModule()

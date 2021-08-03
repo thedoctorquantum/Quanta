@@ -4,13 +4,19 @@
 #include "OpenALAudioDevice.h"
 #include "OpenALAudioSource.h"
 #include "OpenALAudioBuffer.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
     OpenALAudioDevice::OpenALAudioDevice()
     {
         device = alcOpenDevice(nullptr);
+
+        DEBUG_ASSERT(device != nullptr);
+
         context = alcCreateContext(device, nullptr);
+
+        DEBUG_ASSERT(context != nullptr);
 
         alcMakeContextCurrent(context);
     }
@@ -23,11 +29,14 @@ namespace Quanta
     
     void OpenALAudioDevice::InternalPlay(const AudioSource& source, const AudioBuffer& buffer)
     {
-        const OpenALAudioSource& alSource = (const OpenALAudioSource&) source;
-        const OpenALAudioBuffer& alBuffer = (const OpenALAudioBuffer&) buffer;
+        const OpenALAudioSource* alSource = (const OpenALAudioSource*) &source;
+        const OpenALAudioBuffer* alBuffer = (const OpenALAudioBuffer*) &buffer;
 
-        alSourcei(alSource.GetHandle(), AL_BUFFER, alBuffer.GetHandle());
+        DEBUG_ASSERT(alSource != nullptr);
+        DEBUG_ASSERT(alBuffer != nullptr);
 
-        alSourcePlay(alSource.GetHandle());
+        alSourcei(alSource->GetHandle(), AL_BUFFER, alBuffer->GetHandle());
+
+        alSourcePlay(alSource->GetHandle());
     }
 }
