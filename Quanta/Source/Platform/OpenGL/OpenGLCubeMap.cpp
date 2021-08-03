@@ -7,8 +7,8 @@ namespace Quanta
     OpenGLCubeMap::OpenGLCubeMap(size_t width, size_t height)
     {
         this->width = width;
-        this->height = handle;
-
+        this->height = height;
+        
         glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &handle);
 
         glTextureStorage2D(handle, 1, GL_RGBA8, width, height);

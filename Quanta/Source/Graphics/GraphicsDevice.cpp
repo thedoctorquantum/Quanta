@@ -50,14 +50,19 @@ namespace Quanta
         state.device->InternalSetVertexArray(value);
     }
     
-    void GraphicsDevice::BindSampler2D(const Sampler2D& sampler, uint32_t index)
+    void GraphicsDevice::BindSampler(const Sampler2D& sampler, size_t index)
     {
-        state.device->InternalBindSampler2D(sampler, index);
+        state.device->InternalBindSampler(sampler, index);
     }
     
-    void GraphicsDevice::BindSampler3D(const Sampler3D& sampler, uint32_t index)
+    void GraphicsDevice::BindSampler(const Sampler3D& sampler, size_t index)
     {
-        state.device->InternalBindSampler3D(sampler, index);
+        state.device->InternalBindSampler(sampler, index);
+    }
+    
+    void GraphicsDevice::BindSampler(const SamplerCube& sampler, size_t index)
+    {
+        state.device->InternalBindSampler(sampler, index);
     }
 
     void GraphicsDevice::DispatchDraw(const DrawCommand& command)

@@ -6,6 +6,10 @@ namespace Quanta
 {
     OpenGLTexture3D::OpenGLTexture3D(size_t width, size_t height, size_t depth)
     {
+        this->width = width;
+        this->height = height;
+        this->depth = depth;
+
         glCreateTextures(GL_TEXTURE_3D, 1, &handle);
 
         glTextureStorage3D(handle, 1, GL_RGBA8, width, height, depth);

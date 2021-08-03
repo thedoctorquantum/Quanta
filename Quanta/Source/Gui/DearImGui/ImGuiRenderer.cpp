@@ -283,14 +283,14 @@ namespace Quanta
 
             state->vertexBuffer->SetData(drawList->VtxBuffer.Data, vertexBufferSize, vertexOffset);
             state->indexBuffer->SetData(drawList->IdxBuffer.Data, indexBufferSize, indexOffset);
-
+            
             for(int32_t j = 0; j < commands.Size; j++)
             {
                 ImDrawCmd& command = commands[j];
 
                 Sampler2D* sampler = (Sampler2D*) command.TextureId;
 
-                GraphicsDevice::BindSampler2D(*sampler, 0);
+                GraphicsDevice::BindSampler(*sampler, 0);
 
                 state->pipeline->SetScissorViewport({
                      (uint32_t) command.ClipRect.x, 

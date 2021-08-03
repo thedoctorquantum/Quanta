@@ -1,40 +1,39 @@
 #include <glad/glad.h>
 
-#include "OpenGLSampler3D.h"
+#include "OpenGLSamplerCube.h"
 #include "GLEnumConversions.h"
 
 namespace Quanta
 {
-    OpenGLSampler3D::OpenGLSampler3D(const std::shared_ptr<Texture3D>& texture)
+    OpenGLSamplerCube::OpenGLSamplerCube(const std::shared_ptr<CubeMap>& texture)
     {
         this->texture = texture;
 
         glCreateSamplers(1, &handle);
-        
+
         glSamplerParameteri(handle, GL_TEXTURE_MAG_FILTER, FilterModeToGLenum(magnification));
         glSamplerParameteri(handle, GL_TEXTURE_MIN_FILTER, FilterModeToGLenum(minification));
 
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_S, WrapModeToGLenum(wrapModeX));
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_T, WrapModeToGLenum(wrapModeY));
-        glSamplerParameteri(handle, GL_TEXTURE_WRAP_R, WrapModeToGLenum(wrapModeZ));
     }
     
-    OpenGLSampler3D::~OpenGLSampler3D()
+    OpenGLSamplerCube::~OpenGLSamplerCube()
     {
         glDeleteSamplers(1, &handle);
     }
 
-    const std::shared_ptr<Texture3D>& OpenGLSampler3D::GetTexture() const
+    const std::shared_ptr<CubeMap>& OpenGLSamplerCube::GetTexture() const 
     {
         return texture;
-    } 
-
-    FilterMode OpenGLSampler3D::GetMagnification() const
+    }
+    
+    FilterMode OpenGLSamplerCube::GetMagnification() const 
     {
         return magnification;
     }
 
-    void OpenGLSampler3D::SetMagnification(FilterMode value)
+    void OpenGLSamplerCube::SetMagnification(FilterMode value) 
     {
         if(magnification == value) return;
 
@@ -42,13 +41,13 @@ namespace Quanta
 
         glSamplerParameteri(handle, GL_TEXTURE_MAG_FILTER, FilterModeToGLenum(value));
     }
-
-    FilterMode OpenGLSampler3D::GetMinification() const
+    
+    FilterMode OpenGLSamplerCube::GetMinification() const
     {
         return minification;
     }
 
-    void OpenGLSampler3D::SetMinification(FilterMode value)
+    void OpenGLSamplerCube::SetMinification(FilterMode value)
     {
         if(minification == value) return;
 
@@ -56,13 +55,13 @@ namespace Quanta
 
         glSamplerParameteri(handle, GL_TEXTURE_MIN_FILTER, FilterModeToGLenum(value));
     }
-
-    WrapMode OpenGLSampler3D::GetWrapModeX() const
+    
+    WrapMode OpenGLSamplerCube::GetWrapModeX() const
     {
         return wrapModeX;
     }
-
-    void OpenGLSampler3D::SetWrapModeX(WrapMode value)
+    
+    void OpenGLSamplerCube::SetWrapModeX(WrapMode value) 
     {
         if(wrapModeX == value) return;
 
@@ -70,13 +69,13 @@ namespace Quanta
 
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_S, WrapModeToGLenum(value));
     }
-
-    WrapMode OpenGLSampler3D::GetWrapModeY() const
+    
+    WrapMode OpenGLSamplerCube::GetWrapModeY() const 
     {
         return wrapModeY;
     }
     
-    void OpenGLSampler3D::SetWrapModeY(WrapMode value)
+    void OpenGLSamplerCube::SetWrapModeY(WrapMode value) 
     {
         if(wrapModeY == value) return;
 
@@ -84,22 +83,22 @@ namespace Quanta
 
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_T, WrapModeToGLenum(value));
     }
-
-    WrapMode OpenGLSampler3D::GetWrapModeZ() const
+    
+    bool OpenGLSamplerCube::GetIsSeamless() const
     {
-        return wrapModeZ;
+        return isSeamless;
     }
     
-    void OpenGLSampler3D::SetWrapModeZ(WrapMode value)
+    void OpenGLSamplerCube::SetIsSeamless(bool value) 
     {
-        if(wrapModeZ == value) return;
+        if(isSeamless == value) return;
 
-        wrapModeZ = value;
+        isSeamless = value;
 
-        glSamplerParameteri(handle, GL_TEXTURE_WRAP_R, WrapModeToGLenum(value));
+        glSamplerParameteri(handle, GL_TEXTURE_CUBE_MAP_SEAMLESS, value);
     }
 
-    uint32_t OpenGLSampler3D::GetHandle() const
+    uint32_t OpenGLSamplerCube::GetHandle() const
     {
         return handle;
     }

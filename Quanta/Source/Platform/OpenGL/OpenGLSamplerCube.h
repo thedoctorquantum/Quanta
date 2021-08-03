@@ -1,17 +1,17 @@
 #pragma once
 
-#include <Quanta/Graphics/Texture/Sampler3D.h>
+#include <Quanta/Graphics/Texture/SamplerCube.h>
 
 namespace Quanta
 {
-    class OpenGLSampler3D final : public Sampler3D
+    class OpenGLSamplerCube final : public SamplerCube
     {
     public:
-        OpenGLSampler3D(const std::shared_ptr<Texture3D>& texture);
-        ~OpenGLSampler3D();
+        OpenGLSamplerCube(const std::shared_ptr<CubeMap>& texture);
+        ~OpenGLSamplerCube();
 
-        const std::shared_ptr<Texture3D>& GetTexture() const override; 
-
+        const std::shared_ptr<CubeMap>& GetTexture() const override;
+        
         FilterMode GetMagnification() const override;
         void SetMagnification(FilterMode value) override;
         
@@ -24,20 +24,21 @@ namespace Quanta
         WrapMode GetWrapModeY() const override;
         void SetWrapModeY(WrapMode value) override;
         
-        WrapMode GetWrapModeZ() const override;
-        void SetWrapModeZ(WrapMode value) override;
+        bool GetIsSeamless() const override;
+        void SetIsSeamless(bool value) override;
 
         uint32_t GetHandle() const;
-    private: 
-        std::shared_ptr<Texture3D> texture = nullptr;
-        
+    private:
+        std::shared_ptr<CubeMap> texture;
+
         FilterMode magnification = FilterMode::Linear;
         FilterMode minification = FilterMode::Linear;
-        
+
         WrapMode wrapModeX = WrapMode::Repeat;
         WrapMode wrapModeY = WrapMode::Repeat;
-        WrapMode wrapModeZ = WrapMode::Repeat;
+
+        bool isSeamless = false;
 
         uint32_t handle = 0;
     };
-}
+};

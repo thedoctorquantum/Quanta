@@ -9,10 +9,12 @@
 #include "OpenGLTexture3D.h"
 #include "OpenGLSampler2D.h"
 #include "OpenGLSampler3D.h"
+#include "OpenGLCubeMap.h"
+#include "OpenGLSamplerCube.h"
 
 namespace Quanta
 {
-    static void BindSampler(uint32_t texture, uint32_t sampler, uint32_t index)
+    static void BindSamplerHandle(uint32_t texture, uint32_t sampler, size_t index)
     {
         glBindTextureUnit(index, texture);
         glBindSampler(index, sampler);
@@ -311,20 +313,28 @@ namespace Quanta
         this->vertexArray = openglValue;
     }
     
-    void OpenGLGraphicsDevice::InternalBindSampler2D(const Sampler2D& sampler, uint32_t index)
+    void OpenGLGraphicsDevice::InternalBindSampler(const Sampler2D& sampler, size_t index)
     {
         const OpenGLSampler2D& glSampler = (const OpenGLSampler2D&) sampler;
         const OpenGLTexture2D& glTexture = (const OpenGLTexture2D&) *sampler.GetTexture();
         
-        BindSampler(glTexture.GetHandle(), glSampler.GetHandle(), index);
+        BindSamplerHandle(glTexture.GetHandle(), glSampler.GetHandle(), index);
     }
 
-    void OpenGLGraphicsDevice::InternalBindSampler3D(const Sampler3D& sampler, uint32_t index)
+    void OpenGLGraphicsDevice::InternalBindSampler(const Sampler3D& sampler, size_t index)
     {
         const OpenGLSampler3D& glSampler = (const OpenGLSampler3D&) sampler;
         const OpenGLTexture3D& glTexture = (const OpenGLTexture3D&) *sampler.GetTexture();
 
-        BindSampler(glTexture.GetHandle(), glSampler.GetHandle(), index);
+        BindSamplerHandle(glTexture.GetHandle(), glSampler.GetHandle(), index);
+    }
+    
+    void OpenGLGraphicsDevice::InternalBindSampler(const SamplerCube& sampler, size_t index)
+    {
+        const OpenGLSamplerCube& glSampler = (const OpenGLSamplerCube&) sampler;
+        const OpenGLCubeMap& glTexture = (const OpenGLCubeMap&) *sampler.GetTexture();
+
+        BindSamplerHandle(glTexture.GetHandle(), glSampler.GetHandle(), index);
     }
 
     void OpenGLGraphicsDevice::InternalDispatchDraw(const DrawCommand& command)

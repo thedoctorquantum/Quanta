@@ -117,17 +117,6 @@ int main(int argc, char** argv)
     sampler->SetMagnification(Quanta::FilterMode::Linear);
     sampler->SetMinification(Quanta::FilterMode::Linear);
 
-    std::shared_ptr<Quanta::Texture3D> tex3d = Quanta::Texture3D::Create(10, 10, 10);
-
-    std::shared_ptr<Quanta::Sampler3D> sampler3d = Quanta::Sampler3D::Create(tex3d);
-
-    sampler3d->SetMagnification(Quanta::FilterMode::Nearest);
-    sampler3d->SetMinification(Quanta::FilterMode::Nearest);
-
-    sampler3d->SetWrapModeX(Quanta::WrapMode::MirroredRepeat);
-    sampler3d->SetWrapModeY(Quanta::WrapMode::MirroredRepeat);
-    sampler3d->SetWrapModeZ(Quanta::WrapMode::MirroredRepeat);
-
     std::vector<std::shared_ptr<Quanta::Image32>> images =
     {
         Quanta::Image32::FromFile("Resources/Textures/Skybox/right.png"),
@@ -137,8 +126,12 @@ int main(int argc, char** argv)
         Quanta::Image32::FromFile("Resources/Textures/Skybox/back.png"),
         Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
     };
-
+    
     std::shared_ptr<Quanta::CubeMap> cubeMap = Quanta::CubeMap::FromImages(images);
+
+    std::shared_ptr<Quanta::SamplerCube> cubeSampler = Quanta::SamplerCube::Create(cubeMap);
+
+    cubeSampler->SetIsSeamless(true);
 
     float time = 0;
     
@@ -156,15 +149,17 @@ int main(int argc, char** argv)
 
         glm::mat4 model = glm::mat4(1.0f);
 
+        translation.x = sin(time) * 0.1f;
+
         model = glm::translate(model, translation);
         
         uniforms->SetData(&model, sizeof(glm::mat4));
         
         Quanta::GraphicsDevice::SetRasterPipeline(pipeline);
         Quanta::GraphicsDevice::SetVertexArray(vertexArray);
-        
-        Quanta::GraphicsDevice::BindSampler3D(*sampler3d, 0);
-        Quanta::GraphicsDevice::BindSampler2D(*sampler, 0);
+
+        Quanta::GraphicsDevice::BindSampler(*sampler, 0);
+        Quanta::GraphicsDevice::BindSampler(*cubeSampler, 0);
 
         Quanta::DrawCommand cmd;
         
