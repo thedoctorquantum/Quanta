@@ -47,6 +47,8 @@ namespace Quanta
         default:
             DEBUG_FAILURE_MESSAGE("format was out of range");
         }
+        
+        this->format = format;
 
         alBufferData(handle, openalFormat, data, size, frequency);
     }

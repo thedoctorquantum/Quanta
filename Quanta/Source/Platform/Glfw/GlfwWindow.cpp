@@ -6,34 +6,23 @@
 
 namespace Quanta
 {
-    static uint32_t instanceCount = 0;
-
     GlfwWindow::GlfwWindow()
     {
-        instanceCount++;
+        bool isInitialized = glfwInit();
 
-        if(instanceCount == 1)
+        DEBUG_ASSERT(isInitialized);
+
+        glfwSetErrorCallback([](int level, const char* message)
         {
-            bool isInitialized = glfwInit();
-
-            DEBUG_ASSERT(isInitialized);
-
-            glfwSetErrorCallback([](int level, const char* message)
-            {
-                std::cout << "[GLFW]: " << message << '\n';
-            });
-        }
+            std::cout << "[GLFW]: " << message << '\n';
+        });
         
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         
-        #ifndef NDEBUG
-            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
-        #else
-            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, false);
-        #endif
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, DEBUG);
 
         handle = glfwCreateWindow(640, 480, "Window", nullptr, nullptr);
         
@@ -101,14 +90,8 @@ namespace Quanta
     
     GlfwWindow::~GlfwWindow() 
     {
-        instanceCount--;
-        
         glfwDestroyWindow(handle);
-
-        if(!instanceCount)
-        {
-            glfwTerminate();
-        }
+        glfwTerminate();
     }
 
     void GlfwWindow::AddKeyDownCallback(Event<Key>::Handler handler)
@@ -153,8 +136,6 @@ namespace Quanta
     
     void GlfwWindow::SetState(WindowState value)
     {
-        state = value;
-
         switch(value)
         {
         case WindowState::Maximized:
@@ -168,6 +149,8 @@ namespace Quanta
         default:
             DEBUG_FAILURE_MESSAGE("value was out of range");
         }
+
+        state = value;
     }
 
     glm::uvec2 GlfwWindow::GetPosition() const
