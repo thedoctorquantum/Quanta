@@ -11,14 +11,14 @@ namespace Quanta
     class OpenGLGraphicsDevice final : public GraphicsDevice
     {
     public:
-        OpenGLGraphicsDevice();
+        OpenGLGraphicsDevice(const std::shared_ptr<Window>& window);
     private:
         OpenGLVertexArray* vertexArray = nullptr;
         OpenGLRasterPipeline* rasterPipeline = nullptr;
-
-        GLenum geometryLayout = 0;
         
-        uint32_t maxTextureSlots = 0;
+        GLenum geometryLayout = 0;
+        GLenum drawElementsType = 0;
+        GLenum drawElementSize = 0;
         
         void InternalClearBackBuffer(const glm::vec4& color, float depth, int stencil) override;
         

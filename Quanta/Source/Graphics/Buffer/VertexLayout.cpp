@@ -13,6 +13,9 @@ namespace Quanta
     
     void VertexLayout::Add(const VertexElement& element) 
     {
+        DEBUG_ASSERT(element.Count != 0);
+        DEBUG_ASSERT(element.Size != 0);
+        
         elements.push_back(element);
 
         stride += element.Count * element.Size;

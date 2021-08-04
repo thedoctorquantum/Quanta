@@ -13,10 +13,11 @@ namespace Quanta
         ~OpenALAudioDevice();
 
         OpenALAudioDevice(const OpenALAudioDevice&) = delete;
+
         OpenALAudioDevice& operator=(const OpenALAudioDevice&) = delete;
     private:
-        ALCcontext* context;
-        ALCdevice* device;
+        ALCcontext* context = nullptr;
+        ALCdevice* device = nullptr;
 
         void InternalPlay(const AudioSource& source, const AudioBuffer& buffer) override;
     };

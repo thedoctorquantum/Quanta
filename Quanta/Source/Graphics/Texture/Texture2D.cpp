@@ -9,13 +9,15 @@ namespace Quanta
 {
     std::shared_ptr<Texture2D> Texture2D::Create(size_t width, size_t height)
     {
-        switch(GraphicsDevice::GetApi())
+        GraphicsApi api = GraphicsDevice::GetApi();
+
+        DEBUG_ASSERT(api == GraphicsApi::OpenGL);
+
+        switch(api)
         {
         case GraphicsApi::OpenGL:
             return std::make_shared<OpenGLTexture2D>(width, height);
         }
-
-        DEBUG_FAILURE_MESSAGE("GraphicsApi not supported!");
         
         return nullptr;
     }

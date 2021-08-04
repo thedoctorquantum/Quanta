@@ -5,6 +5,15 @@ namespace Quanta
 {
     GLenum FilterModeToGLenum(FilterMode mode)
     {
+        DEBUG_ASSERT(
+            mode == FilterMode::Linear ||
+            mode == FilterMode::Nearest ||
+            mode == FilterMode::NearestMipMapNearest ||
+            mode == FilterMode::LinearMipMapLinear ||
+            mode == FilterMode::NearestMipMapLinear ||
+            mode == FilterMode::LinearMipMapNearest
+        );
+
         switch(mode)
         {
         case FilterMode::Linear: return GL_LINEAR;
@@ -15,13 +24,18 @@ namespace Quanta
         case FilterMode::LinearMipMapNearest: return GL_LINEAR_MIPMAP_NEAREST;
         }
 
-        DEBUG_FAILURE_MESSAGE("mode is not supported!");
-
         return 0;
     }
     
     GLenum WrapModeToGLenum(WrapMode mode)
     {
+        DEBUG_ASSERT(
+            mode == WrapMode::Repeat ||
+            mode == WrapMode::MirroredRepeat ||
+            mode == WrapMode::ClampToEdge ||
+            mode == WrapMode::ClampToBorder
+        );
+
         switch(mode)
         {
         case WrapMode::Repeat: return GL_REPEAT;
@@ -29,8 +43,6 @@ namespace Quanta
         case WrapMode::ClampToEdge: return GL_CLAMP_TO_EDGE;
         case WrapMode::ClampToBorder: return GL_CLAMP_TO_BORDER;
         }
-
-        DEBUG_FAILURE_MESSAGE("mode is not supported!");
 
         return 0;
     }

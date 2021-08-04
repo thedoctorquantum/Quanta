@@ -2,12 +2,17 @@
 #include <Quanta/Graphics/GraphicsDevice.h>
 
 #include "../../Platform/OpenGL/OpenGLCubeMap.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
     std::shared_ptr<CubeMap> CubeMap::Create(size_t width, size_t height)
     {
-        switch(GraphicsDevice::GetApi())
+        GraphicsApi api = GraphicsDevice::GetApi();
+
+        DEBUG_ASSERT(api == GraphicsApi::OpenGL);
+
+        switch(api)
         {
         case GraphicsApi::OpenGL:
             return std::make_shared<OpenGLCubeMap>(width, height);

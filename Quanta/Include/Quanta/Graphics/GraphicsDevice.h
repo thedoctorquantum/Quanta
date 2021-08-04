@@ -9,15 +9,14 @@
 #include "Texture/SamplerCube.h"
 #include "GraphicsApi.h"
 #include "DrawCommand.h"
+#include "../Core/Windowing/Window.h"
 
 namespace Quanta
 {
     class GraphicsDevice
     {
     public:
-        static GraphicsApi GetApi();
-
-        static void Initialize(GraphicsApi api);
+        static void Initialize(const std::shared_ptr<Window>& window);
         static void DeInitialize();
 
         static void ClearBackBuffer(const glm::vec4& color, float depth, int stencil);
@@ -30,6 +29,8 @@ namespace Quanta
         static void BindSampler(const SamplerCube& sampler, size_t index);
 
         static void DispatchDraw(const DrawCommand& command);
+
+        static GraphicsApi GetApi();
     private:
         virtual void InternalClearBackBuffer(const glm::vec4& color, float depth, int stencil) = 0;
 

@@ -10,14 +10,14 @@
     #include <assert.h>
     #include <iostream>
 
-    #define DEBUG_MESSAGE(message) { std::cout << "[DEBUG]: " << message << '\n'; }
-    #define DEBUG_WARNING(message) { std::cout << "[WARNING]: " << message << '\n'; }
+    #define DEBUG_MESSAGE(message) { std::cout << "[DEBUG]: " << (message) << '\n'; }
+    #define DEBUG_WARNING(message) { std::cout << "[WARNING]: " << (message) << '\n'; }
 
     #define DEBUG_ASSERT(condition) { assert(condition); }
-    #define DEBUG_ASSERT_MESSAGE(condition, message) { assert(condition && message); } 
+    #define DEBUG_ASSERT_MESSAGE(condition, message) { assert((condition) && (message)); } 
 
     #define DEBUG_FAILURE() { assert(false); }
-    #define DEBUG_FAILURE_MESSAGE(message) { assert(false && message); }
+    #define DEBUG_FAILURE_MESSAGE(message) { assert(false && (message)); }
 #else
     #define DEBUG_MESSAGE(message)
 

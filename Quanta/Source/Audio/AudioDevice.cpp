@@ -1,17 +1,20 @@
 #include <Quanta/Audio/AudioDevice.h>
 
 #include "../Platform/OpenAL/OpenALAudioDevice.h"
+#include "../Debugging/Validation.h"
 
 namespace Quanta
 {
     struct State
     {
-        AudioApi api;
-        AudioDevice* device;
+        AudioApi api = AudioApi::OpenAL;
+        AudioDevice* device = nullptr;
     } static state;
 
     void AudioDevice::Initialize(AudioApi api)
     {
+        DEBUG_ASSERT(api == AudioApi::OpenAL);
+
         switch(api)
         {
         case AudioApi::OpenAL:
@@ -30,9 +33,11 @@ namespace Quanta
     {
         return state.api;
     }
-
+    
     void AudioDevice::Play(const AudioSource& source, const AudioBuffer& buffer)
     {
+        DEBUG_ASSERT(state.device != nullptr);
+
         state.device->InternalPlay(source, buffer);
     }
 }

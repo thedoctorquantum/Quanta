@@ -11,7 +11,14 @@ namespace Quanta
         DEBUG_ASSERT(source.length() != 0);
         DEBUG_ASSERT(source.c_str() != nullptr);
         
-        GLenum target;
+        DEBUG_ASSERT(
+            type == ShaderType::Vertex ||
+            type == ShaderType::Pixel ||
+            type == ShaderType::Geometry ||
+            type == ShaderType::Compute
+        );
+
+        GLenum target = 0;
         
         switch(type)
         {
@@ -31,8 +38,6 @@ namespace Quanta
             target = GL_COMPUTE_SHADER;
 
             break;
-        default:
-            DEBUG_FAILURE_MESSAGE("ShaderType out of range");
         }
         
         handle = glCreateShader(target);
@@ -43,6 +48,7 @@ namespace Quanta
         int32_t length = source.length();
         
         glShaderSource(handle, 1, &sourcePointer, &length);
+        
         glCompileShader(handle);
 
 #if DEBUG

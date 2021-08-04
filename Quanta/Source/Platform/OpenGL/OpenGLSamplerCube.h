@@ -10,6 +10,10 @@ namespace Quanta
         OpenGLSamplerCube(const std::shared_ptr<CubeMap>& texture);
         ~OpenGLSamplerCube();
 
+        OpenGLSamplerCube(const OpenGLSamplerCube&) = delete;
+
+        OpenGLSamplerCube& operator=(const OpenGLSamplerCube&) = delete;
+
         const std::shared_ptr<CubeMap>& GetTexture() const override;
         
         FilterMode GetMagnification() const override;

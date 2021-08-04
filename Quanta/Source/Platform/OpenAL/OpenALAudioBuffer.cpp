@@ -22,10 +22,16 @@ namespace Quanta
         DEBUG_ASSERT(data != nullptr);
         DEBUG_ASSERT(size != 0);
         DEBUG_ASSERT(frequency != 0);
-        
+        DEBUG_ASSERT(
+            format == SoundFormat::Mono8 ||
+            format == SoundFormat::Mono16 ||
+            format == SoundFormat::Stereo8 ||
+            format == SoundFormat::Stereo16
+        );
+
         this->size = size;
         this->frequency = frequency;
-        
+
         switch(format)
         {
         case SoundFormat::Mono8:
@@ -44,8 +50,6 @@ namespace Quanta
             openalFormat = AL_FORMAT_STEREO16;
 
             break;
-        default:
-            DEBUG_FAILURE_MESSAGE("format was out of range");
         }
         
         this->format = format;

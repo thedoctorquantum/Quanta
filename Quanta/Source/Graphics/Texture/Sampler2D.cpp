@@ -10,13 +10,15 @@ namespace Quanta
     {
         DEBUG_ASSERT(texture != nullptr);
 
-        switch(GraphicsDevice::GetApi())
+        GraphicsApi api = GraphicsDevice::GetApi();
+
+        DEBUG_ASSERT(api == GraphicsApi::OpenGL);
+        
+        switch(api)
         {
         case GraphicsApi::OpenGL:
-            return std::make_unique<OpenGLSampler2D>(texture);            
+            return std::make_shared<OpenGLSampler2D>(texture);            
         }
-        
-        DEBUG_FAILURE_MESSAGE("GraphicsApi not supported!");
         
         return nullptr;
     }

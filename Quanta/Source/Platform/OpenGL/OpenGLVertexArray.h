@@ -22,9 +22,8 @@ namespace Quanta
         const std::shared_ptr<GraphicsBuffer>& GetIndexBuffer() const override;
         
         IndexType GetIndexType() const override;
-        
+                
         uint32_t GetHandle() const;
-        GLenum GetOpenGLIndexType() const;
     private:
         std::shared_ptr<GraphicsBuffer> vertexBuffer = nullptr;
         std::shared_ptr<GraphicsBuffer> indexBuffer = nullptr;
@@ -32,6 +31,5 @@ namespace Quanta
         IndexType indexType = IndexType::UInt32;
         
         uint32_t handle = 0;
-        GLenum openglIndexType = 0;
     };
 }

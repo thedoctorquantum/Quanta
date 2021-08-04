@@ -10,6 +10,10 @@ namespace Quanta
         OpenGLTexture2DArray(size_t width, size_t height, size_t depth);
         ~OpenGLTexture2DArray();
 
+        OpenGLTexture2DArray(const OpenGLTexture2DArray&) = delete;
+
+        OpenGLTexture2DArray& operator=(const OpenGLTexture2DArray&) = delete;
+
         void SetData(const void* data, size_t index) override;
         void GetData(void* data, size_t index) const override;
         

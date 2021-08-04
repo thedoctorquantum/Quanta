@@ -7,6 +7,5 @@
 namespace Quanta
 {
     GLenum FilterModeToGLenum(FilterMode mode);
-
     GLenum WrapModeToGLenum(WrapMode mode);
 }

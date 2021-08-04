@@ -10,6 +10,10 @@ namespace Quanta
         OpenGLTexture3D(size_t width, size_t height, size_t depth);
         ~OpenGLTexture3D();
 
+        OpenGLTexture3D(const OpenGLTexture3D&) = delete;
+        
+        OpenGLTexture3D& operator=(const OpenGLTexture3D&) = delete;
+
         void SetData(const void* data) override;
         void GetData(void* data) const override;
         

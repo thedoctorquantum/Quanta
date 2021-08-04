@@ -8,13 +8,14 @@ namespace Quanta
 {
     std::shared_ptr<VertexArray> VertexArray::Create()
     {
-        switch(GraphicsDevice::GetApi())
-        {
-        case GraphicsApi::OpenGL:
-            return std::make_shared<OpenGLVertexArray>();
-        }
+        GraphicsApi api = GraphicsDevice::GetApi();
         
-        DEBUG_FAILURE_MESSAGE("GraphicsApi is not supported");
+        DEBUG_ASSERT(api == GraphicsApi::OpenGL);
+        
+        switch(api)
+        {
+        case GraphicsApi::OpenGL: return std::make_shared<OpenGLVertexArray>();
+        }
 
         return nullptr;
     }

@@ -33,9 +33,10 @@ std::string ReadAllText(const std::string& filepath)
 
 int main(int argc, char** argv)
 {
-    std::shared_ptr<Quanta::Window> window = Quanta::Window::Create();
+    std::shared_ptr<Quanta::Window> window = Quanta::Window::Create(Quanta::GraphicsApi::OpenGL);
     
-    Quanta::GraphicsDevice::Initialize(Quanta::GraphicsApi::OpenGL);
+    Quanta::GraphicsDevice::Initialize(window);
+    
     Quanta::AudioDevice::Initialize(Quanta::AudioApi::OpenAL);
 
     window->SetState(Quanta::WindowState::Maximized);
@@ -97,7 +98,7 @@ int main(int argc, char** argv)
     std::shared_ptr<Quanta::GraphicsBuffer> uniforms = Quanta::GraphicsBuffer::Create(Quanta::BufferUsage::Static, sizeof(glm::mat4) * 2);
 
     desc.UniformBuffers.emplace_back(uniforms);
-    
+
     std::shared_ptr<Quanta::RasterPipeline> pipeline = Quanta::RasterPipeline::Create(desc);
     
     pipeline->SetPolygonFillMode(Quanta::PolygonFillMode::Solid);   
@@ -109,7 +110,7 @@ int main(int argc, char** argv)
     glm::vec3 translation = glm::vec3(0.0f);
 
     Quanta::ImGuiRenderer::Initialize(*window);
-    
+
     std::shared_ptr<Quanta::Texture2D> texture = Quanta::Texture2D::FromFile("Resources/Textures/tileset.png");
 
     std::shared_ptr<Quanta::Sampler2D> sampler = Quanta::Sampler2D::Create(texture);
@@ -126,7 +127,7 @@ int main(int argc, char** argv)
         Quanta::Image32::FromFile("Resources/Textures/Skybox/back.png"),
         Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
     };
-
+    
     std::shared_ptr<Quanta::CubeMap> cubeMap = Quanta::CubeMap::FromImages(images);
 
     std::shared_ptr<Quanta::SamplerCube> cubeSampler = Quanta::SamplerCube::Create(cubeMap);

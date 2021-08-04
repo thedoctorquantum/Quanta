@@ -15,57 +15,52 @@
 
 namespace Quanta
 {
-    static void BindSamplerHandle(uint32_t texture, uint32_t sampler, size_t index)
+    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const std::shared_ptr<Window>& window)
     {
-        glBindTextureUnit(index, texture);
-        glBindSampler(index, sampler);
-    }
+        DEBUG_ASSERT(window != nullptr);
+        DEBUG_ASSERT(window->GetGraphicsApi() == GraphicsApi::OpenGL);
 
-    OpenGLGraphicsDevice::OpenGLGraphicsDevice()
-    {
         bool isLoaded = gladLoadGL();
 
         DEBUG_ASSERT(isLoaded);
+               
+#if DEBUG
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
 
-        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (int*) &maxTextureSlots);
-        
-#ifndef NDEBUG
-            glEnable(GL_DEBUG_OUTPUT);
-            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+        glDebugMessageCallback([](GLenum source, GLenum type, uint32_t id, GLenum severity, GLsizei length, const char* message, const void* userParam) 
+        {
+            const OpenGLGraphicsDevice* _this = static_cast<const OpenGLGraphicsDevice*>(userParam);
 
-            glDebugMessageCallback([](GLenum source, GLenum type, uint32_t id, GLenum severity, GLsizei length, const char* message, const void* userParam) 
+            const char* severityString = "Notification";
+
+            switch(severity)
             {
-                OpenGLGraphicsDevice* _this = (OpenGLGraphicsDevice*) userParam;
-                
-                const char* severityString = "Notification";
+            case GL_DEBUG_SEVERITY_NOTIFICATION:
+                severityString = "Notification";
 
-                switch(severity)
-                {
-                case GL_DEBUG_SEVERITY_NOTIFICATION:
-                    severityString = "Notification";
+                break;
+            case GL_DEBUG_SEVERITY_LOW:
+                severityString = "Low";
 
-                    break;
-                case GL_DEBUG_SEVERITY_LOW:
-                    severityString = "Low";
+                break;
+            case GL_DEBUG_SEVERITY_MEDIUM:
+                severityString = "Medium";
 
-                    break;
-                case GL_DEBUG_SEVERITY_MEDIUM:
-                    severityString = "Medium";
+                break;
+            case GL_DEBUG_SEVERITY_HIGH:
+                severityString = "High";
 
-                    break;
-                case GL_DEBUG_SEVERITY_HIGH:
-                    severityString = "High";
+                break;
+            }
 
-                    break;
-                }
+            std::cout << "[GraphicsApi=OpenGL] [" << id << "] [" << severityString << "]: " << message << '\n';
+        }, this);
 
-                std::cout << "[GraphicsApi=OpenGL] [" << id << "] [" << severityString << "]: " << message << '\n';
-            }, this);
-
-            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);
 #else
-            glDisable(GL_DEBUG_OUTPUT);
-            glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+        glDisable(GL_DEBUG_OUTPUT);
+        glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
 #endif
     }
     
@@ -98,17 +93,31 @@ namespace Quanta
             return;
         }
 
-        OpenGLRasterPipeline* glPipeline = (OpenGLRasterPipeline*) value.get();
+        OpenGLRasterPipeline* glPipeline = nullptr;
+
+#if DEBUG
+        glPipeline = dynamic_cast<OpenGLRasterPipeline*>(value.get());
 
         DEBUG_ASSERT(glPipeline != nullptr);
+#else
+        glPipeline = static_cast<OpenGLRasterPipeline*>(value.get());
+#endif
 
-        if(rasterPipeline != value.get())
+        if(rasterPipeline != glPipeline)
         {
             for(size_t i = 0; i < value->GetUniformBufferCount(); i++)
             {
                 const std::shared_ptr<GraphicsBuffer>& buffer = value->GetUniformBuffer(i);
 
-                OpenGLGraphicsBuffer* glBuffer = (OpenGLGraphicsBuffer*) buffer.get();
+                OpenGLGraphicsBuffer* glBuffer = nullptr;
+
+#if DEBUG
+                glBuffer = dynamic_cast<OpenGLGraphicsBuffer*>(buffer.get());
+
+                DEBUG_ASSERT(glBuffer != nullptr);
+#else
+                glBuffer = static_cast<OpenGLGraphicsBuffer*>(buffer.get());
+#endif
 
                 glBindBufferBase(GL_UNIFORM_BUFFER, i, glBuffer->GetHandle());
             }
@@ -133,7 +142,7 @@ namespace Quanta
             break;
         }
 
-        if((uint8_t) value->GetDepthTestMode())
+        if(value->GetDepthTestMode() != DepthTestMode::None)
         {
             glEnable(GL_DEPTH_TEST);
 
@@ -189,7 +198,7 @@ namespace Quanta
             glDisable(GL_SCISSOR_TEST);
         }
 
-        if((uint8_t) value->GetBlendMode())
+        if(value->GetBlendMode() != BlendMode::None)
         {
             glEnable(GL_BLEND);
 
@@ -242,7 +251,7 @@ namespace Quanta
             break;
         }
 
-        if((uint8_t) value->GetFaceCullMode())
+        if(value->GetFaceCullMode() != FaceCullMode::None)
         {
             glEnable(GL_CULL_FACE);
 
@@ -282,7 +291,7 @@ namespace Quanta
             
             break;
         }
-
+        
         switch(value->GetGeometryWinding())
         {
         case GeometryWinding::CounterClockwise:
@@ -302,9 +311,7 @@ namespace Quanta
     {
         if(vertexArray == value.get()) return;
 
-        OpenGLVertexArray* openglValue = (OpenGLVertexArray*) value.get();
-        
-        if(!openglValue)
+        if(value == nullptr)
         {
             vertexArray = nullptr;
 
@@ -312,54 +319,89 @@ namespace Quanta
 
             return;
         }
-        
-        glBindVertexArray(openglValue->GetHandle());
 
-        this->vertexArray = openglValue;
+        OpenGLVertexArray* glVertexArray = nullptr;
+
+#if DEBUG
+        glVertexArray = dynamic_cast<OpenGLVertexArray*>(value.get());
+
+        DEBUG_ASSERT(glVertexArray != nullptr);
+#else
+        glVertexArray = static_cast<OpenGLVertexArray*>(value.get());
+#endif
+
+        this->vertexArray = glVertexArray;
+
+        switch(value->GetIndexType())
+        {
+        case IndexType::UInt8:
+            drawElementsType = GL_UNSIGNED_BYTE;
+            drawElementSize = sizeof(uint8_t);
+
+            break;
+        case IndexType::UInt16:
+            drawElementsType = GL_UNSIGNED_SHORT;
+            drawElementSize = sizeof(uint16_t);
+
+            break;
+        case IndexType::UInt32:
+            drawElementsType = GL_UNSIGNED_INT;
+            drawElementSize = sizeof(uint32_t);
+
+            break;
+        }
+        
+        glBindVertexArray(glVertexArray->GetHandle());
+    }
+
+    template<typename PublicSampler, typename InternalSampler, typename InternalTexture>
+    static void BindSamplerUnit(const PublicSampler& sampler, size_t index)
+    {
+        const InternalSampler* internalSampler = nullptr;
+        const InternalTexture* internalTexture = nullptr;
+
+        DEBUG_ASSERT(sampler.GetTexture() != nullptr);
+
+#if DEBUG
+        internalSampler = dynamic_cast<const InternalSampler*>(&sampler);
+        internalTexture = dynamic_cast<const InternalTexture*>(sampler.GetTexture().get());
+
+        DEBUG_ASSERT(internalSampler != nullptr);
+        DEBUG_ASSERT(internalTexture != nullptr);
+#else
+        internalSampler = static_cast<const PrivateSampler*>(&sampler);
+        internalTexture = static_cast<const PrivateTexture*>(sampler.GetTexture().get());
+#endif
+
+        glBindSampler(index, internalSampler->GetHandle());
+        glBindTextureUnit(index, internalTexture->GetHandle());
     }
     
     void OpenGLGraphicsDevice::InternalBindSampler(const Sampler2D& sampler, size_t index)
     {
-        const OpenGLSampler2D* glSampler = (const OpenGLSampler2D*) &sampler;
-        const OpenGLTexture2D* glTexture = (const OpenGLTexture2D*) sampler.GetTexture().get();
-        
-        DEBUG_ASSERT(glSampler != nullptr);
-        DEBUG_ASSERT(glTexture != nullptr);
-
-        BindSamplerHandle(glTexture->GetHandle(), glSampler->GetHandle(), index);
+        BindSamplerUnit<Sampler2D, OpenGLSampler2D, OpenGLTexture2D>(sampler, index);
     }
 
     void OpenGLGraphicsDevice::InternalBindSampler(const Sampler3D& sampler, size_t index)
     {
-        const OpenGLSampler3D* glSampler = (const OpenGLSampler3D*) &sampler;
-        const OpenGLTexture3D* glTexture = (const OpenGLTexture3D*) sampler.GetTexture().get();
-
-        DEBUG_ASSERT(glSampler != nullptr);
-        DEBUG_ASSERT(glTexture != nullptr);
-
-        BindSamplerHandle(glTexture->GetHandle(), glSampler->GetHandle(), index);
+        BindSamplerUnit<Sampler3D, OpenGLSampler3D, OpenGLTexture3D>(sampler, index);
     }
     
     void OpenGLGraphicsDevice::InternalBindSampler(const SamplerCube& sampler, size_t index)
     {
-        const OpenGLSamplerCube* glSampler = (const OpenGLSamplerCube*) &sampler;
-        const OpenGLCubeMap* glTexture = (const OpenGLCubeMap*) sampler.GetTexture().get();
-
-        DEBUG_ASSERT(glSampler != nullptr);
-        DEBUG_ASSERT(glTexture != nullptr);
-
-        BindSamplerHandle(glTexture->GetHandle(), glSampler->GetHandle(), index);
+        BindSamplerUnit<SamplerCube, OpenGLSamplerCube, OpenGLCubeMap>(sampler, index);
     }
-
+    
     void OpenGLGraphicsDevice::InternalDispatchDraw(const DrawCommand& command)
     {
         glDrawElementsInstancedBaseVertexBaseInstance(
             geometryLayout, 
             command.Count, 
-            vertexArray->GetOpenGLIndexType(), 
-            (void*) command.IndexOffset,
+            drawElementsType, 
+            reinterpret_cast<const void*>(command.IndexOffset),
             command.InstanceCount, 
             command.StartVertex,
-            command.StartInstance);
+            command.StartInstance
+        );
     }
 }

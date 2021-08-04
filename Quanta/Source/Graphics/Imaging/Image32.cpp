@@ -55,8 +55,8 @@ namespace Quanta
         uint8_t* data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         
         DEBUG_ASSERT(data != nullptr);
-
-        return std::make_shared<Image32>((Color32*) data, width, height);
+        
+        return std::make_shared<Image32>(reinterpret_cast<Color32*>(data), width, height);
     }
 
     Image32& Image32::operator=(Image32&& other) noexcept

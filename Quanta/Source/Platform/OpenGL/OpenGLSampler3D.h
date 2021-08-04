@@ -10,6 +10,10 @@ namespace Quanta
         OpenGLSampler3D(const std::shared_ptr<Texture3D>& texture);
         ~OpenGLSampler3D();
 
+        OpenGLSampler3D(const OpenGLSampler3D&) = delete;
+        
+        OpenGLSampler3D& operator=(const OpenGLSampler3D&) = delete;
+
         const std::shared_ptr<Texture3D>& GetTexture() const override; 
 
         FilterMode GetMagnification() const override;

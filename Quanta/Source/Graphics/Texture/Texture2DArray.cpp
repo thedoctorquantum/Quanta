@@ -8,14 +8,16 @@ namespace Quanta
 {
     std::shared_ptr<Texture2DArray> Texture2DArray::Create(size_t width, size_t height, size_t depth)
     {
-        switch(GraphicsDevice::GetApi())
+        GraphicsApi api = GraphicsDevice::GetApi();
+
+        DEBUG_ASSERT(api == GraphicsApi::OpenGL);
+
+        switch(api)
         {
         case GraphicsApi::OpenGL:
             return std::make_shared<OpenGLTexture2DArray>(width, height, depth); 
         }
         
-        DEBUG_FAILURE_MESSAGE("GraphicsAPI not supported for Texture2DArray");
-
         return nullptr;
     }
 

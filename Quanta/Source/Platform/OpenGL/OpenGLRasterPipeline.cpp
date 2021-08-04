@@ -18,13 +18,19 @@ namespace Quanta
 
         DEBUG_ASSERT(handle != 0);
 
-        for(int i = 0; i < shaderModules.size(); i++)
+        for(const std::shared_ptr<ShaderModule>& shader : shaderModules)
         {
-            const std::shared_ptr<ShaderModule>& shader = shaderModules[i];
+            const OpenGLShaderModule* glShader = nullptr;
 
-            OpenGLShaderModule& glShader = (OpenGLShaderModule&) *shader;
+#if DEBUG
+            glShader = dynamic_cast<const OpenGLShaderModule*>(shader.get());
+
+            DEBUG_ASSERT(glShader != nullptr);
+#else
+            glShader = static_cast<const OpenGLShaderModule*>(shader.get());
+#endif
             
-            glAttachShader(handle, glShader.GetHandle());
+            glAttachShader(handle, glShader->GetHandle());
         }
     
         glLinkProgram(handle);
@@ -44,13 +50,19 @@ namespace Quanta
         }
 #endif
         
-        for(size_t i = 0; i < shaderModules.size(); i++)
+        for(const std::shared_ptr<ShaderModule>& shader : shaderModules)
         {
-            const std::shared_ptr<ShaderModule>& shader = shaderModules[i];
-            
-            OpenGLShaderModule& glShader = (OpenGLShaderModule&) *shader;
+            const OpenGLShaderModule* glShader = nullptr;
 
-            glDetachShader(handle, glShader.GetHandle());
+#if DEBUG
+            glShader = dynamic_cast<const OpenGLShaderModule*>(shader.get());
+
+            DEBUG_ASSERT(glShader != nullptr);
+#else
+            glShader = static_cast<const OpenGLShaderModule*>(shader.get());
+#endif
+            
+            glDetachShader(handle, glShader->GetHandle());
         }
     }
     

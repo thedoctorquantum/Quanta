@@ -9,29 +9,38 @@ namespace Quanta
 {
     std::shared_ptr<GraphicsBuffer> GraphicsBuffer::Create(BufferUsage usage, size_t size)
     {
-        switch(GraphicsDevice::GetApi())
+        GraphicsApi api = GraphicsDevice::GetApi();
+
+        DEBUG_ASSERT(api == GraphicsApi::OpenGL);
+
+        switch(api)
         {
-        case GraphicsApi::OpenGL: 
-            return std::make_shared<OpenGLGraphicsBuffer>(usage, size);
+        case GraphicsApi::OpenGL: return std::make_shared<OpenGLGraphicsBuffer>(usage, size);
         }
-        
-        DEBUG_FAILURE_MESSAGE("GraphicsApi is not currently implemented");
-        
+
         return nullptr;
     }
-
+    
     void GraphicsBuffer::Resize(GraphicsBuffer& buffer, size_t size)
     {
-        switch(GraphicsDevice::GetApi())
+        GraphicsApi api = GraphicsDevice::GetApi();
+
+        DEBUG_ASSERT(api == GraphicsApi::OpenGL);
+
+        switch(api)
         {
         case GraphicsApi::OpenGL: 
-            DEBUG_ASSERT(((OpenGLGraphicsBuffer*) &buffer) != nullptr);
+            OpenGLGraphicsBuffer* glBuffer = nullptr;
+#if DEBUG
+            glBuffer = dynamic_cast<OpenGLGraphicsBuffer*>(&buffer);
 
-            OpenGLGraphicsBuffer::Resize((OpenGLGraphicsBuffer&) buffer, size);
+            DEBUG_ASSERT(glBuffer != nullptr);
+#else
+            glBuffer = reinterpret_cast<OpenGLGraphicsBuffer*>(&buffer);
+#endif
+            OpenGLGraphicsBuffer::Resize(*glBuffer, size);
 
             break;
-        default:
-            DEBUG_FAILURE_MESSAGE("GraphicsApi is not currently implemented");
         }
     }
     

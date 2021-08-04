@@ -71,13 +71,17 @@ namespace Quanta
     {
         state = new State;
 
-        state->window = (Window*) &window;
+        state->window = &window;
 
         state->context = ImGui::CreateContext();
+
+        DEBUG_ASSERT(state->context != nullptr);
 
         ImGui::SetCurrentContext(state->context);
 
         state->io = &ImGui::GetIO();
+
+        DEBUG_ASSERT(state->io != nullptr);
 
         state->io->Fonts->AddFontDefault();
 

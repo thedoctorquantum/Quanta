@@ -11,6 +11,7 @@ namespace Quanta
         ~OpenGLTexture2D();
 
         OpenGLTexture2D(const OpenGLTexture2D&) = delete;        
+        
         OpenGLTexture2D& operator=(const OpenGLTexture2D&) = delete;
 
         void SetData(const void* data) override;

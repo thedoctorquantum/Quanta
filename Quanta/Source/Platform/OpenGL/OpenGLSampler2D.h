@@ -11,6 +11,7 @@ namespace Quanta
         ~OpenGLSampler2D();
 
         OpenGLSampler2D(const Sampler2D&) = delete;
+        
         OpenGLSampler2D& operator=(const Sampler2D&) = delete;
 
         const std::shared_ptr<Texture2D>& GetTexture() const override;

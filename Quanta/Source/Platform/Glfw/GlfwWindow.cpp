@@ -6,33 +6,50 @@
 
 namespace Quanta
 {
-    GlfwWindow::GlfwWindow()
+    GlfwWindow::GlfwWindow(GraphicsApi graphicsApi)
     {
+        this->graphicsApi = graphicsApi;
+
         bool isInitialized = glfwInit();
-
+        
         DEBUG_ASSERT(isInitialized);
-
+        
+#if DEBUG
         glfwSetErrorCallback([](int level, const char* message)
         {
-            std::cout << "[GLFW]: " << message << '\n';
+            DEBUG_FAILURE_MESSAGE(message);
         });
+#endif 
         
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        DEBUG_ASSERT(graphicsApi == GraphicsApi::OpenGL);
         
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, DEBUG);
+        switch(graphicsApi)
+        {
+        case GraphicsApi::OpenGL:
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            
+            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, DEBUG);
+
+            break;
+        }
+        
         handle = glfwCreateWindow(640, 480, "Window", nullptr, nullptr);
         
         DEBUG_ASSERT(handle != nullptr);
+
+        if(graphicsApi == GraphicsApi::OpenGL)
+        {
+            glfwMakeContextCurrent(handle);
+        }
 
         glfwSetWindowUserPointer(handle, this);
 
         glfwSetKeyCallback(handle, [](GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods)
         {
-            GlfwWindow* _this = (GlfwWindow*) glfwGetWindowUserPointer(window);
+            GlfwWindow* _this = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 
             switch(action)
             {
@@ -49,14 +66,14 @@ namespace Quanta
 
         glfwSetCharCallback(handle, [](GLFWwindow* window, uint32_t character)
         {
-            GlfwWindow* _this = (GlfwWindow*) glfwGetWindowUserPointer(window);
+            GlfwWindow* _this = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 
             _this->onCharacterDown((char) character);
         });
 
         glfwSetMouseButtonCallback(handle, [](GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
         {
-            GlfwWindow* _this = (GlfwWindow*) glfwGetWindowUserPointer(window);
+            GlfwWindow* _this = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 
             switch(action)
             {
@@ -73,25 +90,38 @@ namespace Quanta
 
 		glfwSetCursorPosCallback(handle, [](GLFWwindow* window, double xPos, double yPos)
 		{
-            GlfwWindow* _this = (GlfwWindow*) glfwGetWindowUserPointer(window);
+            GlfwWindow* _this = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 
             _this->onMouseMove({ (float) xPos, (float) yPos });
 		});
 
         glfwSetScrollCallback(handle, [](GLFWwindow* window, double xOffset, double yOffset)
         {
-            GlfwWindow* _this = (GlfwWindow*) glfwGetWindowUserPointer(window);
+            GlfwWindow* _this = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 
             _this->onMouseScroll({ (float) xOffset, (float) yOffset });
         });
-
-        glfwMakeContextCurrent(handle);
     }
     
     GlfwWindow::~GlfwWindow() 
     {
         glfwDestroyWindow(handle);
         glfwTerminate();
+    }
+
+    bool GlfwWindow::Exists() const
+    {
+        return !glfwWindowShouldClose(handle);
+    }
+
+    void GlfwWindow::PollEvents() const
+    {
+        glfwPollEvents();
+    }
+    
+    void GlfwWindow::SwapBuffers() const
+    {
+        glfwSwapBuffers(handle);
     }
 
     void GlfwWindow::AddKeyDownCallback(Event<Key>::Handler handler)
@@ -139,7 +169,7 @@ namespace Quanta
         switch(value)
         {
         case WindowState::Maximized:
-            glfwMaximizeWindow((GLFWwindow*) handle);
+            glfwMaximizeWindow(handle);
 
             break;
         case WindowState::Minimized:
@@ -155,37 +185,42 @@ namespace Quanta
 
     glm::uvec2 GlfwWindow::GetPosition() const
     {
-        glm::uvec2 position;
+        int x;
+        int y;
 
-        glfwGetWindowPos(handle, (int*) &position.x, (int*) &position.y);
+        glfwGetWindowPos(handle, &x, &y);
 
-        return position;
+        return glm::uvec2(x, y);
     }
     
     glm::uvec2 GlfwWindow::GetSize() const
     {
-        glm::uvec2 size;
+        int x; 
+        int y;
 
-        glfwGetWindowSize(handle, (int*) &size.x, (int*) &size.y);
+        glfwGetWindowSize(handle, &x, &y);
 
-        return size;
+        return glm::uvec2(x, y);
     }
 
     glm::uvec4 GlfwWindow::GetBounds() const
     {
-        glm::uvec4 bounds;
+        int x;
+        int y; 
+        int width;
+        int height;
 
-        glfwGetWindowPos(handle, (int*) &bounds.x, (int*) &bounds.y);
-        glfwGetWindowSize(handle, (int*) &bounds.z, (int*) &bounds.w);
+        glfwGetWindowPos(handle, &x, &y);
+        glfwGetWindowSize(handle, &width, &height);
         
-        return bounds;
+        return glm::uvec4(x, y, width, height);
     }
 
     uint32_t GlfwWindow::GetX() const
     {
-        uint32_t x;
+        int x;
 
-        glfwGetWindowPos(handle, (int*) &x, nullptr);
+        glfwGetWindowPos(handle, &x, nullptr);
 
         return x;
     }
@@ -197,7 +232,7 @@ namespace Quanta
 
     uint32_t GlfwWindow::GetY() const
     {
-        int32_t y;
+        int y;
 
         glfwGetWindowPos(handle, nullptr, &y);
 
@@ -211,9 +246,9 @@ namespace Quanta
 
     uint32_t GlfwWindow::GetWidth() const
     {
-        uint32_t width;
+        int width;
 
-        glfwGetWindowSize(handle, (int*) &width, nullptr);
+        glfwGetWindowSize(handle, &width, nullptr);
 
         return width;
     }
@@ -225,9 +260,9 @@ namespace Quanta
     
     uint32_t GlfwWindow::GetHeight() const
     {
-        uint32_t height;
+        int height;
 
-        glfwGetWindowSize(handle, nullptr, (int*) &height);
+        glfwGetWindowSize(handle, nullptr, &height);
 
         return height;
     }
@@ -237,18 +272,18 @@ namespace Quanta
         glfwSetWindowSize(handle, GetWidth(), value);
     }
     
-    bool GlfwWindow::Exists() const
+    const GLFWwindow* GlfwWindow::GetHandle() const
     {
-        return !glfwWindowShouldClose(handle);
+        return handle;
     }
 
-    void GlfwWindow::PollEvents() const
+    GLFWwindow* GlfwWindow::GetHandle() 
     {
-        glfwPollEvents();
+        return handle;
     }
-    
-    void GlfwWindow::SwapBuffers() const
+
+    GraphicsApi GlfwWindow::GetGraphicsApi() const
     {
-        glfwSwapBuffers(handle);
+        return graphicsApi;
     }
 }

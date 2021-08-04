@@ -8,12 +8,16 @@ namespace Quanta
     class GlfwWindow final : public Window
     {
     public:
-        GlfwWindow();
+        GlfwWindow(GraphicsApi graphicsApi);
         ~GlfwWindow();
 
         GlfwWindow(const GlfwWindow&) = delete;
 
         GlfwWindow& operator=(const GlfwWindow&) = delete;
+
+        bool Exists() const override;
+        void PollEvents() const override;
+        void SwapBuffers() const override;
 
         void AddKeyDownCallback(Event<Key>::Handler handler) override;
         void AddKeyUpCallback(Event<Key>::Handler handler) override;
@@ -46,11 +50,13 @@ namespace Quanta
         uint32_t GetHeight() const override;
         void SetHeight(uint32_t value) override;
 
-        bool Exists() const override;
-        void PollEvents() const override;
-        void SwapBuffers() const override;
+        GraphicsApi GetGraphicsApi() const override;
+        
+        const GLFWwindow* GetHandle() const;
+        GLFWwindow* GetHandle();
     private:
         GLFWwindow* handle;
+        GraphicsApi graphicsApi;
 
         WindowState state;
 

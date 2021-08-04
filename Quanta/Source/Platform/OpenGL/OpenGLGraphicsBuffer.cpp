@@ -7,6 +7,11 @@ namespace Quanta
 {
     OpenGLGraphicsBuffer::OpenGLGraphicsBuffer(BufferUsage usage, size_t size)
     {       
+        DEBUG_ASSERT(
+            usage == BufferUsage::Static ||
+            usage == BufferUsage::Dynamic
+        );
+        
         this->usage = usage;
         this->size = size;
         
@@ -24,8 +29,6 @@ namespace Quanta
             glNamedBufferData(handle, size, nullptr, GL_DYNAMIC_DRAW);
 
             break;
-        default:
-            DEBUG_FAILURE_MESSAGE("GraphicsBuffer usage is not supported!");
         }
     }
     
