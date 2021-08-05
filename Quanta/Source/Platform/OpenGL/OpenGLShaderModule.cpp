@@ -62,7 +62,9 @@ namespace Quanta
 
             glGetShaderInfoLog(handle, sizeof(infoLog), nullptr, infoLog);
 
-            DEBUG_FAILURE_MESSAGE(infoLog);
+            printf(infoLog);
+
+            DEBUG_ASSERT(success);
         }
 #endif
     };
