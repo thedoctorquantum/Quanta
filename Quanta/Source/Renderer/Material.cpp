@@ -22,28 +22,73 @@ namespace Quanta
         return *this;
     }
 
-    const glm::vec4& Material::GetColor() const
+    const glm::vec4& Material::GetAlbedo() const
     {
-        return color;
+        return albedo;
     }
 
-    void Material::SetColor(const glm::vec4& value)
+    void Material::SetAlbedo(const glm::vec4& value)
     {
-        color = value;
+        albedo = value;
     }
 
-    const Sampler2D* Material::GetAlbedoSampler() const
+    const glm::vec4& Material::GetDiffuse() const
+    {   
+        return diffuse;
+    }
+    
+    void Material::SetDiffuse(const glm::vec4& value)
+    {
+        diffuse = value;
+    }
+
+    const glm::vec4& Material::GetSpecular() const
+    {
+        return specular;
+    }
+
+    void Material::SetSpecular(const glm::vec4& value)
+    {
+        specular = value;
+    }
+    
+    float Material::GetShininess() const
+    {
+        return shininess;
+    }
+
+    void Material::SetShininess(float value)
+    {
+        shininess = value;
+    }
+    
+    Sampler2D* Material::GetAlbedoSampler() const
     {
         return albedoSampler;
     }
-
-    Sampler2D* Material::GetAlbedoSampler()
-    {
-        return albedoSampler;
-    }
-
+    
     void Material::SetAlbedoSampler(Sampler2D* value)
     {
         albedoSampler = value;
+    }
+
+    Sampler2D* Material::GetDiffuseSampler() const
+    {
+        return diffuseSampler;
+    }
+
+    void Material::SetDiffuseSampler(Sampler2D* value)
+    {
+        diffuseSampler = value;
+    }
+        
+    Sampler2D* Material::GetSpecularSampler() const
+    {
+        return specularSampler;
+    }
+
+    void Material::SetSpecularSampler(Sampler2D* value)
+    {
+        specularSampler = value;
     }
 }

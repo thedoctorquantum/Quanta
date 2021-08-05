@@ -14,3 +14,6 @@
 [submodule "Quanta/External/libsndfile"]
 	path = Quanta/External/libsndfile
 	url = https://github.com/libsndfile/libsndfile.git
+[submodule "Quanta/External/assimp"]
+	path = Quanta/External/assimp
+	url = https://github.com/assimp/assimp.git

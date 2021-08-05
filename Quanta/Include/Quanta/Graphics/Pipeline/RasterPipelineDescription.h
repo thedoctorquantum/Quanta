@@ -12,5 +12,6 @@ namespace Quanta
     {
         std::vector<std::shared_ptr<ShaderModule>> ShaderModules;
         std::vector<std::shared_ptr<GraphicsBuffer>> UniformBuffers;
+        std::vector<std::shared_ptr<GraphicsBuffer>> StorageBuffers;
     };   
 }

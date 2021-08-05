@@ -19,14 +19,6 @@ public:
 
     glm::mat4 GetView()
     {
-        //Front = glm::vec3(
-        //    cos(Rotation.y * TO_RADIANS) * cos(Rotation.x * TO_RADIANS),
-        //    sin(Rotation.y * TO_RADIANS),
-        //    cos(Rotation.y * TO_RADIANS) * sin(Rotation.x * TO_RADIANS)
-        //);
-
-        //Front = glm::normalize(Front);
-
         return glm::lookAt(Position, Position + Front, { 0.0f, 1.0f, 0.0f });
     }
 };
@@ -71,8 +63,8 @@ int main()
 
     std::shared_ptr<Quanta::Sampler2D> sampler = Quanta::Sampler2D::Create(texture);
         
-    sampler->SetMagnification(Quanta::FilterMode::Linear);
-    sampler->SetMinification(Quanta::FilterMode::Linear);
+    sampler->SetMagnification(Quanta::FilterMode::Nearest);
+    sampler->SetMinification(Quanta::FilterMode::Nearest);
 
     std::vector<std::shared_ptr<Quanta::Image32>> images =
     {
@@ -94,39 +86,35 @@ int main()
 
     Quanta::Renderer3D::Initialize(*window);
 
-    Quanta::Vertex meshVerts[3];
-
-    meshVerts[0].Translation = { -0.5f, -0.5f, 0.0f };
-    meshVerts[0].Uv = { 0.0f, 0.0f };
-    meshVerts[0].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-
-    meshVerts[1].Translation = { 0.5f, -0.5f, 0.0f };
-    meshVerts[1].Uv = { 1.0f, 0.0f, };
-    meshVerts[1].Color = { 0.0f, 1.0f, 0.0f, 1.0f };
-
-    meshVerts[2].Translation = { 0.0f, 0.5f, 0.0f };
-    meshVerts[2].Uv = { 0.5f, 1.0f };
-    meshVerts[2].Color = { 0.0f, 0.0f, 1.0f, 1.0f };
-
-    uint32_t meshIndices[3] = { 0u, 1u, 2u };
-
-    Quanta::Mesh mesh(3, 3);
-
-    mesh.SetVertices(meshVerts, 3);
-    mesh.SetIndices(meshIndices, 3);
+    Quanta::Mesh mesh = Quanta::Mesh::FromFile("Resources/Models/cube.fbx");
 
     Quanta::Material material;
 
-    material.SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-    material.SetAlbedoSampler(sampler.get());
+    material.SetAlbedo({ 1.0f, 1.0f, 1.0f, 1.0f });
+    material.SetAlbedoSampler(sampler.get()); 
+
+    material.SetDiffuse({ 1.0f, 0.5f, 0.31f, 1.0f });
+    material.SetSpecular({ 0.5f, 0.5f, 0.5f, 1.0f });
+    material.SetShininess(32.0f);
 
     glm::vec3 pos = { 0.0f, 0.0f, 0.0f }; 
     glm::vec3 rot = { 0.0f, 0.0f, 0.0f };
 
     Camera camera;
 
-    camera.Position = { 0.0f, 0.0f, 10.0f };
-    camera.Front = { 0.0f, 0.0f, -10.0f };
+    camera.Position = { 0.0f, 0.0f, 5.0f };
+    camera.Front = { 0.0f, 0.0f, -5.0f };
+    
+    std::vector<Quanta::PointLight> lights(1);
+    
+    lights[0].Ambient = { 0.2f, 0.2f, 0.2f, 1.0f };
+    lights[0].Diffuse = { 0.5f, 0.5f, 0.5f, 1.0f };
+    lights[0].Specular = { 1.0f, 1.0f, 1.0f, 1.0f };
+    
+    lights[0].Position = glm::vec3(0.0f, 0.0f, 1.5f);
+    lights[0].Constant = 1.0f;
+    lights[0].Linear = 0.007f;
+    lights[0].Quadratic = 0.0002f;
 
     while(window->Exists())
     {
@@ -138,10 +126,12 @@ int main()
 
         model = glm::translate(model, pos);
         model *= glm::toMat4(glm::quat(rot));
-
+        
         Quanta::Renderer3D::BeginPass();
         {
-            Quanta::Renderer3D::SetView(camera.GetView());
+            Quanta::Renderer3D::SetView(camera.GetView(), camera.Position);
+
+            Quanta::Renderer3D::SetLights(lights.data(), lights.size());
             
             Quanta::Renderer3D::DrawMesh(mesh, material, model);
         }
@@ -149,11 +139,25 @@ int main()
 
         Quanta::ImGuiRenderer::Begin(1.0f / 60.0f);
         {
-            ImGui::ShowDemoWindow();
             ImGui::ShowMetricsWindow();
 
             ImGui::DragFloat3("Pos", &pos.x, 0.025f);
             ImGui::DragFloat3("Rot", &rot.x, 0.025f);
+
+            ImGui::Spacing();
+
+            for(size_t i = 0; i < lights.size(); i++)
+            {
+                Quanta::PointLight& light = lights[i];
+
+                ImGui::PushID(i);
+
+                ImGui::Text("Light %u", static_cast<uint32_t>(i));
+
+                ImGui::DragFloat3("Pos", &light.Position.x, 0.025f);
+
+                ImGui::PopID();
+            }
 
             ImGui::Spacing();
 
@@ -186,7 +190,7 @@ int main()
 
         Quanta::GraphicsDevice::SetRasterPipeline(nullptr);
 
-        Quanta::GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 1.0f }, 1.0f, 0);
+        Quanta::GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, 0);
     }
     
     Quanta::Renderer3D::DeInitialize();

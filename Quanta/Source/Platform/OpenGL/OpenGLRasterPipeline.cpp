@@ -13,6 +13,7 @@ namespace Quanta
         
         this->shaderModules = description.ShaderModules;
         this->uniformBuffers = description.UniformBuffers;
+        this->storageBuffers = description.StorageBuffers;
         
         handle = glCreateProgram();
 
@@ -73,14 +74,25 @@ namespace Quanta
 
     const std::shared_ptr<ShaderModule>& OpenGLRasterPipeline::GetShaderModule(size_t index) const
     {
+        DEBUG_ASSERT(index < shaderModules.size());
+
         return shaderModules[index];
     }
-
+    
     const std::shared_ptr<GraphicsBuffer>& OpenGLRasterPipeline::GetUniformBuffer(size_t index) const
     {
+        DEBUG_ASSERT(index < uniformBuffers.size());
+
         return uniformBuffers[index];
     }
     
+    const std::shared_ptr<GraphicsBuffer>& OpenGLRasterPipeline::GetStorageBuffer(size_t index) const
+    {
+        DEBUG_ASSERT(index < storageBuffers.size());
+
+        return storageBuffers[index];
+    }
+
     const glm::uvec4& OpenGLRasterPipeline::GetViewport() const
     {
         return viewport;
@@ -113,6 +125,11 @@ namespace Quanta
     size_t OpenGLRasterPipeline::GetUniformBufferCount() const
     {
         return uniformBuffers.size();
+    }
+    
+    size_t OpenGLRasterPipeline::GetStorageBufferCount() const
+    {
+        return storageBuffers.size();
     }
 
     PolygonFillMode OpenGLRasterPipeline::GetPolygonFillMode() const

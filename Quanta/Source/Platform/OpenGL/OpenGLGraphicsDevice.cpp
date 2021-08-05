@@ -83,7 +83,7 @@ namespace Quanta
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             glDisable(GL_DEPTH_TEST);
-            glDepthMask(false);
+            glDepthMask(true);
             
             glDisable(GL_SCISSOR_TEST);
             glDisable(GL_BLEND);
@@ -120,6 +120,23 @@ namespace Quanta
 #endif
 
                 glBindBufferBase(GL_UNIFORM_BUFFER, i, glBuffer->GetHandle());
+            }
+            
+            for(size_t i = 0; i < value->GetStorageBufferCount(); i++)
+            {
+                const std::shared_ptr<GraphicsBuffer>& buffer = value->GetStorageBuffer(i);
+
+                OpenGLGraphicsBuffer* glBuffer = nullptr;
+
+#if DEBUG
+                glBuffer = dynamic_cast<OpenGLGraphicsBuffer*>(buffer.get());
+
+                DEBUG_ASSERT(glBuffer != nullptr);
+#else
+                glBuffer = static_cast<OpenGLGraphicsBuffer*>(buffer.get());
+#endif
+
+                glBindBufferBase(GL_SHADER_STORAGE_BUFFER, i, glBuffer->GetHandle());
             }
 
             glUseProgram(glPipeline->GetHandle());

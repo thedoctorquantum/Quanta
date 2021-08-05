@@ -25,9 +25,11 @@ namespace Quanta
 
         virtual const std::shared_ptr<ShaderModule>& GetShaderModule(size_t index) const = 0;
         virtual const std::shared_ptr<GraphicsBuffer>& GetUniformBuffer(size_t index) const = 0;
-
+        virtual const std::shared_ptr<GraphicsBuffer>& GetStorageBuffer(size_t index) const = 0;
+        
         virtual size_t GetShaderModuleCount() const = 0;
         virtual size_t GetUniformBufferCount() const = 0;
+        virtual size_t GetStorageBufferCount() const = 0;
 
         virtual const glm::uvec4& GetViewport() const = 0;
         virtual void SetViewport(const glm::uvec4& value) = 0;

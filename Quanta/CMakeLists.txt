@@ -1,6 +1,6 @@
 file(GLOB_RECURSE SOURCE Source/*.c Source/*.h Source/*.cpp Source/*.hpp)
 
-add_library("${CMAKE_PROJECT_NAME}" "${SOURCE}")
+add_library("${CMAKE_PROJECT_NAME}" STATIC "${SOURCE}")
 
 set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -14,6 +14,8 @@ target_include_directories("${CMAKE_PROJECT_NAME}"
 
 add_subdirectory("External")
 
+target_precompile_headers("${CMAKE_PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source/Utilites/Precompiled.h")
+
 target_link_libraries("${CMAKE_PROJECT_NAME}" 
     PUBLIC 
     
@@ -21,9 +23,10 @@ target_link_libraries("${CMAKE_PROJECT_NAME}"
     
     PRIVATE 
 
-    "glfw"
+    "assimp"
     "glad"
-    "stb_image"
-    "OpenAL"
+    "glfw"
     "sndfile"
+    "OpenAL"
+    "stb_image"
 )

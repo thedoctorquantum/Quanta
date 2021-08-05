@@ -19,15 +19,34 @@ namespace Quanta
 
         Material& operator=(Material&&);
 
-        const glm::vec4& GetColor() const;
-        void SetColor(const glm::vec4&);
-
-        const Sampler2D* GetAlbedoSampler() const;
-        Sampler2D* GetAlbedoSampler();
+        const glm::vec4& GetAlbedo() const;
+        void SetAlbedo(const glm::vec4&);
         
+        const glm::vec4& GetDiffuse() const;
+        void SetDiffuse(const glm::vec4&);
+
+        const glm::vec4& GetSpecular() const;
+        void SetSpecular(const glm::vec4&);
+        
+        float GetShininess() const;
+        void SetShininess(float);
+
+        Sampler2D* GetAlbedoSampler() const;
         void SetAlbedoSampler(Sampler2D*);
+
+        Sampler2D* GetDiffuseSampler() const;
+        void SetDiffuseSampler(Sampler2D*);
+
+        Sampler2D* GetSpecularSampler() const;
+        void SetSpecularSampler(Sampler2D*);
     private:    
+        glm::vec4 albedo = glm::vec4(1.0f);
+        glm::vec4 diffuse = glm::vec4(0.0f);
+        glm::vec4 specular = glm::vec4(0.0f);
+        float shininess = 0.0f;
+        
         Sampler2D* albedoSampler = nullptr;
-        glm::vec4 color = glm::vec4(1.0f);
+        Sampler2D* diffuseSampler = nullptr;
+        Sampler2D* specularSampler = nullptr;
     };
 }

@@ -16,9 +16,11 @@ namespace Quanta
 
         const std::shared_ptr<ShaderModule>& GetShaderModule(size_t index) const override;
         const std::shared_ptr<GraphicsBuffer>& GetUniformBuffer(size_t index) const override;
+        const std::shared_ptr<GraphicsBuffer>& GetStorageBuffer(size_t index) const override;
         
         size_t GetShaderModuleCount() const override;
         size_t GetUniformBufferCount() const override;
+        size_t GetStorageBufferCount() const override;
 
         const glm::uvec4& GetViewport() const override;
         void SetViewport(const glm::uvec4& value) override;
@@ -56,11 +58,10 @@ namespace Quanta
         uint32_t GetHandle() const;
     private:
         uint32_t handle = 0;
-
-        size_t instanceId = 0;
         
         std::vector<std::shared_ptr<ShaderModule>> shaderModules;
         std::vector<std::shared_ptr<GraphicsBuffer>> uniformBuffers;
+        std::vector<std::shared_ptr<GraphicsBuffer>> storageBuffers;
         
         glm::uvec4 viewport = { };
         glm::uvec4 scissorViewport = { };

@@ -1,4 +1,7 @@
 #include <Quanta/Renderer/Mesh.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include "../Debugging/Validation.h"
 
@@ -6,7 +9,70 @@ namespace Quanta
 {
     Mesh Mesh::FromFile(const std::string& filepath)
     {
-        return { };
+        Assimp::Importer importer;
+
+        Mesh mesh;
+
+        const aiScene* scene = importer.ReadFile(filepath, 
+            aiProcess_Triangulate |
+            aiProcess_FlipUVs
+        ); 
+
+        DEBUG_ASSERT(scene != nullptr);
+
+        std::vector<Vertex> vertices;
+        std::vector<uint32_t> indices;
+
+        size_t indexOffset = 0;
+
+        for(size_t i = 0; i < scene->mNumMeshes; i++)
+        {
+            aiMesh* mesh = scene->mMeshes[i];
+
+            for(size_t j = 0; j < mesh->mNumVertices; j++)
+            {                
+                Vertex vertex;
+
+                aiVector3D& translation = mesh->mVertices[j];
+                aiVector3D& normal = mesh->mNormals[j];
+
+                aiVector3D uv = aiVector3D(0.0f);
+
+                if(mesh->HasTextureCoords(0))
+                {
+                    uv = mesh->mTextureCoords[0][j]; 
+                }
+
+                aiColor4D color = aiColor4D(1.0f);
+
+                if(mesh->HasVertexColors(0))
+                {
+                    color = mesh->mColors[0][j]; 
+                }
+
+                vertex.Translation = glm::vec3(translation.x, translation.y, translation.z);
+                vertex.Normal = glm::vec3(normal.x, normal.y, normal.z);
+                vertex.Uv = glm::vec2(uv.x, uv.y);
+                vertex.Color = glm::vec4(color.r, color.g, color.b, color.a);
+
+                vertices.push_back(vertex);
+            }
+
+            for(size_t j = 0; j < mesh->mNumFaces; j++)
+            {
+                aiFace& face = mesh->mFaces[j];
+
+                for(size_t k = 0; k < face.mNumIndices; k++)
+                {
+                    indices.push_back(face.mIndices[k]);
+                }
+            }
+        }
+
+        mesh.SetVertices(vertices.data(), vertices.size());
+        mesh.SetIndices(indices.data(), indices.size());    
+
+        return mesh;
     }
     
     Mesh::Mesh() : Mesh(0, 0)
@@ -65,24 +131,22 @@ namespace Quanta
 
     Mesh::Mesh(Mesh&& other)
     {
-        DEBUG_ASSERT(false);
-
-        vertexArray = std::move(other.vertexArray);
+        vertexArray = other.vertexArray;
         vertexCount = other.vertexCount;
         indexCount = other.indexCount;
 
+        other.vertexArray = nullptr;
         other.vertexCount = 0;
         other.indexCount = 0;
     }
     
     Mesh& Mesh::operator=(Mesh&& other)
     {
-        DEBUG_ASSERT(false);
-
-        vertexArray = std::move(other.vertexArray);
+        vertexArray = other.vertexArray;
         vertexCount = other.vertexCount;
         indexCount = other.indexCount;
 
+        other.vertexArray = nullptr;
         other.vertexCount = 0;
         other.indexCount = 0;
 

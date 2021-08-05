@@ -17,6 +17,8 @@ namespace Quanta::Renderer3D
             mat4 projection;        
             
             mat4 viewProjection;
+
+            vec3 viewTranslation;
         } u_Matrices;
 
         layout(location = 0) in vec3 a_Translation;
@@ -29,45 +31,127 @@ namespace Quanta::Renderer3D
             vec3 normal;
             vec2 uv;
             vec4 color;
+
+            vec3 fragmentPosition;
         } v_Out;
 
         void main()
         {
-            v_Out.normal = a_Normal;
+            v_Out.normal = mat3(transpose(inverse(u_Matrices.model))) * a_Normal;
             v_Out.uv = a_Uv;
             v_Out.color = a_Color;
 
-            gl_Position = u_Matrices.viewProjection * u_Matrices.model * vec4(a_Translation, 1.0);
+            vec4 translation = u_Matrices.model * vec4(a_Translation, 1.0);
+
+            v_Out.fragmentPosition = vec3(translation);
+
+            gl_Position = u_Matrices.viewProjection * translation;
         }
     )";
     
     constexpr const char* fragmentShaderSource = R"(
         #version 450
 
-        struct Material
+        struct PointLight
         {
-            vec4 color;
+            vec3 position;
+
+            vec4 ambient;
+            vec4 diffuse;
+            vec4 specular;
+
+            float constant;
+            float linear;
+            float quadratic;
         };
         
-        layout(std140, binding = 1) uniform MaterialUniforms
+        layout(std140, binding = 0) uniform Matrices
         {
-            Material material;
+            mat4 model;
+            mat4 view;
+            mat4 projection;        
+            
+            mat4 viewProjection;
+
+            vec3 viewTranslation;
+        } u_Matrices;
+
+        layout(std140, binding = 1) uniform Material
+        {
+            vec4 albedo;
+            vec4 diffuse;
+            vec4 specular;
+            float shininess;
         } u_Material;  
 
+        layout(std430, binding = 0) buffer Lights
+        {
+            PointLight lights[];
+        };
+
         layout(binding = 0) uniform sampler2D u_AlbedoSampler;
+        layout(binding = 1) uniform sampler2D u_DiffuseSampler;
+        layout(binding = 2) uniform sampler2D u_SpecularSampler;
 
         layout(location = 0) in Out
         {
             vec3 normal;
             vec2 uv;
             vec4 color;
+
+            vec3 fragmentPosition;
         } v_In;
 
         layout(location = 0) out vec4 a_Fragment;
+        
+        vec4 CalculatePointLight(vec3 normal, vec3 viewDirection)
+        {
+            vec4 result = vec4(0.0);
+
+            vec4 sampledAlbedo = texture(u_AlbedoSampler, v_In.uv);
+            vec4 sampledDiffuse = texture(u_DiffuseSampler, v_In.uv);
+            vec4 sampledSpecular = texture(u_SpecularSampler, v_In.uv);
+
+            int count = lights.length();
+            
+            for(int i = 0; i < count; i++)
+            {
+                PointLight light = lights[i];
+
+                vec3 positionDifference = light.position - v_In.fragmentPosition;
+                vec3 lightDirection = normalize(positionDifference);
+                vec3 reflectDirection = reflect(-lightDirection, normal);
+
+                float diffuseFactor = max(dot(normal, lightDirection), 0.0);
+                float specularFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), u_Material.shininess);
+
+                vec4 ambient = u_Material.albedo * sampledAlbedo * light.ambient;
+                vec4 diffuse = u_Material.diffuse * sampledDiffuse * light.diffuse * diffuseFactor;
+                vec4 specular = u_Material.specular * sampledSpecular * light.specular * specularFactor;
+
+                float distance = length(positionDifference);
+                float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+
+                ambient *= attenuation;
+                diffuse *= attenuation;
+                specular *= attenuation;
+
+                result += ambient + diffuse + specular;
+            }
+            
+            result.w = 1.0;
+
+            return result;
+        }
 
         void main()
         {
-            a_Fragment = texture(u_AlbedoSampler, v_In.uv) * u_Material.material.color * v_In.color;
+            vec3 normal = normalize(v_In.normal);
+            vec3 viewDirection = normalize(u_Matrices.viewTranslation - v_In.fragmentPosition);
+
+            vec4 pointLight = CalculatePointLight(normal, viewDirection);
+
+            a_Fragment = v_In.color * pointLight;
         }
     )";
 
@@ -80,7 +164,13 @@ namespace Quanta::Renderer3D
         std::shared_ptr<GraphicsBuffer> matrixUniforms = nullptr;
         std::shared_ptr<GraphicsBuffer> materialUniforms = nullptr;
 
-        std::shared_ptr<Sampler2D> defaultSampler = nullptr;
+        std::shared_ptr<GraphicsBuffer> lightBuffer = nullptr;
+
+        std::shared_ptr<Sampler2D> defaultAlbedoSampler = nullptr;
+        std::shared_ptr<Sampler2D> defaultDiffuseSampler = nullptr;
+        std::shared_ptr<Sampler2D> defaultSpecularSampler = nullptr;
+
+        std::vector<PointLight> lights;
 
         glm::mat4 viewMatrix = glm::mat4(1.0f);
         glm::mat4 projectionMatrix = glm::mat4(1.0f);
@@ -94,39 +184,61 @@ namespace Quanta::Renderer3D
 
         state->window = &window;
 
-        state->matrixUniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::mat4) * 4);
-        state->materialUniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::vec4));
+        state->matrixUniforms = GraphicsBuffer::Create(BufferUsage::Static, (sizeof(glm::mat4) * 4) + sizeof(glm::vec4));
+        state->materialUniforms = GraphicsBuffer::Create(BufferUsage::Static, (sizeof(glm::vec4) * 3) + sizeof(glm::vec4));
+
+        state->lightBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
 
         RasterPipelineDescription pipelineDescriptor;
 
         pipelineDescriptor.UniformBuffers.push_back(state->matrixUniforms);
         pipelineDescriptor.UniformBuffers.push_back(state->materialUniforms);
 
+        pipelineDescriptor.StorageBuffers.push_back(state->lightBuffer);
+
         pipelineDescriptor.ShaderModules.push_back(ShaderModule::Create(ShaderType::Vertex, vertexShaderSource));
         pipelineDescriptor.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, fragmentShaderSource));
 
         state->pipeline = RasterPipeline::Create(pipelineDescriptor);
 
-        state->pipeline->SetFaceCullMode(FaceCullMode::None);
-        state->pipeline->SetEnableDepthWriting(false);
+        state->pipeline->SetFaceCullMode(FaceCullMode::Back);
+        state->pipeline->SetEnableDepthWriting(true);
         state->pipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
         state->pipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
         state->pipeline->SetBlendMode(BlendMode::Add);
 
-        std::shared_ptr<Texture2D> defaultTexture = Texture2D::Create(1, 1);
+        Color32 albedo = 0xFFFFFFFF;
+        Color32 diffuse = 0x99999999;
+        Color32 specular = 0x00000000;
 
-        Color32 white = 0xFFFFFFFF;
+        std::shared_ptr<Texture2D> albedoTexture = Texture2D::Create(1, 1);
+        std::shared_ptr<Texture2D> diffuseTexture = Texture2D::Create(1, 1);
+        std::shared_ptr<Texture2D> specularTexture = Texture2D::Create(1, 1);
+        
+        albedoTexture->SetData(&albedo);
+        diffuseTexture->SetData(&diffuse);
+        specularTexture->SetData(&specular);
 
-        defaultTexture->SetData(&white);
+        state->defaultAlbedoSampler = Sampler2D::Create(albedoTexture);
 
-        state->defaultSampler = Sampler2D::Create(defaultTexture);
+        state->defaultAlbedoSampler->SetMagnification(FilterMode::Nearest);
+        state->defaultAlbedoSampler->SetMinification(FilterMode::Nearest);
 
-        state->defaultSampler->SetMagnification(FilterMode::Nearest);
-        state->defaultSampler->SetMinification(FilterMode::Nearest);
+        state->defaultDiffuseSampler = Sampler2D::Create(diffuseTexture);
+        
+        state->defaultDiffuseSampler->SetMagnification(FilterMode::Nearest);
+        state->defaultDiffuseSampler->SetMinification(FilterMode::Nearest);
+
+        state->defaultSpecularSampler = Sampler2D::Create(specularTexture);
+
+        state->defaultSpecularSampler->SetMagnification(FilterMode::Nearest);
+        state->defaultSpecularSampler->SetMinification(FilterMode::Nearest);   
     }
     
     void DeInitialize()
     {
+        DEBUG_ASSERT(state != nullptr);
+
         delete state;
     }
 
@@ -137,20 +249,23 @@ namespace Quanta::Renderer3D
         return state->viewMatrix;
     }
 
-    void SetView(const glm::mat4& value)
+    void SetView(const glm::mat4& matrix, const glm::vec3& position)
     {
         DEBUG_ASSERT(state != nullptr);
 
-        state->viewMatrix = value;
+        state->viewMatrix = matrix;
         
         state->viewProjectionMatrix = state->projectionMatrix * state->viewMatrix;
 
         state->matrixUniforms->SetData(&state->viewMatrix, sizeof(glm::mat4), sizeof(glm::mat4));
         state->matrixUniforms->SetData(&state->viewProjectionMatrix, sizeof(glm::mat4), sizeof(glm::mat4) * 3);
+        state->matrixUniforms->SetData(&position, sizeof(glm::vec3), sizeof(glm::mat4) * 4);
     }
     
     void BeginPass()
     {
+        DEBUG_ASSERT(state != nullptr);
+
         state->projectionMatrix = glm::perspective(
             45.0f * (static_cast<float>(M_PI) / 180.0f),
             static_cast<float>(state->window->GetWidth()) / static_cast<float>(state->window->GetHeight()),
@@ -170,6 +285,21 @@ namespace Quanta::Renderer3D
 
         GraphicsDevice::SetRasterPipeline(nullptr);
     }
+
+    void SetLights(const PointLight* lights, size_t count)
+    {
+        DEBUG_ASSERT(lights != nullptr);
+        DEBUG_ASSERT(state != nullptr);
+
+        size_t size = count * sizeof(PointLight);
+
+        if(size > state->lightBuffer->GetSize())
+        {
+            GraphicsBuffer::Resize(*state->lightBuffer, size);
+        }
+
+        state->lightBuffer->SetData(lights, size);
+    }
     
     void DrawMesh(const Mesh& mesh, const Material& material, const glm::mat4& transform)
     {
@@ -177,7 +307,15 @@ namespace Quanta::Renderer3D
 
         const std::shared_ptr<VertexArray>& vertexArray = mesh.GetVertexArray();
 
-        state->materialUniforms->SetData(&material.GetColor(), sizeof(glm::vec4));        
+        DEBUG_ASSERT(vertexArray != nullptr);
+
+        float shininess = material.GetShininess();
+
+        state->materialUniforms->SetData(&material.GetAlbedo(), sizeof(glm::vec4));
+        state->materialUniforms->SetData(&material.GetDiffuse(), sizeof(glm::vec4), sizeof(glm::vec4));        
+        state->materialUniforms->SetData(&material.GetSpecular(), sizeof(glm::vec4), sizeof(glm::vec4) * 2);
+        state->materialUniforms->SetData(&shininess, sizeof(float), sizeof(glm::vec4) * 3);
+        
         state->matrixUniforms->SetData(&transform, sizeof(glm::mat4));
 
         GraphicsDevice::SetVertexArray(vertexArray);
@@ -188,9 +326,27 @@ namespace Quanta::Renderer3D
         }
         else
         {
-            GraphicsDevice::BindSampler(*state->defaultSampler, 0);
+            GraphicsDevice::BindSampler(*state->defaultAlbedoSampler, 0);
         }
 
+        if(material.GetDiffuseSampler() != nullptr)
+        {
+            GraphicsDevice::BindSampler(*material.GetDiffuseSampler(), 1);
+        }
+        else
+        {
+            GraphicsDevice::BindSampler(*state->defaultDiffuseSampler, 1);
+        }
+
+        if(material.GetSpecularSampler() != nullptr)
+        {
+            GraphicsDevice::BindSampler(*material.GetSpecularSampler(), 2);
+        }
+        else
+        {
+            GraphicsDevice::BindSampler(*state->defaultSpecularSampler, 2);
+        }
+        
         DrawCommand command;
 
         command.Count = mesh.GetIndexCount();
