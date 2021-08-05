@@ -173,8 +173,7 @@ namespace Quanta
 
             break;
         case WindowState::Minimized:
-            DEBUG_WARNING("WindowState::Minimized is not currently implemented");
-            
+                        
             break;
         default:
             DEBUG_FAILURE_MESSAGE("value was out of range");

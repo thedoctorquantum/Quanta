@@ -8,10 +8,6 @@
 
 #if DEBUG
     #include <assert.h>
-    #include <iostream>
-
-    #define DEBUG_MESSAGE(message) { std::cout << "[DEBUG]: " << (message) << '\n'; }
-    #define DEBUG_WARNING(message) { std::cout << "[WARNING]: " << (message) << '\n'; }
 
     #define DEBUG_ASSERT(condition) { assert(condition); }
     #define DEBUG_ASSERT_MESSAGE(condition, message) { assert((condition) && (message)); } 

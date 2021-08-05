@@ -31,7 +31,7 @@ std::string ReadAllText(const std::string& filepath)
     return std::move(contents.str());
 }
 
-int main(int argc, char** argv)
+int main()
 {
     std::shared_ptr<Quanta::Window> window = Quanta::Window::Create(Quanta::GraphicsApi::OpenGL);
     
@@ -144,7 +144,7 @@ int main(int argc, char** argv)
 
         pipeline->SetViewport({ 0.0f, 0.0f, window->GetWidth(), window->GetHeight() });
 
-        glm::mat4 proj = glm::ortho(0.0f, (float) window->GetWidth(), 0.0f, (float) window->GetHeight(), 0.1f, 100.0f);
+        glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(window->GetWidth()), 0.0f, static_cast<float>(window->GetHeight()), 0.1f, 100.0f);
 
         uniforms->SetData(&proj, sizeof(glm::mat4), sizeof(glm::mat4));
 
@@ -190,7 +190,7 @@ int main(int argc, char** argv)
                     }
                 }
 
-                ImGui::Image(sampler.get(), ImVec2((float) texture->GetWidth(), (float) texture->GetHeight()));
+                ImGui::Image(sampler.get(), ImVec2(static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight())));
             }
             ImGui::End();
         }

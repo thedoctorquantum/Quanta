@@ -33,27 +33,27 @@ namespace Quanta
 
     void OnKeyDown(Key key)
     {
-       state->io->KeysDown[(int32_t) key] = true;
+       state->io->KeysDown[static_cast<size_t>(key)] = true;
     }
 
     void OnKeyUp(Key key)
     {
-        state->io->KeysDown[(int32_t) key] = false;
+        state->io->KeysDown[static_cast<size_t>(key)] = false;
     }
 
     void OnMouseDown(MouseButton button)
     {
-        state->io->MouseDown[(int32_t) button] = true;
+        state->io->MouseDown[static_cast<size_t>(button)] = true;
     }
 
     void OnMouseUp(MouseButton button)
     {
-        state->io->MouseDown[(int32_t) button] = false;
+        state->io->MouseDown[static_cast<size_t>(button)] = false;
     }
     
     void OnMouseMove(glm::vec2 position)
     {
-        state->io->MousePos = *(ImVec2*) &position;
+        state->io->MousePos = { position.x, position.y };
     }
 
     void OnMouseScroll(glm::vec2 scroll)
@@ -159,8 +159,8 @@ namespace Quanta
 
         state->vertexArray = VertexArray::Create();
 
-        state->vertexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0 * sizeof(ImDrawVert));
-        state->indexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0 * sizeof(uint16_t));
+        state->vertexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
+        state->indexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
 
         VertexLayout layout;
 
@@ -185,11 +185,11 @@ namespace Quanta
         state->vertexArray->SetVertexBuffer(state->vertexBuffer, layout);
         state->vertexArray->SetIndexBuffer(state->indexBuffer, IndexType::UInt16);
 
-        uint8_t* pixels;
-        uint32_t width;
-        uint32_t height;
+        unsigned char* pixels = nullptr;
+        int width = 0;
+        int height = 0;
 
-        state->io->Fonts->GetTexDataAsRGBA32(&pixels, (int*) &width, (int*) &height);
+        state->io->Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
         state->fontTexture = Texture2D::Create(width, height);
 
@@ -202,27 +202,25 @@ namespace Quanta
 
         state->io->Fonts->SetTexID(state->fontSampler.get());
 
-        state->io->Fonts->ClearTexData();
-
-        state->io->KeyMap[ImGuiKey_Tab] = (int) Key::Tab;
-        state->io->KeyMap[ImGuiKey_LeftArrow] = (int) Key::Left;
-        state->io->KeyMap[ImGuiKey_RightArrow] = (int) Key::Right;
-        state->io->KeyMap[ImGuiKey_UpArrow] = (int) Key::Up;
-        state->io->KeyMap[ImGuiKey_DownArrow] = (int) Key::Down;
-        state->io->KeyMap[ImGuiKey_PageUp] = (int) Key::PageUp;
-        state->io->KeyMap[ImGuiKey_PageDown] = (int) Key::PageDown;
-        state->io->KeyMap[ImGuiKey_Home] = (int) Key::Home;
-        state->io->KeyMap[ImGuiKey_End] = (int) Key::End;
-        state->io->KeyMap[ImGuiKey_Delete] = (int) Key::Delete;
-        state->io->KeyMap[ImGuiKey_Backspace] = (int) Key::Backspace;
-        state->io->KeyMap[ImGuiKey_Enter] = (int) Key::Enter;
-        state->io->KeyMap[ImGuiKey_Escape] = (int) Key::Escape;
-        state->io->KeyMap[ImGuiKey_A] = (int) Key::A;
-        state->io->KeyMap[ImGuiKey_C] = (int) Key::C;
-        state->io->KeyMap[ImGuiKey_V] = (int) Key::V;
-        state->io->KeyMap[ImGuiKey_X] = (int) Key::X;
-        state->io->KeyMap[ImGuiKey_Y] = (int) Key::Y;
-        state->io->KeyMap[ImGuiKey_Z] = (int) Key::Z;
+        state->io->KeyMap[ImGuiKey_Tab] = static_cast<int>(Key::Tab);
+        state->io->KeyMap[ImGuiKey_LeftArrow] = static_cast<int>(Key::Left);
+        state->io->KeyMap[ImGuiKey_RightArrow] = static_cast<int>(Key::Right);
+        state->io->KeyMap[ImGuiKey_UpArrow] = static_cast<int>(Key::Up);
+        state->io->KeyMap[ImGuiKey_DownArrow] = static_cast<int>(Key::Down);
+        state->io->KeyMap[ImGuiKey_PageUp] = static_cast<int>(Key::PageUp);
+        state->io->KeyMap[ImGuiKey_PageDown] = static_cast<int>(Key::PageDown);
+        state->io->KeyMap[ImGuiKey_Home] = static_cast<int>(Key::Home);
+        state->io->KeyMap[ImGuiKey_End] = static_cast<int>(Key::End);
+        state->io->KeyMap[ImGuiKey_Delete] = static_cast<int>(Key::Delete);
+        state->io->KeyMap[ImGuiKey_Backspace] = static_cast<int>(Key::Backspace);
+        state->io->KeyMap[ImGuiKey_Enter] = static_cast<int>(Key::Enter);
+        state->io->KeyMap[ImGuiKey_Escape] = static_cast<int>(Key::Escape);
+        state->io->KeyMap[ImGuiKey_A] = static_cast<int>(Key::A);
+        state->io->KeyMap[ImGuiKey_C] = static_cast<int>(Key::C);
+        state->io->KeyMap[ImGuiKey_V] = static_cast<int>(Key::V);
+        state->io->KeyMap[ImGuiKey_X] = static_cast<int>(Key::X);
+        state->io->KeyMap[ImGuiKey_Y] = static_cast<int>(Key::Y);
+        state->io->KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);
     }
 
     void ImGuiRenderer::Shutdown()
@@ -232,7 +230,7 @@ namespace Quanta
 
     void ImGuiRenderer::Begin(float elapsed)
     {
-        state->io->DisplaySize = ImVec2((float) state->window->GetWidth(), (float) state->window->GetHeight());
+        state->io->DisplaySize = ImVec2(static_cast<float>(state->window->GetWidth()), static_cast<float>(state->window->GetHeight()));
         state->io->DeltaTime = elapsed;
         state->io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 
@@ -249,7 +247,7 @@ namespace Quanta
 
         DEBUG_ASSERT(drawData != nullptr);
 
-        if(!drawData->CmdListsCount) return;
+        if(drawData->CmdListsCount <= 0) return;
 
         drawData->ScaleClipRects(state->io->DisplayFramebufferScale);
 
@@ -280,31 +278,33 @@ namespace Quanta
 
         DrawCommand drawCommand;
 
-        for(int32_t i = 0; i < drawData->CmdListsCount; i++)
+        for(size_t i = 0; i < drawData->CmdListsCount; i++)
         {
             ImDrawList* drawList = drawData->CmdLists[i];
 
             ImVector<ImDrawCmd>& commands = drawList->CmdBuffer;
 
             size_t vertexBufferSize = drawList->VtxBuffer.Size * sizeof(ImDrawVert);
-            size_t indexBufferSize = drawList->IdxBuffer.Size * sizeof(uint16_t);
+            size_t indexBufferSize = drawList->IdxBuffer.Size * sizeof(ImWchar);
 
             state->vertexBuffer->SetData(drawList->VtxBuffer.Data, vertexBufferSize, vertexOffset);
             state->indexBuffer->SetData(drawList->IdxBuffer.Data, indexBufferSize, indexOffset);
             
-            for(int32_t j = 0; j < commands.Size; j++)
+            for(size_t j = 0; j < commands.Size; j++)
             {
                 ImDrawCmd& command = commands[j];
 
-                Sampler2D* sampler = (Sampler2D*) command.TextureId;
+                Sampler2D* sampler = static_cast<Sampler2D*>(command.TextureId);
+
+                DEBUG_ASSERT(sampler != nullptr);
 
                 GraphicsDevice::BindSampler(*sampler, 0);
 
                 state->pipeline->SetScissorViewport({
-                     (uint32_t) command.ClipRect.x, 
-                     (uint32_t) (state->window->GetHeight() - command.ClipRect.w), 
-                     (uint32_t) (command.ClipRect.z - command.ClipRect.x),
-                     (uint32_t) (command.ClipRect.w - command.ClipRect.y) 
+                    static_cast<uint32_t>(command.ClipRect.x), 
+                    static_cast<uint32_t>(state->window->GetHeight() - command.ClipRect.w), 
+                    static_cast<uint32_t>(command.ClipRect.z - command.ClipRect.x),
+                    static_cast<uint32_t>(command.ClipRect.w - command.ClipRect.y) 
                 });
                 
                 drawCommand.Count = command.ElemCount;
@@ -313,7 +313,7 @@ namespace Quanta
 
                 GraphicsDevice::DispatchDraw(drawCommand);
 
-                indexOffset += command.ElemCount * sizeof(uint16_t);
+                indexOffset += command.ElemCount * sizeof(ImWchar);
             }
 
             vertexOffset += vertexBufferSize;
