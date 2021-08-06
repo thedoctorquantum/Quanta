@@ -23,6 +23,8 @@ namespace Quanta
         bool isLoaded = gladLoadGL();
 
         DEBUG_ASSERT(isLoaded);
+
+        glEnable(GL_MULTISAMPLE);
                
 #if DEBUG
         glEnable(GL_DEBUG_OUTPUT);

@@ -14,7 +14,7 @@ namespace Quanta
 
         Mesh mesh;
 
-        const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate); 
+        const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_CalcTangentSpace); 
 
         DEBUG_ASSERT(scene != nullptr);
 
@@ -48,10 +48,15 @@ namespace Quanta
                     color = mesh->mColors[0][j]; 
                 }
 
+                aiVector3D tangent = mesh->mTangents[j];
+                aiVector3D biTangent = mesh->mBitangents[j];
+                
                 vertex.Translation = glm::vec3(translation.x, translation.y, translation.z);
                 vertex.Normal = glm::vec3(normal.x, normal.y, normal.z);
                 vertex.Uv = glm::vec2(uv.x, uv.y);
                 vertex.Color = glm::vec4(color.r, color.g, color.b, color.a);
+                vertex.Tangent = glm::vec3(tangent.x, tangent.y, tangent.z);
+                vertex.BiTangent = glm::vec3(biTangent.x, biTangent.y, biTangent.z);
 
                 vertices.push_back(vertex);
             }
@@ -113,6 +118,20 @@ namespace Quanta
         layout.Add({
             BufferPrimitive::Float,
             2,
+            sizeof(float),
+            false
+        });
+
+        layout.Add({
+            BufferPrimitive::Float,
+            3,
+            sizeof(float),
+            false
+        });
+
+        layout.Add({
+            BufferPrimitive::Float,
+            3,
             sizeof(float),
             false
         });

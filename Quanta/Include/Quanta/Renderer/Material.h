@@ -39,6 +39,9 @@ namespace Quanta
 
         Sampler2D* GetSpecularSampler() const;
         void SetSpecularSampler(Sampler2D*);
+        
+        Sampler2D* GetNormalSampler() const;
+        void SetNormalSampler(Sampler2D*);
     private:    
         glm::vec4 albedo = glm::vec4(1.0f);
         glm::vec4 diffuse = glm::vec4(0.0f);
@@ -48,5 +51,6 @@ namespace Quanta
         Sampler2D* albedoSampler = nullptr;
         Sampler2D* diffuseSampler = nullptr;
         Sampler2D* specularSampler = nullptr;
+        Sampler2D* normalSampler = nullptr;
     };
 }

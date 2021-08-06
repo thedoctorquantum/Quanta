@@ -91,4 +91,14 @@ namespace Quanta
     {
         specularSampler = value;
     }
+
+    Sampler2D* Material::GetNormalSampler() const
+    {
+        return normalSampler;
+    }
+    
+    void Material::SetNormalSampler(Sampler2D* value)
+    {
+        normalSampler = value;
+    }
 }

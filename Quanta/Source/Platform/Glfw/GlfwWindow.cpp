@@ -33,6 +33,8 @@ namespace Quanta
             
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, DEBUG);
 
+            glfwWindowHint(GLFW_SAMPLES, 4);
+
             break;
         }
         

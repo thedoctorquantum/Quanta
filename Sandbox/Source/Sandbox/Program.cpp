@@ -80,30 +80,34 @@ int main()
     Quanta::Renderer3D::Initialize(*window);
 
     std::shared_ptr<Quanta::Texture2D> albedo = Quanta::Texture2D::FromFile("Resources/Models/backpack/diffuse.jpg");
-    //std::shared_ptr<Quanta::Texture2D> diffuse = Quanta::Texture2D::FromFile("Resources/Models/backpack/diffuse.jpg");
+    std::shared_ptr<Quanta::Texture2D> diffuse = Quanta::Texture2D::FromFile("Resources/Models/backpack/roughness.jpg");
     std::shared_ptr<Quanta::Texture2D> specular = Quanta::Texture2D::FromFile("Resources/Models/backpack/specular.jpg");
+    std::shared_ptr<Quanta::Texture2D> normal = Quanta::Texture2D::FromFile("Resources/Models/backpack/normal.png");
 
     std::shared_ptr<Quanta::Sampler2D> albedoSampler = Quanta::Sampler2D::Create(albedo);
-    //std::shared_ptr<Quanta::Sampler2D> diffuseSampler = Quanta::Sampler2D::Create(diffuse);
+    std::shared_ptr<Quanta::Sampler2D> diffuseSampler = Quanta::Sampler2D::Create(diffuse);
     std::shared_ptr<Quanta::Sampler2D> specularSampler = Quanta::Sampler2D::Create(specular);
+    std::shared_ptr<Quanta::Sampler2D> normalSampler = Quanta::Sampler2D::Create(normal);
         
     albedoSampler->SetMagnification(Quanta::FilterMode::Nearest);
     albedoSampler->SetMinification(Quanta::FilterMode::Nearest);
 
-    Quanta::Mesh mesh = Quanta::Mesh::FromFile("Resources/Models/backpack/backpack.obj");
+    Quanta::Mesh mesh = Quanta::Mesh::FromFile("Resources/Models/backpack/backpack.fbx");
 
     Quanta::Material material;
 
     material.SetAlbedo({ 1.0f, 1.0f, 1.0f, 1.0f });
     material.SetAlbedoSampler(albedoSampler.get()); 
 
-    material.SetDiffuse({ 1.0f, 1.0f, 1.0f, 1.0f });
-    //material.SetDiffuseSampler(diffuseSampler);
+    material.SetDiffuse({ 0.8f, 0.8f, 0.8f, 1.0f });
+    material.SetDiffuseSampler(diffuseSampler.get());
 
     material.SetSpecular({ 0.5f, 0.5f, 0.5f, 1.0f });
     material.SetSpecularSampler(specularSampler.get());
+    
+    material.SetNormalSampler(normalSampler.get());
 
-    material.SetShininess(32.0f);
+    material.SetShininess(225.0f);
 
     glm::vec3 pos = { 0.0f, 0.0f, 0.0f }; 
     glm::vec3 rot = { 0.0f, 0.0f, 0.0f };
