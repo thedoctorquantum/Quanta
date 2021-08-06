@@ -121,9 +121,10 @@ namespace Quanta::Renderer3D
                 vec3 positionDifference = light.position - v_In.fragmentPosition;
                 vec3 lightDirection = normalize(positionDifference);
                 vec3 reflectDirection = reflect(-lightDirection, normal);
+                vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 
                 float diffuseFactor = max(dot(normal, lightDirection), 0.0);
-                float specularFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), u_Material.shininess);
+                float specularFactor = pow(max(dot(normal, halfwayDirection), 0.0), u_Material.shininess);
 
                 vec4 ambient = u_Material.albedo * sampledAlbedo * light.ambient;
                 vec4 diffuse = u_Material.diffuse * sampledDiffuse * light.diffuse * diffuseFactor;
@@ -286,7 +287,7 @@ namespace Quanta::Renderer3D
         GraphicsDevice::SetRasterPipeline(nullptr);
     }
 
-    void SetLights(const PointLight* lights, size_t count)
+    void SetPointLights(const PointLight* lights, size_t count)
     {
         DEBUG_ASSERT(lights != nullptr);
         DEBUG_ASSERT(state != nullptr);

@@ -2,6 +2,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <filesystem>
 
 #include "../Debugging/Validation.h"
 
@@ -13,10 +14,7 @@ namespace Quanta
 
         Mesh mesh;
 
-        const aiScene* scene = importer.ReadFile(filepath, 
-            aiProcess_Triangulate |
-            aiProcess_FlipUVs
-        ); 
+        const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate); 
 
         DEBUG_ASSERT(scene != nullptr);
 
@@ -24,7 +22,7 @@ namespace Quanta
         std::vector<uint32_t> indices;
 
         size_t indexOffset = 0;
-
+        
         for(size_t i = 0; i < scene->mNumMeshes; i++)
         {
             aiMesh* mesh = scene->mMeshes[i];
@@ -58,15 +56,21 @@ namespace Quanta
                 vertices.push_back(vertex);
             }
 
+            size_t indexCount = 0;
+
             for(size_t j = 0; j < mesh->mNumFaces; j++)
             {
                 aiFace& face = mesh->mFaces[j];
 
                 for(size_t k = 0; k < face.mNumIndices; k++)
                 {
-                    indices.push_back(face.mIndices[k]);
+                    indices.push_back(indexOffset + face.mIndices[k]);
+                    
+                    indexCount++;
                 }
             }
+
+            indexOffset += indexCount;
         }
 
         mesh.SetVertices(vertices.data(), vertices.size());
@@ -175,7 +179,7 @@ namespace Quanta
 
         size_t size = count * sizeof(uint32_t);
 
-        if(count > vertexCount)
+        if(count > indexCount)
         {
             GraphicsBuffer::Resize(*vertexArray->GetIndexBuffer(), size);
         }

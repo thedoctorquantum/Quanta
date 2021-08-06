@@ -59,13 +59,6 @@ int main()
 
     Quanta::ImGuiRenderer::Initialize(*window);
 
-    std::shared_ptr<Quanta::Texture2D> texture = Quanta::Texture2D::FromFile("Resources/Textures/tileset.png");
-
-    std::shared_ptr<Quanta::Sampler2D> sampler = Quanta::Sampler2D::Create(texture);
-        
-    sampler->SetMagnification(Quanta::FilterMode::Nearest);
-    sampler->SetMinification(Quanta::FilterMode::Nearest);
-
     std::vector<std::shared_ptr<Quanta::Image32>> images =
     {
         Quanta::Image32::FromFile("Resources/Textures/Skybox/right.png"),
@@ -86,15 +79,30 @@ int main()
 
     Quanta::Renderer3D::Initialize(*window);
 
-    Quanta::Mesh mesh = Quanta::Mesh::FromFile("Resources/Models/cube.fbx");
+    std::shared_ptr<Quanta::Texture2D> albedo = Quanta::Texture2D::FromFile("Resources/Models/backpack/diffuse.jpg");
+    //std::shared_ptr<Quanta::Texture2D> diffuse = Quanta::Texture2D::FromFile("Resources/Models/backpack/diffuse.jpg");
+    std::shared_ptr<Quanta::Texture2D> specular = Quanta::Texture2D::FromFile("Resources/Models/backpack/specular.jpg");
+
+    std::shared_ptr<Quanta::Sampler2D> albedoSampler = Quanta::Sampler2D::Create(albedo);
+    //std::shared_ptr<Quanta::Sampler2D> diffuseSampler = Quanta::Sampler2D::Create(diffuse);
+    std::shared_ptr<Quanta::Sampler2D> specularSampler = Quanta::Sampler2D::Create(specular);
+        
+    albedoSampler->SetMagnification(Quanta::FilterMode::Nearest);
+    albedoSampler->SetMinification(Quanta::FilterMode::Nearest);
+
+    Quanta::Mesh mesh = Quanta::Mesh::FromFile("Resources/Models/backpack/backpack.obj");
 
     Quanta::Material material;
 
     material.SetAlbedo({ 1.0f, 1.0f, 1.0f, 1.0f });
-    material.SetAlbedoSampler(sampler.get()); 
+    material.SetAlbedoSampler(albedoSampler.get()); 
 
-    material.SetDiffuse({ 1.0f, 0.5f, 0.31f, 1.0f });
+    material.SetDiffuse({ 1.0f, 1.0f, 1.0f, 1.0f });
+    //material.SetDiffuseSampler(diffuseSampler);
+
     material.SetSpecular({ 0.5f, 0.5f, 0.5f, 1.0f });
+    material.SetSpecularSampler(specularSampler.get());
+
     material.SetShininess(32.0f);
 
     glm::vec3 pos = { 0.0f, 0.0f, 0.0f }; 
@@ -124,6 +132,7 @@ int main()
 
         glm::mat4 model = glm::mat4(1.0);
 
+        model = glm::scale(model, glm::vec3(1.0f));
         model = glm::translate(model, pos);
         model *= glm::toMat4(glm::quat(rot));
         
@@ -131,7 +140,7 @@ int main()
         {
             Quanta::Renderer3D::SetView(camera.GetView(), camera.Position);
 
-            Quanta::Renderer3D::SetLights(lights.data(), lights.size());
+            Quanta::Renderer3D::SetPointLights(lights.data(), lights.size());
             
             Quanta::Renderer3D::DrawMesh(mesh, material, model);
         }
@@ -168,19 +177,17 @@ int main()
             {
                 if(ImGui::Button("Toggle Filter Mode"))
                 {
-                    if(sampler->GetMagnification() == Quanta::FilterMode::Linear)
+                    if(albedoSampler->GetMagnification() == Quanta::FilterMode::Linear)
                     {
-                        sampler->SetMagnification(Quanta::FilterMode::Nearest);
-                        sampler->SetMinification(Quanta::FilterMode::Nearest);
+                        albedoSampler->SetMagnification(Quanta::FilterMode::Nearest);
+                        albedoSampler->SetMinification(Quanta::FilterMode::Nearest);
                     }
                     else
                     {
-                        sampler->SetMagnification(Quanta::FilterMode::Linear);
-                        sampler->SetMinification(Quanta::FilterMode::Linear);
+                        albedoSampler->SetMagnification(Quanta::FilterMode::Linear);
+                        albedoSampler->SetMinification(Quanta::FilterMode::Linear);
                     }
                 }
-
-                ImGui::Image(sampler.get(), ImVec2(static_cast<float>(texture->GetWidth()), static_cast<float>(texture->GetHeight())));
             }
             ImGui::End();
         }

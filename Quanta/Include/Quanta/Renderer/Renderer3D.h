@@ -18,7 +18,7 @@ namespace Quanta::Renderer3D
     void BeginPass();
     void EndPass();
     
-    void SetLights(const PointLight* lights, size_t count);
+    void SetPointLights(const PointLight* lights, size_t count);
     
     void DrawMesh(const Mesh& mesh, const Material& material, const glm::mat4& transform);
 }
