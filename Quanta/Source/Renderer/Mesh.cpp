@@ -14,7 +14,7 @@ namespace Quanta
 
         Mesh mesh;
 
-        const aiScene* scene = importer.ReadFile(filepath, aiProcess_Triangulate | aiProcess_CalcTangentSpace); 
+        const aiScene* scene = importer.ReadFile(filepath, aiProcess_CalcTangentSpace); 
 
         DEBUG_ASSERT(scene != nullptr);
 
@@ -35,7 +35,7 @@ namespace Quanta
                 aiVector3D& normal = mesh->mNormals[j];
 
                 aiVector3D uv = aiVector3D(0.0f);
-
+                
                 if(mesh->HasTextureCoords(0))
                 {
                     uv = mesh->mTextureCoords[0][j]; 

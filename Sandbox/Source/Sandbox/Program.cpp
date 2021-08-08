@@ -71,8 +71,8 @@ int main()
     
     std::shared_ptr<Quanta::Sampler> brickNormalSampler = Quanta::Sampler::Create(brickNormalMap);
 
-    Quanta::Mesh cube = Quanta::Mesh::FromFile("Resources/Models/cube.fbx");
-
+    Quanta::Mesh cube = Quanta::Mesh::FromFile("Resources/Models/cube.glb");
+    
     Quanta::Material brickMaterial;
 
     brickMaterial.SetAlbedoSampler(brickSampler.get());
@@ -91,7 +91,7 @@ int main()
     albedoSampler->SetMagnification(Quanta::FilterMode::Nearest);
     albedoSampler->SetMinification(Quanta::FilterMode::Nearest);
     
-    Quanta::Mesh backpack = Quanta::Mesh::FromFile("Resources/Models/backpack/backpack.obj");
+    Quanta::Mesh backpack = Quanta::Mesh::FromFile("Resources/Models/backpack/backpack.glb");
     
     Quanta::Material backpackMaterial;
 
