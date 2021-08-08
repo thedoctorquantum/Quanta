@@ -51,70 +51,69 @@ int main()
 {
     std::shared_ptr<Quanta::Window> window = Quanta::Window::Create(Quanta::GraphicsApi::OpenGL);
     
-    Quanta::GraphicsDevice::Initialize(window);
+    Quanta::GraphicsDevice::Initialize(window.get());
     
     Quanta::AudioDevice::Initialize(Quanta::AudioApi::OpenAL);
 
     window->SetState(Quanta::WindowState::Maximized);
 
     Quanta::ImGuiRenderer::Initialize(*window);
-
-    std::vector<std::shared_ptr<Quanta::Image32>> images =
-    {
-        Quanta::Image32::FromFile("Resources/Textures/Skybox/right.png"),
-        Quanta::Image32::FromFile("Resources/Textures/Skybox/left.png"),
-        Quanta::Image32::FromFile("Resources/Textures/Skybox/top.png"),
-        Quanta::Image32::FromFile("Resources/Textures/Skybox/bottom.png"),
-        Quanta::Image32::FromFile("Resources/Textures/Skybox/back.png"),
-        Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
-    };
-    
-    std::shared_ptr<Quanta::CubeMap> cubeMap = Quanta::CubeMap::FromImages(images);
-
-    std::shared_ptr<Quanta::SamplerCube> cubeSampler = Quanta::SamplerCube::Create(cubeMap);
-
-    cubeSampler->SetIsSeamless(true);
     
     float time = 0;
 
     Quanta::Renderer3D::Initialize(*window);
 
-    std::shared_ptr<Quanta::Texture2D> albedo = Quanta::Texture2D::FromFile("Resources/Models/backpack/diffuse.jpg");
-    std::shared_ptr<Quanta::Texture2D> diffuse = Quanta::Texture2D::FromFile("Resources/Models/backpack/roughness.jpg");
-    std::shared_ptr<Quanta::Texture2D> specular = Quanta::Texture2D::FromFile("Resources/Models/backpack/specular.jpg");
-    std::shared_ptr<Quanta::Texture2D> normal = Quanta::Texture2D::FromFile("Resources/Models/backpack/normal.png");
+    std::shared_ptr<Quanta::Texture> testTexture = Quanta::Texture::Load2D("Resources/Textures/brick_albedo.jpg");
 
-    std::shared_ptr<Quanta::Sampler2D> albedoSampler = Quanta::Sampler2D::Create(albedo);
-    std::shared_ptr<Quanta::Sampler2D> diffuseSampler = Quanta::Sampler2D::Create(diffuse);
-    std::shared_ptr<Quanta::Sampler2D> specularSampler = Quanta::Sampler2D::Create(specular);
-    std::shared_ptr<Quanta::Sampler2D> normalSampler = Quanta::Sampler2D::Create(normal);
+    std::shared_ptr<Quanta::Sampler> brickSampler = Quanta::Sampler::Create(testTexture);
+
+    std::shared_ptr<Quanta::Texture> brickNormalMap = Quanta::Texture::Load2D("Resources/Textures/brick_normal.png");
+    
+    std::shared_ptr<Quanta::Sampler> brickNormalSampler = Quanta::Sampler::Create(brickNormalMap);
+
+    Quanta::Mesh cube = Quanta::Mesh::FromFile("Resources/Models/cube.fbx");
+
+    Quanta::Material brickMaterial;
+
+    brickMaterial.SetAlbedoSampler(brickSampler.get());
+    brickMaterial.SetNormalSampler(brickNormalSampler.get());   
+    
+    std::shared_ptr<Quanta::Texture> albedo = Quanta::Texture::Load2D("Resources/Models/backpack/diffuse.jpg");
+    std::shared_ptr<Quanta::Texture> diffuse = Quanta::Texture::Load2D("Resources/Models/backpack/roughness.jpg");
+    std::shared_ptr<Quanta::Texture> specular = Quanta::Texture::Load2D("Resources/Models/backpack/specular.jpg");
+    std::shared_ptr<Quanta::Texture> normal = Quanta::Texture::Load2D("Resources/Models/backpack/normal.png");
+
+    std::shared_ptr<Quanta::Sampler> albedoSampler = Quanta::Sampler::Create(albedo);
+    std::shared_ptr<Quanta::Sampler> diffuseSampler = Quanta::Sampler::Create(diffuse);
+    std::shared_ptr<Quanta::Sampler> specularSampler = Quanta::Sampler::Create(specular);
+    std::shared_ptr<Quanta::Sampler> normalSampler = Quanta::Sampler::Create(normal);
         
     albedoSampler->SetMagnification(Quanta::FilterMode::Nearest);
     albedoSampler->SetMinification(Quanta::FilterMode::Nearest);
-
-    Quanta::Mesh mesh = Quanta::Mesh::FromFile("Resources/Models/backpack/backpack.fbx");
-
-    Quanta::Material material;
-
-    material.SetAlbedo({ 1.0f, 1.0f, 1.0f, 1.0f });
-    material.SetAlbedoSampler(albedoSampler.get()); 
-
-    material.SetDiffuse({ 0.8f, 0.8f, 0.8f, 1.0f });
-    material.SetDiffuseSampler(diffuseSampler.get());
-
-    material.SetSpecular({ 0.5f, 0.5f, 0.5f, 1.0f });
-    material.SetSpecularSampler(specularSampler.get());
     
-    material.SetNormalSampler(normalSampler.get());
+    Quanta::Mesh backpack = Quanta::Mesh::FromFile("Resources/Models/backpack/backpack.obj");
+    
+    Quanta::Material backpackMaterial;
 
-    material.SetShininess(225.0f);
+    backpackMaterial.SetAlbedo({ 1.0f, 1.0f, 1.0f, 1.0f });
+    backpackMaterial.SetAlbedoSampler(albedoSampler.get()); 
+
+    backpackMaterial.SetDiffuse({ 0.8f, 0.8f, 0.8f, 1.0f });
+    backpackMaterial.SetDiffuseSampler(diffuseSampler.get());
+
+    backpackMaterial.SetSpecular({ 0.5f, 0.5f, 0.5f, 1.0f });
+    backpackMaterial.SetSpecularSampler(specularSampler.get());
+    
+    backpackMaterial.SetNormalSampler(normalSampler.get());
+
+    backpackMaterial.SetShininess(225.0f);
 
     glm::vec3 pos = { 0.0f, 0.0f, 0.0f }; 
     glm::vec3 rot = { 0.0f, 0.0f, 0.0f };
 
     Camera camera;
 
-    camera.Position = { 0.0f, 0.0f, 5.0f };
+    camera.Position = { 2.5f, 0.0f, 7.5f };
     camera.Front = { 0.0f, 0.0f, -5.0f };
     
     std::vector<Quanta::PointLight> lights(1);
@@ -134,11 +133,13 @@ int main()
         
         window->PollEvents();
 
-        glm::mat4 model = glm::mat4(1.0);
+        glm::mat4 backpackTransform = glm::mat4(1.0);
 
-        model = glm::scale(model, glm::vec3(1.0f));
-        model = glm::translate(model, pos);
-        model *= glm::toMat4(glm::quat(rot));
+        backpackTransform = glm::scale(backpackTransform, glm::vec3(1.0f));
+        backpackTransform = glm::translate(backpackTransform, pos);
+        backpackTransform *= glm::toMat4(glm::quat(rot));
+
+        rot.y = time;
         
         Quanta::Renderer3D::BeginPass();
         {
@@ -146,7 +147,8 @@ int main()
 
             Quanta::Renderer3D::SetPointLights(lights.data(), lights.size());
             
-            Quanta::Renderer3D::DrawMesh(mesh, material, model);
+            Quanta::Renderer3D::DrawMesh(backpack, backpackMaterial, backpackTransform);
+            Quanta::Renderer3D::DrawMesh(cube, brickMaterial, glm::translate(glm::mat4(1.0f), { 5.0f, 0.0f, 0.0f }));
         }
         Quanta::Renderer3D::EndPass();
 

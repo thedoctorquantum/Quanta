@@ -25,8 +25,7 @@ namespace Quanta::Renderer3D
         layout(location = 1) in vec3 a_Normal;
         layout(location = 2) in vec2 a_Uv;
         layout(location = 3) in vec3 a_Tangent;
-        layout(location = 4) in vec3 a_BiTangent;
-        layout(location = 5) in vec4 a_Color;
+        layout(location = 4) in vec4 a_Color;
 
         layout(location = 0) out Out
         {
@@ -179,10 +178,10 @@ namespace Quanta::Renderer3D
 
         std::shared_ptr<GraphicsBuffer> lightBuffer = nullptr;
 
-        std::shared_ptr<Sampler2D> defaultAlbedoSampler = nullptr;
-        std::shared_ptr<Sampler2D> defaultDiffuseSampler = nullptr;
-        std::shared_ptr<Sampler2D> defaultSpecularSampler = nullptr;
-        std::shared_ptr<Sampler2D> defaultNormalSampler = nullptr;
+        std::shared_ptr<Sampler> defaultAlbedoSampler = nullptr;
+        std::shared_ptr<Sampler> defaultDiffuseSampler = nullptr;
+        std::shared_ptr<Sampler> defaultSpecularSampler = nullptr;
+        std::shared_ptr<Sampler> defaultNormalSampler = nullptr;
 
         std::vector<PointLight> lights;
 
@@ -214,7 +213,8 @@ namespace Quanta::Renderer3D
         pipelineDescriptor.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, fragmentShaderSource));
 
         state->pipeline = RasterPipeline::Create(pipelineDescriptor);
-
+        
+        state->pipeline->SetPolygonFillMode(PolygonFillMode::Solid);
         state->pipeline->SetFaceCullMode(FaceCullMode::Back);
         state->pipeline->SetEnableDepthWriting(true);
         state->pipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
@@ -226,32 +226,32 @@ namespace Quanta::Renderer3D
         Color32 specular = 0x00000000;
         Color32 normal = Color32(128, 128, 255, 255);
 
-        std::shared_ptr<Texture2D> albedoTexture = Texture2D::Create(1, 1);
-        std::shared_ptr<Texture2D> diffuseTexture = Texture2D::Create(1, 1);
-        std::shared_ptr<Texture2D> specularTexture = Texture2D::Create(1, 1);
-        std::shared_ptr<Texture2D> normalTexture = Texture2D::Create(1, 1);
+        std::shared_ptr<Texture> albedoTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
+        std::shared_ptr<Texture> diffuseTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
+        std::shared_ptr<Texture> specularTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
+        std::shared_ptr<Texture> normalTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
         
         albedoTexture->SetData(&albedo);
         diffuseTexture->SetData(&diffuse);
         specularTexture->SetData(&specular);
         normalTexture->SetData(&normal);
 
-        state->defaultAlbedoSampler = Sampler2D::Create(albedoTexture);
+        state->defaultAlbedoSampler = Sampler::Create(albedoTexture);
 
         state->defaultAlbedoSampler->SetMagnification(FilterMode::Nearest);
         state->defaultAlbedoSampler->SetMinification(FilterMode::Nearest);
 
-        state->defaultDiffuseSampler = Sampler2D::Create(diffuseTexture);
+        state->defaultDiffuseSampler = Sampler::Create(diffuseTexture);
         
         state->defaultDiffuseSampler->SetMagnification(FilterMode::Nearest);
         state->defaultDiffuseSampler->SetMinification(FilterMode::Nearest);
 
-        state->defaultSpecularSampler = Sampler2D::Create(specularTexture);
+        state->defaultSpecularSampler = Sampler::Create(specularTexture);
 
         state->defaultSpecularSampler->SetMagnification(FilterMode::Nearest);
         state->defaultSpecularSampler->SetMinification(FilterMode::Nearest);   
 
-        state->defaultNormalSampler = Sampler2D::Create(normalTexture);
+        state->defaultNormalSampler = Sampler::Create(normalTexture);
         
         state->defaultNormalSampler->SetMagnification(FilterMode::Nearest);
         state->defaultNormalSampler->SetMinification(FilterMode::Nearest);
@@ -298,7 +298,7 @@ namespace Quanta::Renderer3D
 
         state->pipeline->SetViewport({ 0, 0, state->window->GetWidth(), state->window->GetHeight() });
     
-        GraphicsDevice::SetRasterPipeline(state->pipeline);
+        GraphicsDevice::SetRasterPipeline(state->pipeline.get());
     }
 
     void EndPass()
@@ -340,43 +340,37 @@ namespace Quanta::Renderer3D
         
         state->matrixUniforms->SetData(&transform, sizeof(glm::mat4));
 
-        GraphicsDevice::SetVertexArray(vertexArray);
+        GraphicsDevice::SetVertexArray(vertexArray.get());
 
-        if(material.GetAlbedoSampler() != nullptr)
-        {
-            GraphicsDevice::BindSampler(*material.GetAlbedoSampler(), 0);
-        }
-        else
-        {
-            GraphicsDevice::BindSampler(*state->defaultAlbedoSampler, 0);
-        }
+        const Sampler* albedo = state->defaultAlbedoSampler.get();
+        const Sampler* diffuse = state->defaultDiffuseSampler.get();
+        const Sampler* specular = state->defaultSpecularSampler.get();
+        const Sampler* normal = state->defaultNormalSampler.get();
 
-        if(material.GetDiffuseSampler() != nullptr)
+        if(material.GetAlbedoSampler())
         {
-            GraphicsDevice::BindSampler(*material.GetDiffuseSampler(), 1);
-        }
-        else
-        {
-            GraphicsDevice::BindSampler(*state->defaultDiffuseSampler, 1);
+            albedo = material.GetAlbedoSampler();
         }
 
-        if(material.GetSpecularSampler() != nullptr)
+        if(material.GetDiffuseSampler())
         {
-            GraphicsDevice::BindSampler(*material.GetSpecularSampler(), 2);
-        }
-        else
-        {
-            GraphicsDevice::BindSampler(*state->defaultSpecularSampler, 2);
+            diffuse = material.GetDiffuseSampler();
         }
 
-        if(material.GetNormalSampler() != nullptr)
+        if(material.GetSpecularSampler())
         {
-            GraphicsDevice::BindSampler(*material.GetNormalSampler(), 3);
+            specular = material.GetSpecularSampler();
         }
-        else
+
+        if(material.GetNormalSampler())
         {
-            GraphicsDevice::BindSampler(*state->defaultNormalSampler, 3);
+            normal = material.GetNormalSampler();
         }
+
+        GraphicsDevice::BindSampler(albedo, 0);
+        GraphicsDevice::BindSampler(diffuse, 1);
+        GraphicsDevice::BindSampler(specular, 2);
+        GraphicsDevice::BindSampler(normal, 3);
         
         DrawCommand command;
 

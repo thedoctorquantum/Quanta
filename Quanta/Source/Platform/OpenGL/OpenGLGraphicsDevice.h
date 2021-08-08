@@ -11,10 +11,10 @@ namespace Quanta
     class OpenGLGraphicsDevice final : public GraphicsDevice
     {
     public:
-        OpenGLGraphicsDevice(const std::shared_ptr<Window>& window);
+        OpenGLGraphicsDevice(const Window* window);
     private:
-        OpenGLVertexArray* vertexArray = nullptr;
-        OpenGLRasterPipeline* rasterPipeline = nullptr;
+        const OpenGLVertexArray* vertexArray = nullptr;
+        const OpenGLRasterPipeline* rasterPipeline = nullptr;
         
         GLenum geometryLayout = 0;
         GLenum drawElementsType = 0;
@@ -22,13 +22,11 @@ namespace Quanta
         
         void InternalClearBackBuffer(const glm::vec4& color, float depth, int stencil) override;
         
-        void InternalSetRasterPipeline(const std::shared_ptr<RasterPipeline>& value) override;
-        void InternalSetVertexArray(const std::shared_ptr<VertexArray>& value) override;
+        void InternalSetRasterPipeline(const RasterPipeline* value) override;
+        void InternalSetVertexArray(const VertexArray* value) override;
         
-        void InternalBindSampler(const Sampler2D& sampler, size_t index) override;
-        void InternalBindSampler(const Sampler3D& sampler, size_t index) override;
-        void InternalBindSampler(const SamplerCube& sampler, size_t index) override;
-
+        void InternalBindSampler(const Sampler* sampler, size_t index) override;
+        
         void InternalDispatchDraw(const DrawCommand& command) override;
     };
 }

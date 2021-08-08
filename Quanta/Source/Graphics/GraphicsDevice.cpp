@@ -1,7 +1,5 @@
 #include <Quanta/Graphics/GraphicsDevice.h>
 
-#include "../Platform/OpenGL/OpenGLVertexArray.h"
-#include "../Platform/OpenGL/OpenGLGraphicsBuffer.h"
 #include "../Platform/OpenGL/OpenGLGraphicsDevice.h"
 #include "../Debugging/Validation.h"
 
@@ -12,11 +10,9 @@ namespace Quanta
         GraphicsDevice* device = nullptr;
         GraphicsApi api = GraphicsApi::OpenGL;
     } static state;
-
-    void GraphicsDevice::Initialize(const std::shared_ptr<Window>& window)
+    
+    void GraphicsDevice::Initialize(const Window* window)
     {
-        DEBUG_ASSERT(window != nullptr);
-
         GraphicsApi api = window->GetGraphicsApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
@@ -44,41 +40,27 @@ namespace Quanta
         state.device->InternalClearBackBuffer(color, depth, stencil);
     }
         
-    void GraphicsDevice::SetRasterPipeline(const std::shared_ptr<RasterPipeline>& value)
+    void GraphicsDevice::SetRasterPipeline(const RasterPipeline* value)
     {
         DEBUG_ASSERT(state.device != nullptr);
 
         state.device->InternalSetRasterPipeline(value);
     }
 
-    void GraphicsDevice::SetVertexArray(const std::shared_ptr<VertexArray>& value)
+    void GraphicsDevice::SetVertexArray(const VertexArray* value)
     {
         DEBUG_ASSERT(state.device != nullptr);
 
         state.device->InternalSetVertexArray(value);
     }
-    
-    void GraphicsDevice::BindSampler(const Sampler2D& sampler, size_t index)
+        
+    void GraphicsDevice::BindSampler(const Sampler* sampler, size_t index)
     {
         DEBUG_ASSERT(state.device != nullptr);
 
         state.device->InternalBindSampler(sampler, index);
     }
     
-    void GraphicsDevice::BindSampler(const Sampler3D& sampler, size_t index)
-    {
-        DEBUG_ASSERT(state.device != nullptr);
-
-        state.device->InternalBindSampler(sampler, index);
-    }
-    
-    void GraphicsDevice::BindSampler(const SamplerCube& sampler, size_t index)
-    {
-        DEBUG_ASSERT(state.device != nullptr);
-
-        state.device->InternalBindSampler(sampler, index);
-    }
-
     void GraphicsDevice::DispatchDraw(const DrawCommand& command)
     {
         DEBUG_ASSERT(state.device != nullptr);

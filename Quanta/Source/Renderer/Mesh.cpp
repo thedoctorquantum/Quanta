@@ -56,7 +56,6 @@ namespace Quanta
                 vertex.Uv = glm::vec2(uv.x, uv.y);
                 vertex.Color = glm::vec4(color.r, color.g, color.b, color.a);
                 vertex.Tangent = glm::vec3(tangent.x, tangent.y, tangent.z);
-                vertex.BiTangent = glm::vec3(biTangent.x, biTangent.y, biTangent.z);
 
                 vertices.push_back(vertex);
             }
@@ -118,13 +117,6 @@ namespace Quanta
         layout.Add({
             BufferPrimitive::Float,
             2,
-            sizeof(float),
-            false
-        });
-
-        layout.Add({
-            BufferPrimitive::Float,
-            3,
             sizeof(float),
             false
         });

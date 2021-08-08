@@ -5,19 +5,14 @@
 #include "OpenGLVertexArray.h"
 #include "OpenGLGraphicsBuffer.h"
 #include "OpenGLRasterPipeline.h"
-#include "OpenGLTexture2D.h"
-#include "OpenGLTexture3D.h"
-#include "OpenGLSampler2D.h"
-#include "OpenGLSampler3D.h"
-#include "OpenGLCubeMap.h"
-#include "OpenGLSamplerCube.h"
+#include "OpenGLTexture.h"
+#include "OpenGLSampler.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
-    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const std::shared_ptr<Window>& window)
+    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const Window* window)
     {
-        DEBUG_ASSERT(window != nullptr);
         DEBUG_ASSERT(window->GetGraphicsApi() == GraphicsApi::OpenGL);
 
         bool isLoaded = gladLoadGL();
@@ -73,7 +68,7 @@ namespace Quanta
         glClearNamedFramebufferiv(0, GL_STENCIL, 0, &stencil);
     }
     
-    void OpenGLGraphicsDevice::InternalSetRasterPipeline(const std::shared_ptr<RasterPipeline>& value)
+    void OpenGLGraphicsDevice::InternalSetRasterPipeline(const RasterPipeline* value)
     {
         if(!value)
         {
@@ -95,10 +90,10 @@ namespace Quanta
             return;
         }
 
-        OpenGLRasterPipeline* glPipeline = nullptr;
+        const OpenGLRasterPipeline* glPipeline = nullptr;
 
 #if DEBUG
-        glPipeline = dynamic_cast<OpenGLRasterPipeline*>(value.get());
+        glPipeline = dynamic_cast<const OpenGLRasterPipeline*>(value);
 
         DEBUG_ASSERT(glPipeline != nullptr);
 #else
@@ -326,9 +321,9 @@ namespace Quanta
         rasterPipeline = glPipeline;
     }
     
-    void OpenGLGraphicsDevice::InternalSetVertexArray(const std::shared_ptr<VertexArray>& value)
+    void OpenGLGraphicsDevice::InternalSetVertexArray(const VertexArray* value)
     {
-        if(vertexArray == value.get()) return;
+        if(vertexArray == value) return;
 
         if(value == nullptr)
         {
@@ -339,14 +334,14 @@ namespace Quanta
             return;
         }
 
-        OpenGLVertexArray* glVertexArray = nullptr;
+        const OpenGLVertexArray* glVertexArray = nullptr;
 
 #if DEBUG
-        glVertexArray = dynamic_cast<OpenGLVertexArray*>(value.get());
+        glVertexArray = dynamic_cast<const OpenGLVertexArray*>(value);
 
         DEBUG_ASSERT(glVertexArray != nullptr);
 #else
-        glVertexArray = static_cast<OpenGLVertexArray*>(value.get());
+        glVertexArray = static_cast<const OpenGLVertexArray*>(value.get());
 #endif
 
         this->vertexArray = glVertexArray;
@@ -372,43 +367,27 @@ namespace Quanta
         
         glBindVertexArray(glVertexArray->GetHandle());
     }
-
-    template<typename PublicSampler, typename InternalSampler, typename InternalTexture>
-    static void BindSamplerUnit(const PublicSampler& sampler, size_t index)
+    
+    void OpenGLGraphicsDevice::InternalBindSampler(const Sampler* sampler, size_t index)
     {
-        const InternalSampler* internalSampler = nullptr;
-        const InternalTexture* internalTexture = nullptr;
+        const OpenGLSampler* internalSampler = nullptr;
+        const OpenGLTexture* internalTexture = nullptr;
 
-        DEBUG_ASSERT(sampler.GetTexture() != nullptr);
+        DEBUG_ASSERT(sampler->GetTexture() != nullptr);
 
 #if DEBUG
-        internalSampler = dynamic_cast<const InternalSampler*>(&sampler);
-        internalTexture = dynamic_cast<const InternalTexture*>(sampler.GetTexture().get());
+        internalSampler = dynamic_cast<const OpenGLSampler*>(sampler);
+        internalTexture = dynamic_cast<const OpenGLTexture*>(sampler->GetTexture().get());
 
         DEBUG_ASSERT(internalSampler != nullptr);
         DEBUG_ASSERT(internalTexture != nullptr);
 #else
-        internalSampler = static_cast<const PrivateSampler*>(&sampler);
-        internalTexture = static_cast<const PrivateTexture*>(sampler.GetTexture().get());
+        internalSampler = static_cast<const PrivateSampler*>(sampler);
+        internalTexture = static_cast<const PrivateTexture*>(sampler->GetTexture().get());
 #endif
 
         glBindSampler(index, internalSampler->GetHandle());
         glBindTextureUnit(index, internalTexture->GetHandle());
-    }
-    
-    void OpenGLGraphicsDevice::InternalBindSampler(const Sampler2D& sampler, size_t index)
-    {
-        BindSamplerUnit<Sampler2D, OpenGLSampler2D, OpenGLTexture2D>(sampler, index);
-    }
-
-    void OpenGLGraphicsDevice::InternalBindSampler(const Sampler3D& sampler, size_t index)
-    {
-        BindSamplerUnit<Sampler3D, OpenGLSampler3D, OpenGLTexture3D>(sampler, index);
-    }
-    
-    void OpenGLGraphicsDevice::InternalBindSampler(const SamplerCube& sampler, size_t index)
-    {
-        BindSamplerUnit<SamplerCube, OpenGLSamplerCube, OpenGLCubeMap>(sampler, index);
     }
     
     void OpenGLGraphicsDevice::InternalDispatchDraw(const DrawCommand& command)

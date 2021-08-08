@@ -62,42 +62,42 @@ namespace Quanta
         shininess = value;
     }
     
-    Sampler2D* Material::GetAlbedoSampler() const
+    Sampler* Material::GetAlbedoSampler() const
     {
         return albedoSampler;
     }
     
-    void Material::SetAlbedoSampler(Sampler2D* value)
+    void Material::SetAlbedoSampler(Sampler* value)
     {
         albedoSampler = value;
     }
 
-    Sampler2D* Material::GetDiffuseSampler() const
+    Sampler* Material::GetDiffuseSampler() const
     {
         return diffuseSampler;
     }
 
-    void Material::SetDiffuseSampler(Sampler2D* value)
+    void Material::SetDiffuseSampler(Sampler* value)
     {
         diffuseSampler = value;
     }
         
-    Sampler2D* Material::GetSpecularSampler() const
+    Sampler* Material::GetSpecularSampler() const
     {
         return specularSampler;
     }
 
-    void Material::SetSpecularSampler(Sampler2D* value)
+    void Material::SetSpecularSampler(Sampler* value)
     {
         specularSampler = value;
     }
 
-    Sampler2D* Material::GetNormalSampler() const
+    Sampler* Material::GetNormalSampler() const
     {
         return normalSampler;
     }
     
-    void Material::SetNormalSampler(Sampler2D* value)
+    void Material::SetNormalSampler(Sampler* value)
     {
         normalSampler = value;
     }

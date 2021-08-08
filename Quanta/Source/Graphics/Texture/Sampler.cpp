@@ -1,12 +1,12 @@
-#include <Quanta/Graphics/Texture/Sampler2D.h>
+#include <Quanta/Graphics/Texture/Sampler.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 
-#include "../../Platform/OpenGL/OpenGLSampler2D.h"
+#include "../../Platform/OpenGL/OpenGLSampler.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
-    std::shared_ptr<Sampler2D> Sampler2D::Create(const std::shared_ptr<Texture2D>& texture) 
+    std::shared_ptr<Sampler> Sampler::Create(const std::shared_ptr<Texture>& texture) 
     {
         DEBUG_ASSERT(texture != nullptr);
 
@@ -17,11 +17,11 @@ namespace Quanta
         switch(api)
         {
         case GraphicsApi::OpenGL:
-            return std::make_shared<OpenGLSampler2D>(texture);            
+            return std::make_shared<OpenGLSampler>(texture);            
         }
         
         return nullptr;
     }
     
-    Sampler2D::~Sampler2D() = default;
+    Sampler::~Sampler() = default;
 }

@@ -1,16 +1,14 @@
 #include <glad/glad.h>
 
-#include "OpenGLSampler2DArray.h"
-#include "OpenGLTexture2DArray.h"
+#include "OpenGLSampler.h"
 #include "GLEnumConversions.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
-    OpenGLSampler2DArray::OpenGLSampler2DArray(const std::shared_ptr<Texture2DArray>& texture)
+    OpenGLSampler::OpenGLSampler(const std::shared_ptr<Texture>& texture)
     {
         DEBUG_ASSERT(texture != nullptr);
-        DEBUG_ASSERT(((OpenGLTexture2DArray*) texture.get()) != nullptr);
         
         this->texture = texture;
 
@@ -23,24 +21,27 @@ namespace Quanta
 
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_S, WrapModeToGLenum(wrapModeX));
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_T, WrapModeToGLenum(wrapModeY));
+        glSamplerParameteri(handle, GL_TEXTURE_WRAP_R, WrapModeToGLenum(wrapModeZ));
+        
+        glSamplerParameteri(handle, GL_TEXTURE_CUBE_MAP_SEAMLESS, 1);
     }
     
-    OpenGLSampler2DArray::~OpenGLSampler2DArray()
+    OpenGLSampler::~OpenGLSampler()
     {
         glDeleteSamplers(1, &handle);
     }
 
-    const std::shared_ptr<Texture2DArray>& OpenGLSampler2DArray::GetTexture() const
+    const std::shared_ptr<Texture>& OpenGLSampler::GetTexture() const
     {
         return texture;
     } 
 
-    FilterMode OpenGLSampler2DArray::GetMagnification() const
+    FilterMode OpenGLSampler::GetMagnification() const
     {
         return magnifiaction;
     }
 
-    void OpenGLSampler2DArray::SetMagnification(FilterMode value)
+    void OpenGLSampler::SetMagnification(FilterMode value)
     {
         if(magnifiaction == value) return;
 
@@ -49,12 +50,12 @@ namespace Quanta
         glSamplerParameteri(handle, GL_TEXTURE_MAG_FILTER, FilterModeToGLenum(value));
     }
 
-    FilterMode OpenGLSampler2DArray::GetMinification() const
+    FilterMode OpenGLSampler::GetMinification() const
     {
         return minification;
     }
 
-    void OpenGLSampler2DArray::SetMinification(FilterMode value)
+    void OpenGLSampler::SetMinification(FilterMode value)
     {
         if(minification == value) return;
 
@@ -63,12 +64,12 @@ namespace Quanta
         glSamplerParameteri(handle, GL_TEXTURE_MIN_FILTER, FilterModeToGLenum(value));
     }
 
-    WrapMode OpenGLSampler2DArray::GetWrapModeX() const
+    WrapMode OpenGLSampler::GetWrapModeX() const
     {
         return wrapModeX;
     }
 
-    void OpenGLSampler2DArray::SetWrapModeX(WrapMode value)
+    void OpenGLSampler::SetWrapModeX(WrapMode value)
     {
         if(wrapModeX == value) return;
 
@@ -77,12 +78,12 @@ namespace Quanta
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_S, WrapModeToGLenum(value));
     }
 
-    WrapMode OpenGLSampler2DArray::GetWrapModeY() const
+    WrapMode OpenGLSampler::GetWrapModeY() const
     {
         return wrapModeY;
     }
 
-    void OpenGLSampler2DArray::SetWrapModeY(WrapMode value)
+    void OpenGLSampler::SetWrapModeY(WrapMode value)
     {
         if(wrapModeY == value) return;
 
@@ -91,7 +92,21 @@ namespace Quanta
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_T, WrapModeToGLenum(value));
     }
 
-    uint32_t OpenGLSampler2DArray::GetHandle() const
+    WrapMode OpenGLSampler::GetWrapModeZ() const
+    {
+        return wrapModeZ;
+    }
+
+    void OpenGLSampler::SetWrapModeZ(WrapMode value)
+    {
+        if(wrapModeZ == value) return;
+
+        wrapModeZ = value;
+
+        glSamplerParameteri(handle, GL_TEXTURE_WRAP_R, WrapModeToGLenum(value));
+    }
+
+    uint32_t OpenGLSampler::GetHandle() const
     {
         return handle;
     }

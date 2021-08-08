@@ -3,13 +3,9 @@
 #include <Quanta/Graphics/Buffer/VertexArray.h>
 #include <Quanta/Graphics/Pipeline/RasterPipeline.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
-#include <Quanta/Graphics/Texture/Texture2D.h>
-#include <Quanta/Graphics/Texture/Sampler2D.h>
-#include <memory>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
-#include <iostream>
 
 #include "../../Debugging/Validation.h"
 
@@ -22,8 +18,8 @@ namespace Quanta
         std::shared_ptr<GraphicsBuffer> vertexBuffer = nullptr;
         std::shared_ptr<GraphicsBuffer> indexBuffer = nullptr;
         std::shared_ptr<GraphicsBuffer> uniformBuffer = nullptr;
-        std::shared_ptr<Texture2D> fontTexture = nullptr;
-        std::shared_ptr<Sampler2D> fontSampler = nullptr;
+        std::shared_ptr<Texture> fontTexture = nullptr;
+        std::shared_ptr<Sampler> fontSampler = nullptr;
     
         Window* window = nullptr;
 
@@ -191,11 +187,11 @@ namespace Quanta
 
         state->io->Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
-        state->fontTexture = Texture2D::Create(width, height);
+        state->fontTexture = Texture::Create(TextureType::Texture2D, width, height, 1);
 
         state->fontTexture->SetData(pixels);
 
-        state->fontSampler = Sampler2D::Create(state->fontTexture);
+        state->fontSampler = Sampler::Create(state->fontTexture);
 
         state->fontSampler->SetMagnification(FilterMode::Nearest);
         state->fontSampler->SetMinification(FilterMode::Nearest);
@@ -255,8 +251,8 @@ namespace Quanta
 
         state->uniformBuffer->SetData(&matrix, sizeof(glm::mat4));
 
-        GraphicsDevice::SetRasterPipeline(state->pipeline);
-        GraphicsDevice::SetVertexArray(state->vertexArray);
+        GraphicsDevice::SetRasterPipeline(state->pipeline.get());
+        GraphicsDevice::SetVertexArray(state->vertexArray.get());
 
         size_t totalVertexBuffersize = drawData->TotalVtxCount * sizeof(ImDrawVert);
         size_t totalIndexBufferSize = drawData->TotalIdxCount * sizeof(uint16_t);
@@ -294,11 +290,11 @@ namespace Quanta
             {
                 ImDrawCmd& command = commands[j];
 
-                Sampler2D* sampler = static_cast<Sampler2D*>(command.TextureId);
+                Sampler* sampler = static_cast<Sampler*>(command.TextureId);
 
                 DEBUG_ASSERT(sampler != nullptr);
 
-                GraphicsDevice::BindSampler(*sampler, 0);
+                GraphicsDevice::BindSampler(sampler, 0);
 
                 state->pipeline->SetScissorViewport({
                     static_cast<uint32_t>(command.ClipRect.x), 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "../Graphics/Texture/Sampler2D.h"
+#include "../Graphics/Texture/Sampler.h"
 
 namespace Quanta
 {
@@ -31,26 +31,26 @@ namespace Quanta
         float GetShininess() const;
         void SetShininess(float);
 
-        Sampler2D* GetAlbedoSampler() const;
-        void SetAlbedoSampler(Sampler2D*);
+        Sampler* GetAlbedoSampler() const;
+        void SetAlbedoSampler(Sampler*);
 
-        Sampler2D* GetDiffuseSampler() const;
-        void SetDiffuseSampler(Sampler2D*);
+        Sampler* GetDiffuseSampler() const;
+        void SetDiffuseSampler(Sampler*);
 
-        Sampler2D* GetSpecularSampler() const;
-        void SetSpecularSampler(Sampler2D*);
+        Sampler* GetSpecularSampler() const;
+        void SetSpecularSampler(Sampler*);
         
-        Sampler2D* GetNormalSampler() const;
-        void SetNormalSampler(Sampler2D*);
+        Sampler* GetNormalSampler() const;
+        void SetNormalSampler(Sampler*);
     private:    
         glm::vec4 albedo = glm::vec4(1.0f);
-        glm::vec4 diffuse = glm::vec4(0.0f);
+        glm::vec4 diffuse = glm::vec4(1.0f);
         glm::vec4 specular = glm::vec4(0.0f);
-        float shininess = 0.0f;
+        float shininess = 1.0f;
         
-        Sampler2D* albedoSampler = nullptr;
-        Sampler2D* diffuseSampler = nullptr;
-        Sampler2D* specularSampler = nullptr;
-        Sampler2D* normalSampler = nullptr;
+        Sampler* albedoSampler = nullptr;
+        Sampler* diffuseSampler = nullptr;
+        Sampler* specularSampler = nullptr;
+        Sampler* normalSampler = nullptr;
     };
 }
