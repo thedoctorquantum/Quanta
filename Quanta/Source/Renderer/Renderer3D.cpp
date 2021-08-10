@@ -25,13 +25,13 @@ namespace Quanta::Renderer3D
         layout(location = 1) in vec3 a_Normal;
         layout(location = 2) in vec2 a_Uv;
         layout(location = 3) in vec3 a_Tangent;
-        layout(location = 4) in vec4 a_Color;
+        layout(location = 4) in vec3 a_Color;
 
         layout(location = 0) out Out
         {
             mat3 tbn;
             vec2 uv;
-            vec4 color;
+            vec3 color;
 
             vec3 fragmentPosition;
             vec3 viewPosition;
@@ -68,26 +68,40 @@ namespace Quanta::Renderer3D
         {
             vec3 position;
 
-            vec4 ambient;
-            vec4 diffuse;
-            vec4 specular;
+            vec3 ambient;
+            vec3 diffuse;
+            vec3 specular;
 
             float constant;
             float linear;
             float quadratic;
         };
 
+        struct DirectionalLight
+        {
+            vec3 direction;
+
+            vec3 ambient;
+            vec3 diffuse;
+            vec3 specular;
+        };
+
         layout(std140, binding = 1) uniform Material
         {
-            vec4 albedo;
-            vec4 diffuse;
-            vec4 specular;
+            vec3 albedo;
+            vec3 diffuse;
+            vec3 specular;
             float shininess;
         } u_Material;  
 
-        layout(std430, binding = 0) buffer Lights
+        layout(std140, binding = 2) uniform DirectionalLights
         {
-            PointLight lights[];
+            DirectionalLight directionalLight;
+        };
+
+        layout(std430, binding = 0) buffer PointLights
+        {
+            PointLight pointLights[];
         };
 
         layout(binding = 0) uniform sampler2D u_AlbedoSampler;
@@ -99,71 +113,82 @@ namespace Quanta::Renderer3D
         {
             mat3 tbn;
             vec2 uv;
-            vec4 color;
+            vec3 color;
 
             vec3 fragmentPosition;
             vec3 viewPosition;
         } v_In;
-
+        
         layout(location = 0) out vec4 a_Fragment;
         
-        vec4 CalculatePointLight(vec3 normal, vec3 viewDirection, vec4 albedo, vec4 diffuse, vec4 specular)
+        void DirectionalLightContribute(vec3 normal, vec3 viewDirection, inout vec3 ambient, inout vec3 diffuse, inout vec3 specular)
         {
-            vec4 result = vec4(0.0);
+            vec3 lightDirection = normalize(-directionalLight.direction);
+            vec3 reflectDirection = reflect(-lightDirection, normal);
+            vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 
-            int count = lights.length();
-            
+            float diffuseFactor = max(dot(normal, lightDirection), 0.0);
+            float specularFactor = pow(max(dot(normal, halfwayDirection), 0.0), u_Material.shininess);
+
+            ambient += directionalLight.ambient;
+            diffuse += directionalLight.diffuse * diffuseFactor;
+            specular += directionalLight.specular * specularFactor;
+        }
+        
+        void PointLightContribute(vec3 normal, vec3 viewDirection, inout vec3 ambient, inout vec3 diffuse, inout vec3 specular)
+        {          
+            int count = pointLights.length();
+
             for(int i = 0; i < count; i++)
             {
-                PointLight light = lights[i];
+                PointLight light = pointLights[i];
 
                 vec3 positionDifference = (v_In.tbn * light.position) - v_In.fragmentPosition;
                 vec3 lightDirection = normalize(positionDifference);
                 vec3 reflectDirection = reflect(-lightDirection, normal);
                 vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 
-                float diffuseFactor = max(dot(normal, lightDirection), 0.0);
-                float specularFactor = pow(max(dot(normal, halfwayDirection), 0.0), u_Material.shininess);
-
-                vec4 ambient = u_Material.albedo * albedo * light.ambient;
-                vec4 diffuse = u_Material.diffuse * diffuse * light.diffuse * diffuseFactor;
-                vec4 specular = u_Material.specular * specular * light.specular * specularFactor;
-
                 float distance = length(positionDifference);
                 float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
-                ambient *= attenuation;
-                diffuse *= attenuation;
-                specular *= attenuation;
+                float diffuseFactor = max(dot(normal, lightDirection), 0.0);
+                float specularFactor = pow(max(dot(normal, halfwayDirection), 0.0), u_Material.shininess);
 
-                result += ambient + diffuse + specular;
+                ambient += light.ambient * attenuation;
+                diffuse += light.diffuse * diffuseFactor * attenuation;
+                specular += light.specular * specularFactor * attenuation;
             }
-            
-            result.w = 1.0;
+        }
+        
+        vec3 GetLightContribution(vec3 normal, vec3 viewDirection, vec3 ambient, vec3 diffuse, vec3 specular)
+        {
+            vec3 ambientContribution = vec3(0.0);
+            vec3 diffuseContribution = vec3(0.0);
+            vec3 specularContribution = vec3(0.0);
 
-            return result;
+            //DirectionalLightContribute(normal, viewDirection, ambientContribution, diffuseContribution, specularContribution);
+            PointLightContribute(normal, viewDirection, ambientContribution, diffuseContribution, specularContribution);
+
+            ambientContribution *= ambient;
+            diffuseContribution *= diffuse;
+            specularContribution *= specular;
+
+            return ambientContribution + diffuseContribution + specularContribution;
         }
 
         void main()
         {
             vec3 viewDirection = normalize(v_In.viewPosition - v_In.fragmentPosition);
 
-            vec4 sampledAlbedo = texture(u_AlbedoSampler, v_In.uv);
-            vec4 sampledDiffuse = texture(u_DiffuseSampler, v_In.uv);
-            vec4 sampledSpecular = texture(u_SpecularSampler, v_In.uv);
-            vec4 sampledNormal = texture(u_NormalSampler, v_In.uv);
+            vec3 materialAlbedo = u_Material.albedo * vec3(texture(u_AlbedoSampler, v_In.uv));
+            vec3 materialDiffuse = u_Material.diffuse * vec3(texture(u_DiffuseSampler, v_In.uv));
+            vec3 materialSpecular = u_Material.specular * vec3(texture(u_SpecularSampler, v_In.uv));
 
-            vec3 normal = normalize(vec3(sampledNormal) * 2.0 - 1.0);
+            vec3 normal = normalize(vec3(texture(u_NormalSampler, v_In.uv)) * 2.0 - 1.0);
 
-            a_Fragment = v_In.color;
+            vec3 light = GetLightContribution(normal, viewDirection, materialAlbedo, materialDiffuse, materialSpecular);
 
-            a_Fragment *= CalculatePointLight(
-                normal,
-                viewDirection,
-                sampledAlbedo,
-                sampledDiffuse,
-                sampledSpecular
-            );
+            a_Fragment = vec4(v_In.color * light, 1.0);
         }
     )";
 
@@ -175,6 +200,7 @@ namespace Quanta::Renderer3D
 
         std::shared_ptr<GraphicsBuffer> matrixUniforms = nullptr;
         std::shared_ptr<GraphicsBuffer> materialUniforms = nullptr;
+        std::shared_ptr<GraphicsBuffer> directionalLightUniforms = nullptr;
 
         std::shared_ptr<GraphicsBuffer> lightBuffer = nullptr;
 
@@ -198,7 +224,8 @@ namespace Quanta::Renderer3D
         state->window = &window;
 
         state->matrixUniforms = GraphicsBuffer::Create(BufferUsage::Static, (sizeof(glm::mat4) * 4) + sizeof(glm::vec4));
-        state->materialUniforms = GraphicsBuffer::Create(BufferUsage::Static, (sizeof(glm::vec4) * 3) + sizeof(glm::vec4));
+        state->materialUniforms = GraphicsBuffer::Create(BufferUsage::Static, (sizeof(glm::vec4) * 3));
+        state->directionalLightUniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(DirectionalLight));
 
         state->lightBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
 
@@ -206,6 +233,7 @@ namespace Quanta::Renderer3D
 
         pipelineDescriptor.UniformBuffers.push_back(state->matrixUniforms);
         pipelineDescriptor.UniformBuffers.push_back(state->materialUniforms);
+        pipelineDescriptor.UniformBuffers.push_back(state->directionalLightUniforms);
 
         pipelineDescriptor.StorageBuffers.push_back(state->lightBuffer);
 
@@ -218,13 +246,11 @@ namespace Quanta::Renderer3D
         state->pipeline->SetFaceCullMode(FaceCullMode::Back);
         state->pipeline->SetEnableDepthWriting(true);
         state->pipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
-        state->pipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
-        state->pipeline->SetBlendMode(BlendMode::Add);
 
-        Color32 albedo = 0xFFFFFFFF;
-        Color32 diffuse = 0x99999999;
-        Color32 specular = 0x00000000;
-        Color32 normal = Color32(128, 128, 255, 255);
+        Color32 albedo { 0xFFFFFFFF };
+        Color32 diffuse { 0xFFFFFFFF };
+        Color32 specular { 0xFFFFFFFF };
+        Color32 normal { 128, 128, 255, 0 };
 
         std::shared_ptr<Texture> albedoTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
         std::shared_ptr<Texture> diffuseTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
@@ -308,6 +334,13 @@ namespace Quanta::Renderer3D
         GraphicsDevice::SetRasterPipeline(nullptr);
     }
 
+    void SetDirectionalLight(const DirectionalLight& light)
+    {
+        DEBUG_ASSERT(state != nullptr);
+
+        state->directionalLightUniforms->SetData(&light, sizeof(light));
+    }
+
     void SetPointLights(const PointLight* lights, size_t count)
     {
         DEBUG_ASSERT(lights != nullptr);
@@ -333,10 +366,10 @@ namespace Quanta::Renderer3D
 
         float shininess = material.GetShininess();
 
-        state->materialUniforms->SetData(&material.GetAlbedo(), sizeof(glm::vec4));
-        state->materialUniforms->SetData(&material.GetDiffuse(), sizeof(glm::vec4), sizeof(glm::vec4));        
-        state->materialUniforms->SetData(&material.GetSpecular(), sizeof(glm::vec4), sizeof(glm::vec4) * 2);
-        state->materialUniforms->SetData(&shininess, sizeof(float), sizeof(glm::vec4) * 3);
+        state->materialUniforms->SetData(&material.GetAlbedo(), sizeof(material.GetAlbedo()));
+        state->materialUniforms->SetData(&material.GetDiffuse(), sizeof(material.GetDiffuse()), sizeof(glm::vec4));        
+        state->materialUniforms->SetData(&material.GetSpecular(), sizeof(material.GetSpecular()), sizeof(glm::vec4) * 2);
+        state->materialUniforms->SetData(&shininess, sizeof(shininess), sizeof(glm::vec4) * 2 + sizeof(glm::vec3));
         
         state->matrixUniforms->SetData(&transform, sizeof(glm::mat4));
 
@@ -349,22 +382,22 @@ namespace Quanta::Renderer3D
 
         if(material.GetAlbedoSampler())
         {
-            albedo = material.GetAlbedoSampler();
+            albedo = material.GetAlbedoSampler().get();
         }
 
         if(material.GetDiffuseSampler())
         {
-            diffuse = material.GetDiffuseSampler();
+            diffuse = material.GetDiffuseSampler().get();
         }
 
         if(material.GetSpecularSampler())
         {
-            specular = material.GetSpecularSampler();
+            specular = material.GetSpecularSampler().get();
         }
 
         if(material.GetNormalSampler())
         {
-            normal = material.GetNormalSampler();
+            normal = material.GetNormalSampler().get();
         }
 
         GraphicsDevice::BindSampler(albedo, 0);
@@ -377,5 +410,13 @@ namespace Quanta::Renderer3D
         command.Count = mesh.GetIndexCount();
 
         GraphicsDevice::DispatchDraw(command);
+    }
+    
+    void DrawModel(const Model& model, const glm::mat4& transform)
+    {
+        for(const Model::Part& part : model.GetParts())
+        {
+            DrawMesh(part.mesh, model.GetMaterials()[part.materialIndex], transform);
+        }
     }
 }

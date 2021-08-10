@@ -3,9 +3,11 @@
 #include <vector>
 
 #include "../Core/Windowing/Window.h"
+#include "Model.h"
 #include "Mesh.h"
 #include "Material.h"
 #include "PointLight.h"
+#include "DirectionalLight.h"
 
 namespace Quanta::Renderer3D
 {
@@ -18,7 +20,10 @@ namespace Quanta::Renderer3D
     void BeginPass();
     void EndPass();
     
+    void SetDirectionalLight(const DirectionalLight& light);
+
     void SetPointLights(const PointLight* lights, size_t count);
     
     void DrawMesh(const Mesh& mesh, const Material& material, const glm::mat4& transform);
+    void DrawModel(const Model& model, const glm::mat4& transform);
 }

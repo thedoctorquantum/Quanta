@@ -2,7 +2,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <filesystem>
 
 #include "../Debugging/Validation.h"
 
@@ -35,7 +34,7 @@ namespace Quanta
                 aiVector3D& normal = mesh->mNormals[j];
 
                 aiVector3D uv = aiVector3D(0.0f);
-                
+
                 if(mesh->HasTextureCoords(0))
                 {
                     uv = mesh->mTextureCoords[0][j]; 
@@ -49,12 +48,11 @@ namespace Quanta
                 }
 
                 aiVector3D tangent = mesh->mTangents[j];
-                aiVector3D biTangent = mesh->mBitangents[j];
                 
                 vertex.Translation = glm::vec3(translation.x, translation.y, translation.z);
                 vertex.Normal = glm::vec3(normal.x, normal.y, normal.z);
                 vertex.Uv = glm::vec2(uv.x, uv.y);
-                vertex.Color = glm::vec4(color.r, color.g, color.b, color.a);
+                vertex.Color = glm::vec3(color.r, color.g, color.b);
                 vertex.Tangent = glm::vec3(tangent.x, tangent.y, tangent.z);
 
                 vertices.push_back(vertex);
@@ -130,7 +128,7 @@ namespace Quanta
 
         layout.Add({
             BufferPrimitive::Float,
-            4,
+            3,
             sizeof(float),
             false
         });
@@ -143,16 +141,10 @@ namespace Quanta
     {
 
     }
-
+    
     Mesh::Mesh(Mesh&& other)
     {
-        vertexArray = other.vertexArray;
-        vertexCount = other.vertexCount;
-        indexCount = other.indexCount;
-
-        other.vertexArray = nullptr;
-        other.vertexCount = 0;
-        other.indexCount = 0;
+        *this = std::move(other);
     }
     
     Mesh& Mesh::operator=(Mesh&& other)

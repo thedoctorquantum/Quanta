@@ -19,38 +19,38 @@ namespace Quanta
 
         Material& operator=(Material&&);
 
-        const glm::vec4& GetAlbedo() const;
-        void SetAlbedo(const glm::vec4&);
+        const glm::vec3& GetAlbedo() const;
+        void SetAlbedo(const glm::vec3&);
         
-        const glm::vec4& GetDiffuse() const;
-        void SetDiffuse(const glm::vec4&);
+        const glm::vec3& GetDiffuse() const;
+        void SetDiffuse(const glm::vec3&);
 
-        const glm::vec4& GetSpecular() const;
-        void SetSpecular(const glm::vec4&);
+        const glm::vec3& GetSpecular() const;
+        void SetSpecular(const glm::vec3&);
         
         float GetShininess() const;
         void SetShininess(float);
-
-        Sampler* GetAlbedoSampler() const;
-        void SetAlbedoSampler(Sampler*);
-
-        Sampler* GetDiffuseSampler() const;
-        void SetDiffuseSampler(Sampler*);
-
-        Sampler* GetSpecularSampler() const;
-        void SetSpecularSampler(Sampler*);
         
-        Sampler* GetNormalSampler() const;
-        void SetNormalSampler(Sampler*);
+        std::shared_ptr<Sampler> GetAlbedoSampler() const;
+        void SetAlbedoSampler(std::shared_ptr<Sampler>);
+
+        std::shared_ptr<Sampler> GetDiffuseSampler() const;
+        void SetDiffuseSampler(std::shared_ptr<Sampler>);
+
+        std::shared_ptr<Sampler> GetSpecularSampler() const;
+        void SetSpecularSampler(std::shared_ptr<Sampler>);
+        
+        std::shared_ptr<Sampler> GetNormalSampler() const;
+        void SetNormalSampler(std::shared_ptr<Sampler>);
     private:    
-        glm::vec4 albedo = glm::vec4(1.0f);
-        glm::vec4 diffuse = glm::vec4(1.0f);
-        glm::vec4 specular = glm::vec4(0.0f);
+        glm::vec3 albedo = glm::vec3(1.0f);
+        glm::vec3 diffuse = glm::vec3(1.0f);
+        glm::vec3 specular = glm::vec3(0.0f);
         float shininess = 1.0f;
         
-        Sampler* albedoSampler = nullptr;
-        Sampler* diffuseSampler = nullptr;
-        Sampler* specularSampler = nullptr;
-        Sampler* normalSampler = nullptr;
+        std::shared_ptr<Sampler> albedoSampler = nullptr;
+        std::shared_ptr<Sampler> diffuseSampler = nullptr;
+        std::shared_ptr<Sampler> specularSampler = nullptr;
+        std::shared_ptr<Sampler> normalSampler = nullptr;
     };
 }

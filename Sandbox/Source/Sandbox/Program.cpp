@@ -71,43 +71,18 @@ int main()
     
     std::shared_ptr<Quanta::Sampler> brickNormalSampler = Quanta::Sampler::Create(brickNormalMap);
 
-    Quanta::Mesh cube = Quanta::Mesh::FromFile("Resources/Models/cube.glb");
-    
+    Quanta::Model backpack = Quanta::Model::FromFile("Resources/Models/backpack/backpack.fbx");
+
+    //Quanta::Mesh cube = Quanta::Mesh::FromFile("Resources/Models/cube.glb");
+
     Quanta::Material brickMaterial;
 
-    brickMaterial.SetAlbedoSampler(brickSampler.get());
-    brickMaterial.SetNormalSampler(brickNormalSampler.get());   
+    brickMaterial.SetAlbedoSampler(brickSampler);
+    brickMaterial.SetNormalSampler(brickNormalSampler);   
+
+    brickMaterial.SetSpecular(glm::vec3(0.8f));
+    brickMaterial.SetShininess(200.0f);
     
-    std::shared_ptr<Quanta::Texture> albedo = Quanta::Texture::Load2D("Resources/Models/backpack/diffuse.jpg");
-    std::shared_ptr<Quanta::Texture> diffuse = Quanta::Texture::Load2D("Resources/Models/backpack/roughness.jpg");
-    std::shared_ptr<Quanta::Texture> specular = Quanta::Texture::Load2D("Resources/Models/backpack/specular.jpg");
-    std::shared_ptr<Quanta::Texture> normal = Quanta::Texture::Load2D("Resources/Models/backpack/normal.png");
-
-    std::shared_ptr<Quanta::Sampler> albedoSampler = Quanta::Sampler::Create(albedo);
-    std::shared_ptr<Quanta::Sampler> diffuseSampler = Quanta::Sampler::Create(diffuse);
-    std::shared_ptr<Quanta::Sampler> specularSampler = Quanta::Sampler::Create(specular);
-    std::shared_ptr<Quanta::Sampler> normalSampler = Quanta::Sampler::Create(normal);
-        
-    albedoSampler->SetMagnification(Quanta::FilterMode::Nearest);
-    albedoSampler->SetMinification(Quanta::FilterMode::Nearest);
-    
-    Quanta::Mesh backpack = Quanta::Mesh::FromFile("Resources/Models/backpack/backpack.glb");
-    
-    Quanta::Material backpackMaterial;
-
-    backpackMaterial.SetAlbedo({ 1.0f, 1.0f, 1.0f, 1.0f });
-    backpackMaterial.SetAlbedoSampler(albedoSampler.get()); 
-
-    backpackMaterial.SetDiffuse({ 0.8f, 0.8f, 0.8f, 1.0f });
-    backpackMaterial.SetDiffuseSampler(diffuseSampler.get());
-
-    backpackMaterial.SetSpecular({ 0.5f, 0.5f, 0.5f, 1.0f });
-    backpackMaterial.SetSpecularSampler(specularSampler.get());
-    
-    backpackMaterial.SetNormalSampler(normalSampler.get());
-
-    backpackMaterial.SetShininess(225.0f);
-
     glm::vec3 pos = { 0.0f, 0.0f, 0.0f }; 
     glm::vec3 rot = { 0.0f, 0.0f, 0.0f };
 
@@ -118,15 +93,25 @@ int main()
     
     std::vector<Quanta::PointLight> lights(1);
     
-    lights[0].Ambient = { 0.2f, 0.2f, 0.2f, 1.0f };
-    lights[0].Diffuse = { 0.5f, 0.5f, 0.5f, 1.0f };
-    lights[0].Specular = { 1.0f, 1.0f, 1.0f, 1.0f };
+    lights[0].Ambient = glm::vec3(1.0f);
+    lights[0].Diffuse = { 0.5f, 0.5f, 0.5f };
+    lights[0].Specular = { 1.0f, 1.0f, 1.0f };
     
     lights[0].Position = glm::vec3(0.0f, 0.0f, 1.5f);
     lights[0].Constant = 1.0f;
     lights[0].Linear = 0.007f;
     lights[0].Quadratic = 0.0002f;
 
+    Quanta::Model model = Quanta::Model::FromFile("Resources/Models/sponza/sponza.fbx");
+
+    Quanta::DirectionalLight sun;
+
+    sun.Direction = { -0.2f, -1.0f, -0.3f };
+    
+    sun.Ambient = glm::vec3(0.5f);
+    sun.Diffuse = glm::vec3(0.4f);
+    sun.Specular = glm::vec3(0.5f);
+    
     while(window->Exists())
     {
         time += 0.0167f;
@@ -140,15 +125,17 @@ int main()
         backpackTransform *= glm::toMat4(glm::quat(rot));
 
         rot.y = time;
-        
+
         Quanta::Renderer3D::BeginPass();
         {
-            Quanta::Renderer3D::SetView(camera.GetView(), camera.Position);
+            Quanta::Renderer3D::SetView(camera.GetView(), camera.Position + camera.Front);
 
+            Quanta::Renderer3D::SetDirectionalLight(sun);
             Quanta::Renderer3D::SetPointLights(lights.data(), lights.size());
             
-            Quanta::Renderer3D::DrawMesh(backpack, backpackMaterial, backpackTransform);
-            Quanta::Renderer3D::DrawMesh(cube, brickMaterial, glm::translate(glm::mat4(1.0f), { 5.0f, 0.0f, 0.0f }));
+            Quanta::Renderer3D::DrawModel(model, glm::scale(glm::mat4(1.0f), glm::vec3(0.2f)));
+
+            Quanta::Renderer3D::DrawModel(backpack, backpackTransform);
         }
         Quanta::Renderer3D::EndPass();
 
@@ -161,6 +148,10 @@ int main()
 
             ImGui::Spacing();
 
+            ImGui::DragFloat3("Sun Direction", &sun.Direction.x, 0.025f);
+
+            ImGui::Spacing();
+
             for(size_t i = 0; i < lights.size(); i++)
             {
                 Quanta::PointLight& light = lights[i];
@@ -170,32 +161,15 @@ int main()
                 ImGui::Text("Light %u", static_cast<uint32_t>(i));
 
                 ImGui::DragFloat3("Pos", &light.Position.x, 0.025f);
+                ImGui::ColorEdit4("Color", &light.Ambient.x); 
 
                 ImGui::PopID();
             }
 
             ImGui::Spacing();
 
-            ImGui::DragFloat3("CamPos", &camera.Position.x, 0.025f);
+            ImGui::DragFloat3("CamPos", &camera.Position.x, 0.5f);
             ImGui::DragFloat3("CamRot", &camera.Rotation.x, 0.025f);
-
-            ImGui::Begin("Sampler2D");
-            {
-                if(ImGui::Button("Toggle Filter Mode"))
-                {
-                    if(albedoSampler->GetMagnification() == Quanta::FilterMode::Linear)
-                    {
-                        albedoSampler->SetMagnification(Quanta::FilterMode::Nearest);
-                        albedoSampler->SetMinification(Quanta::FilterMode::Nearest);
-                    }
-                    else
-                    {
-                        albedoSampler->SetMagnification(Quanta::FilterMode::Linear);
-                        albedoSampler->SetMinification(Quanta::FilterMode::Linear);
-                    }
-                }
-            }
-            ImGui::End();
         }
         Quanta::ImGuiRenderer::End();
 

@@ -11,43 +11,61 @@ namespace Quanta
     {
 
     }
-
+    
     Material::Material(Material&& other)
     {
-        
+        *this = std::move(other);
     }
 
     Material& Material::operator=(Material&& other)
     {
+        albedoSampler = other.albedoSampler;
+        diffuseSampler = other.diffuseSampler;
+        specularSampler = other.specularSampler;
+        normalSampler = other.normalSampler;
+
+        albedo = other.albedo;
+        diffuse = other.diffuse;
+        specular = other.specular;
+
+        other.albedoSampler = nullptr;
+        other.diffuseSampler = nullptr;
+        other.specularSampler = nullptr;
+        other.normalSampler = nullptr; 
+
+        other.albedo = { };
+        other.diffuse = { };
+        other.specular = { };
+
         return *this;
     }
 
-    const glm::vec4& Material::GetAlbedo() const
+    const glm::vec3& Material::GetAlbedo() const
     {
         return albedo;
     }
 
-    void Material::SetAlbedo(const glm::vec4& value)
+    void Material::SetAlbedo(const glm::vec3& value)
     {
         albedo = value;
     }
 
-    const glm::vec4& Material::GetDiffuse() const
+    const glm::vec3& Material::GetDiffuse() const
     {   
         return diffuse;
     }
     
-    void Material::SetDiffuse(const glm::vec4& value)
+    void Material::SetDiffuse(const glm::vec3& value)
     {
         diffuse = value;
     }
 
-    const glm::vec4& Material::GetSpecular() const
+    const glm::vec3& Material::GetSpecular() const
     {
         return specular;
     }
 
-    void Material::SetSpecular(const glm::vec4& value)
+    void Material::SetSpecular(const glm::vec3& value)
     {
         specular = value;
     }
@@ -62,42 +80,42 @@ namespace Quanta
         shininess = value;
     }
     
-    Sampler* Material::GetAlbedoSampler() const
+    std::shared_ptr<Sampler> Material::GetAlbedoSampler() const
     {
         return albedoSampler;
     }
     
-    void Material::SetAlbedoSampler(Sampler* value)
+    void Material::SetAlbedoSampler(std::shared_ptr<Sampler> value)
     {
         albedoSampler = value;
     }
 
-    Sampler* Material::GetDiffuseSampler() const
+    std::shared_ptr<Sampler> Material::GetDiffuseSampler() const
     {
         return diffuseSampler;
     }
 
-    void Material::SetDiffuseSampler(Sampler* value)
+    void Material::SetDiffuseSampler(std::shared_ptr<Sampler> value)
     {
         diffuseSampler = value;
     }
         
-    Sampler* Material::GetSpecularSampler() const
+    std::shared_ptr<Sampler> Material::GetSpecularSampler() const
     {
         return specularSampler;
     }
 
-    void Material::SetSpecularSampler(Sampler* value)
+    void Material::SetSpecularSampler(std::shared_ptr<Sampler> value)
     {
         specularSampler = value;
     }
 
-    Sampler* Material::GetNormalSampler() const
+    std::shared_ptr<Sampler> Material::GetNormalSampler() const
     {
         return normalSampler;
     }
     
-    void Material::SetNormalSampler(Sampler* value)
+    void Material::SetNormalSampler(std::shared_ptr<Sampler> value)
     {
         normalSampler = value;
     }

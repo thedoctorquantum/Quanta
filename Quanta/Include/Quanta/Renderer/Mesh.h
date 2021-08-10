@@ -13,8 +13,8 @@ namespace Quanta
         static Mesh FromFile(const std::string& filepath);
         
         Mesh();
-
-        explicit Mesh(size_t vertexCount, size_t indexCount);
+        
+        Mesh(size_t vertexCount, size_t indexCount);
         
         ~Mesh();
 
