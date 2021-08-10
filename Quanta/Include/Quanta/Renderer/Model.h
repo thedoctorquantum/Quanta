@@ -35,6 +35,9 @@ namespace Quanta
         const std::vector<Part>& GetParts() const;
         const std::vector<Material>& GetMaterials() const; 
 
+        std::vector<Part>& GetParts();
+        std::vector<Material>& GetMaterials(); 
+
         size_t GetPartCount() const;
         size_t GetMaterialCount() const;
     private:

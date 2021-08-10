@@ -146,6 +146,12 @@ int main()
             ImGui::DragFloat3("Pos", &pos.x, 0.025f);
             ImGui::DragFloat3("Rot", &rot.x, 0.025f);
 
+            float opacity = backpack.GetMaterials()[0].GetOpacity();
+
+            ImGui::DragFloat("Opacity", &opacity, 0.025f);
+
+            backpack.GetMaterials()[0].SetOpacity(opacity);
+
             ImGui::Spacing();
 
             ImGui::DragFloat3("Sun Direction", &sun.Direction.x, 0.025f);

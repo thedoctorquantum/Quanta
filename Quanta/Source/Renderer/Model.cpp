@@ -94,9 +94,18 @@ namespace Quanta
                 material.SetNormalSampler(Sampler::Create(normal));
             }
 
+            if(materialData->GetTexture(aiTextureType_OPACITY, 0, &path) == aiReturn_SUCCESS)
+            {
+                std::string fullPath = directory + '/' + path.data;
+
+                std::shared_ptr<Texture> opacity = Texture::Load2D(fullPath);
+                
+                material.SetOpacitySampler(Sampler::Create(opacity));
+            }
+
             model.materials.push_back(std::move(material));
         }
-        
+
         for(size_t i = 0; i < scene->mNumMeshes; i++)
         {
             aiMesh* meshData = scene->mMeshes[i];
@@ -179,13 +188,23 @@ namespace Quanta
 
         return *this;
     }
-    
+
     const std::vector<Model::Part>& Model::GetParts() const
     {
         return parts;
     }
+    
+    const std::vector<Material>& Model::GetMaterials() const
+    {
+        return materials;
+    }
+    
+    std::vector<Model::Part>& Model::GetParts()
+    {
+        return parts;
+    }
 
-    const std::vector<Material>& Model::GetMaterials() const 
+    std::vector<Material>& Model::GetMaterials()  
     {
         return materials;
     }

@@ -30,6 +30,9 @@ namespace Quanta
         
         float GetShininess() const;
         void SetShininess(float);
+
+        float GetOpacity() const;
+        void SetOpacity(float);
         
         std::shared_ptr<Sampler> GetAlbedoSampler() const;
         void SetAlbedoSampler(std::shared_ptr<Sampler>);
@@ -42,15 +45,20 @@ namespace Quanta
         
         std::shared_ptr<Sampler> GetNormalSampler() const;
         void SetNormalSampler(std::shared_ptr<Sampler>);
+
+        std::shared_ptr<Sampler> GetOpacitySampler() const;
+        void SetOpacitySampler(std::shared_ptr<Sampler>);
     private:    
         glm::vec3 albedo = glm::vec3(1.0f);
         glm::vec3 diffuse = glm::vec3(1.0f);
         glm::vec3 specular = glm::vec3(0.0f);
         float shininess = 1.0f;
+        float opacity = 1.0f;
         
         std::shared_ptr<Sampler> albedoSampler = nullptr;
         std::shared_ptr<Sampler> diffuseSampler = nullptr;
         std::shared_ptr<Sampler> specularSampler = nullptr;
         std::shared_ptr<Sampler> normalSampler = nullptr;
+        std::shared_ptr<Sampler> opacitySampler = nullptr;
     };
 }
