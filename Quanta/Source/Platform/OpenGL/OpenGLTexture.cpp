@@ -96,6 +96,31 @@ namespace Quanta
             break;
         } 
     }
+    
+    void OpenGLTexture::SetData(const void* data, size_t xOffset, size_t yOffset, size_t zOffset)
+    {
+        DEBUG_ASSERT(data != nullptr);
+
+        switch(type)
+        {
+        case TextureType::Texture1D:
+            glTextureSubImage1D(handle, 0, xOffset, width, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+            break;
+        case TextureType::Texture2D:
+            glTextureSubImage2D(handle, 0, xOffset, yOffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+            break;
+        case TextureType::Texture3D:
+            glTextureSubImage3D(handle, 0, xOffset, yOffset, zOffset, width, height, depth, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+            break;
+        case TextureType::CubeMap:
+            glTextureSubImage3D(handle, 0, xOffset, yOffset, zOffset, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+            break;
+        } 
+    }
 
     TextureType OpenGLTexture::GetType() const
     {

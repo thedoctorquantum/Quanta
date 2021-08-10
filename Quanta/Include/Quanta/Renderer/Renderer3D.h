@@ -24,6 +24,8 @@ namespace Quanta::Renderer3D
 
     void SetPointLights(const PointLight* lights, size_t count);
     
+    void SetEnvironmentSampler(const std::shared_ptr<Sampler>&);
+
     void DrawMesh(const Mesh& mesh, const Material& material, const glm::mat4& transform);
     void DrawModel(const Model& model, const glm::mat4& transform);
 }

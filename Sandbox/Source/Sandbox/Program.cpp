@@ -63,6 +63,25 @@ int main()
 
     Quanta::Renderer3D::Initialize(*window);
 
+    std::shared_ptr<Quanta::Texture> skybox = Quanta::Texture::Create(Quanta::TextureType::CubeMap, 1024, 1024, 1);
+
+    std::shared_ptr<Quanta::Image32> images[] 
+    {
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/right.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/left.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/top.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/bottom.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/back.png"),
+        Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
+    };
+
+    for(size_t i = 0; i < 6; i++)
+    {
+        Quanta::Image32& image = *images[i];
+
+        skybox->SetData(image.GetData(), 0, 0, i);
+    }
+
     std::shared_ptr<Quanta::Texture> testTexture = Quanta::Texture::Load2D("Resources/Textures/brick_albedo.jpg");
 
     std::shared_ptr<Quanta::Sampler> brickSampler = Quanta::Sampler::Create(testTexture);
@@ -112,6 +131,8 @@ int main()
     sun.Diffuse = glm::vec3(0.4f);
     sun.Specular = glm::vec3(0.5f);
     
+    Quanta::Renderer3D::SetEnvironmentSampler(Quanta::Sampler::Create(skybox));
+
     while(window->Exists())
     {
         time += 0.0167f;
@@ -125,7 +146,7 @@ int main()
         backpackTransform *= glm::toMat4(glm::quat(rot));
 
         rot.y = time;
-
+        
         Quanta::Renderer3D::BeginPass();
         {
             Quanta::Renderer3D::SetView(camera.GetView(), camera.Position + camera.Front);

@@ -12,6 +12,8 @@ namespace Quanta
 
         void SetData(const void* data) override;
 
+        void SetData(const void* data, size_t xOffset, size_t yOffset, size_t zOffset) override;
+
         TextureType GetType() const override;
 
         size_t GetWidth() const override;

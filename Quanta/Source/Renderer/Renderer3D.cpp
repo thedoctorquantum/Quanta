@@ -326,8 +326,73 @@ namespace Quanta::Renderer3D
             a_Fragment = vec4(v_In.color * light, materialOpacity);
         }
     )";
+    
+    constexpr const char* environmentVertexShaderSource = R"(
+        #version 450
 
-    struct DrawCall 
+        layout(std140, binding = 0) uniform Matrices
+        {
+            mat4 model;
+            mat4 view;
+            mat4 projection;        
+            
+            mat4 viewProjection;
+
+            vec3 viewPosition;
+        } u_Matrices;
+
+        layout(location = 0) in vec3 a_Translation; 
+
+        layout(location = 0) out Out
+        {
+            vec3 uvw;
+        } v_Out;
+
+        void main()
+        {
+            v_Out.uvw = a_Translation;
+
+            gl_Position = u_Matrices.projection * mat4(mat3(u_Matrices.view)) * u_Matrices.model * vec4(a_Translation, 1.0);
+        }
+    )";
+
+    constexpr const char* environmentFragmentShaderSource = R"(
+        #version 450 
+
+        layout(location = 0) out vec4 a_Fragment;
+
+        layout(location = 0) in Out
+        {
+            vec3 uvw;
+        } v_In;
+
+        layout(binding = 0) uniform samplerCube u_EnvironmentSampler;
+
+        void main()
+        {
+            a_Fragment = texture(u_EnvironmentSampler, v_In.uvw);
+        }
+    )";
+
+    struct ShaderMaterial final
+    {
+    public:
+        glm::vec3 albedo;
+    private:
+        float padding1;
+    public:
+        glm::vec3 diffuse;
+    private:
+        float padding2;
+    public:
+        glm::vec3 specular;
+        float shininess;
+        float opacity;
+    private:
+        glm::vec3 padding3;
+    };
+
+    struct DrawCall final
     {
         const Mesh* mesh = nullptr;
         const Material* material = nullptr;
@@ -341,12 +406,16 @@ namespace Quanta::Renderer3D
         }
     };
 
-    struct State 
+    struct State final
     {
         const Window* window = nullptr;
 
+        float nearPlane = 0.1f;
+        float farPlane = 10000.0f;
+
         std::shared_ptr<RasterPipeline> opaquePipeline = nullptr;
         std::shared_ptr<RasterPipeline> transparentPipeline = nullptr;
+        std::shared_ptr<RasterPipeline> environmentPipeline = nullptr;
 
         std::shared_ptr<GraphicsBuffer> matrixUniforms = nullptr;
         std::shared_ptr<GraphicsBuffer> materialUniforms = nullptr;
@@ -354,11 +423,16 @@ namespace Quanta::Renderer3D
 
         std::shared_ptr<GraphicsBuffer> lightBuffer = nullptr;
 
+        std::shared_ptr<Sampler> environmentSampler = nullptr;
+        std::shared_ptr<Sampler> defaultEnvironmentSampler = nullptr;
+
         std::shared_ptr<Sampler> defaultAlbedoSampler = nullptr;
         std::shared_ptr<Sampler> defaultDiffuseSampler = nullptr;
         std::shared_ptr<Sampler> defaultSpecularSampler = nullptr;
         std::shared_ptr<Sampler> defaultNormalSampler = nullptr;
         std::shared_ptr<Sampler> defaultOpacitySampler = nullptr;
+
+        std::shared_ptr<VertexArray> environmentVertexArray = nullptr;
 
         std::vector<PointLight> lights;
 
@@ -378,10 +452,63 @@ namespace Quanta::Renderer3D
         state->window = &window;
 
         state->matrixUniforms = GraphicsBuffer::Create(BufferUsage::Static, (sizeof(glm::mat4) * 4) + sizeof(glm::vec4));
-        state->materialUniforms = GraphicsBuffer::Create(BufferUsage::Static, (sizeof(glm::vec4) * 3) + sizeof(glm::vec4));
+        state->materialUniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(ShaderMaterial));
         state->directionalLightUniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(DirectionalLight));
 
         state->lightBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
+
+        std::shared_ptr<Texture> environmentMap = Texture::Create(TextureType::CubeMap, 1, 1, 1);
+
+        Color32 environmentColor { 255, 255, 255, 255 };
+
+        for(size_t i = 0; i < 6; i++)
+        {
+            environmentMap->SetData(&environmentColor, 0, 0, i);
+        }
+
+        state->environmentVertexArray = VertexArray::Create();
+
+        float vertices[]
+        {
+            -0.5f, -0.5f, 0.5f,
+            0.5f, -0.5f, 0.5f,
+            0.5f, 0.5f, 0.5f,
+            -0.5f, 0.5f, 0.5f,
+            -0.5f, -0.5f, -0.5f,
+            0.5f, -0.5f, -0.5f,
+            0.5f, 0.5f, -0.5f,
+            -0.5f, 0.5f, -0.5f
+        };
+
+        uint8_t indices[] 
+        {
+            0, 1, 2, 2, 3, 0,
+            1, 5, 6, 6, 2, 1,
+            7, 6, 5, 5, 4, 7,
+            4, 0, 3, 3, 7, 4,
+            4, 5, 1, 1, 0, 4,
+            3, 2, 6, 6, 7, 3
+        };
+
+        std::shared_ptr<GraphicsBuffer> environmentVertexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(vertices));
+        std::shared_ptr<GraphicsBuffer> environmentIndexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(indices));
+
+        environmentVertexBuffer->SetData(vertices, sizeof(vertices));
+        environmentIndexBuffer->SetData(indices, sizeof(indices));
+
+        VertexLayout layout;
+
+        layout.Add({ 
+            BufferPrimitive::Float,
+            3,
+            sizeof(float),
+            false
+        });
+
+        state->environmentVertexArray->SetVertexBuffer(environmentVertexBuffer, layout);
+        state->environmentVertexArray->SetIndexBuffer(environmentIndexBuffer, IndexType::UInt8);
+
+        state->defaultEnvironmentSampler = Sampler::Create(environmentMap); 
 
         std::shared_ptr<ShaderModule> vertexShader = ShaderModule::Create(ShaderType::Vertex, vertexShaderSource);
 
@@ -416,12 +543,23 @@ namespace Quanta::Renderer3D
 
         state->transparentPipeline = RasterPipeline::Create(transparentPipelineDescription);
         
-        state->transparentPipeline->SetPolygonFillMode(PolygonFillMode::Solid);
-        state->transparentPipeline->SetFaceCullMode(FaceCullMode::None);
         state->transparentPipeline->SetEnableDepthWriting(true);
         state->transparentPipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
         state->transparentPipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
         state->transparentPipeline->SetBlendMode(BlendMode::Add);
+
+        RasterPipelineDescription environmentPipelineDescription;
+
+        environmentPipelineDescription.UniformBuffers.push_back(state->matrixUniforms);
+
+        environmentPipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Vertex, environmentVertexShaderSource));
+        environmentPipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, environmentFragmentShaderSource));
+
+        state->environmentPipeline = RasterPipeline::Create(environmentPipelineDescription);
+
+        state->environmentPipeline->SetFaceCullMode(FaceCullMode::Front);
+        state->environmentPipeline->SetEnableDepthWriting(true);
+        state->environmentPipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
 
         Color32 albedo { 0xFFFFFFFF };
         Color32 diffuse { 0xFFFFFFFF };
@@ -504,7 +642,7 @@ namespace Quanta::Renderer3D
         state->projectionMatrix = glm::perspective(
             45.0f * (static_cast<float>(M_PI) / 180.0f),
             static_cast<float>(state->window->GetWidth()) / static_cast<float>(state->window->GetHeight()),
-            0.1f, 2000.0f
+            state->nearPlane, state->farPlane
         );
 
         state->matrixUniforms->SetData(&state->projectionMatrix, sizeof(glm::mat4), sizeof(glm::mat4) * 2);
@@ -534,16 +672,19 @@ namespace Quanta::Renderer3D
 
                 DEBUG_ASSERT(vertexArray != nullptr);
 
+                GraphicsDevice::SetVertexArray(vertexArray.get());
+
                 state->matrixUniforms->SetData(&transform, sizeof(transform));
 
-                float shininess = material.GetShininess();
+                ShaderMaterial materialData;
 
-                state->materialUniforms->SetData(&material.GetAlbedo(), sizeof(material.GetAlbedo()));
-                state->materialUniforms->SetData(&material.GetDiffuse(), sizeof(material.GetDiffuse()), sizeof(glm::vec4));        
-                state->materialUniforms->SetData(&material.GetSpecular(), sizeof(material.GetSpecular()), sizeof(glm::vec4) * 2);
-                state->materialUniforms->SetData(&shininess, sizeof(shininess), sizeof(glm::vec4) * 2 + sizeof(glm::vec3));
+                materialData.albedo = material.GetAlbedo();
+                materialData.diffuse = material.GetDiffuse();
+                materialData.specular = material.GetSpecular();
+                materialData.shininess = material.GetShininess();
+                materialData.opacity = material.GetOpacity();
 
-                GraphicsDevice::SetVertexArray(vertexArray.get());
+                state->materialUniforms->SetData(&materialData, sizeof(materialData));
 
                 const Sampler* albedo = state->defaultAlbedoSampler.get();
                 const Sampler* diffuse = state->defaultDiffuseSampler.get();
@@ -583,6 +724,29 @@ namespace Quanta::Renderer3D
             }
         }
 
+        GraphicsDevice::SetRasterPipeline(state->environmentPipeline.get());
+
+        const Sampler* environmentSampler = state->defaultEnvironmentSampler.get();
+
+        if(state->environmentSampler != nullptr)
+        {
+            environmentSampler = state->environmentSampler.get();
+        }
+
+        glm::mat4 environmentTransform = glm::scale(glm::mat4(1.0f), glm::vec3(state->farPlane));
+
+        state->matrixUniforms->SetData(&environmentTransform, sizeof(environmentTransform));
+
+        GraphicsDevice::SetVertexArray(state->environmentVertexArray.get());
+
+        GraphicsDevice::BindSampler(environmentSampler, 0); 
+
+        DrawCommand environmentDraw;
+
+        environmentDraw.Count = state->environmentVertexArray->GetIndexBuffer()->GetSize();
+
+        GraphicsDevice::DispatchDraw(environmentDraw);
+
         if(state->transparentDraws.size() > 0)
         {
             state->transparentPipeline->SetViewport(viewport);
@@ -601,18 +765,19 @@ namespace Quanta::Renderer3D
 
                 DEBUG_ASSERT(vertexArray != nullptr);
 
+                GraphicsDevice::SetVertexArray(vertexArray.get());
+
                 state->matrixUniforms->SetData(&transform, sizeof(transform));
 
-                float shininess = material.GetShininess();
-                float opacity = material.GetOpacity();
+                ShaderMaterial materialData;
 
-                state->materialUniforms->SetData(&material.GetAlbedo(), sizeof(material.GetAlbedo()));
-                state->materialUniforms->SetData(&material.GetDiffuse(), sizeof(material.GetDiffuse()), sizeof(glm::vec4));        
-                state->materialUniforms->SetData(&material.GetSpecular(), sizeof(material.GetSpecular()), sizeof(glm::vec4) * 2);
-                state->materialUniforms->SetData(&shininess, sizeof(shininess), sizeof(glm::vec4) * 2 + sizeof(glm::vec3));
-                state->materialUniforms->SetData(&opacity, sizeof(opacity), sizeof(glm::vec4) * 2 + sizeof(glm::vec4));
+                materialData.albedo = material.GetAlbedo();
+                materialData.diffuse = material.GetDiffuse();
+                materialData.specular = material.GetSpecular();
+                materialData.shininess = material.GetShininess();
+                materialData.opacity = material.GetOpacity();
 
-                GraphicsDevice::SetVertexArray(vertexArray.get());
+                state->materialUniforms->SetData(&materialData, sizeof(materialData));
 
                 const Sampler* albedoSampler = state->defaultAlbedoSampler.get();
                 const Sampler* diffuseSampler = state->defaultDiffuseSampler.get();
@@ -659,7 +824,7 @@ namespace Quanta::Renderer3D
             }
         }
     }
-
+    
     void SetDirectionalLight(const DirectionalLight& light)
     {
         DEBUG_ASSERT(state != nullptr);
@@ -680,6 +845,13 @@ namespace Quanta::Renderer3D
         }
 
         state->lightBuffer->SetData(lights, size);
+    }
+    
+    void SetEnvironmentSampler(const std::shared_ptr<Sampler>& value)
+    {
+        DEBUG_ASSERT(state != nullptr);
+
+        state->environmentSampler = value;
     }
     
     void DrawMesh(const Mesh& mesh, const Material& material, const glm::mat4& transform)
