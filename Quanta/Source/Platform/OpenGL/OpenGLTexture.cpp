@@ -1,11 +1,12 @@
 #include <glad/glad.h>
 
 #include "OpenGLTexture.h"
+#include "GLEnumConversions.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
-    OpenGLTexture::OpenGLTexture(TextureType type, size_t width, size_t height, size_t depth)
+    OpenGLTexture::OpenGLTexture(TextureType type, TexelFormat format, size_t width, size_t height, size_t depth)
     {
         this->width = width;
         this->height = height;
@@ -17,8 +18,12 @@ namespace Quanta
             type == TextureType::Texture3D ||
             type == TextureType::CubeMap 
         );
-
+        
         this->type = type;
+
+        glPixelFormat = TexelFormatToPixelFormat(format);
+        glInternalFormat = TexelFormatToInternalFormat(format);
+        glPixelType = TexelFormatToPixelType(format);
 
         GLenum textureTarget = 0;
 
@@ -49,19 +54,19 @@ namespace Quanta
         switch(type)
         {
         case TextureType::Texture1D:
-            glTextureStorage1D(handle, 1, GL_RGBA8, width);
+            glTextureStorage1D(handle, 1, glInternalFormat, width);
 
             break;
         case TextureType::Texture2D:
-            glTextureStorage2D(handle, 1, GL_RGBA8, width, height);
+            glTextureStorage2D(handle, 1, glInternalFormat, width, height);
 
             break;
         case TextureType::Texture3D:
-            glTextureStorage3D(handle, 1, GL_RGBA8, width, height, depth);
+            glTextureStorage3D(handle, 1, glInternalFormat, width, height, depth);
 
             break;
         case TextureType::CubeMap:
-            glTextureStorage2D(handle, 1, GL_RGBA8, width, height);
+            glTextureStorage2D(handle, 1, glInternalFormat, width, height);
 
             break;
         } 
@@ -79,19 +84,19 @@ namespace Quanta
         switch(type)
         {
         case TextureType::Texture1D:
-            glTextureSubImage1D(handle, 0, 0, width, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage1D(handle, 0, 0, width, glPixelFormat, glPixelType, data);
 
             break;
         case TextureType::Texture2D:
-            glTextureSubImage2D(handle, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage2D(handle, 0, 0, 0, width, height, glPixelFormat, glPixelType, data);
 
             break;
         case TextureType::Texture3D:
-            glTextureSubImage3D(handle, 0, 0, 0, 0, width, height, depth, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage3D(handle, 0, 0, 0, 0, width, height, depth, glPixelFormat, glPixelType, data);
 
             break;
         case TextureType::CubeMap:
-            glTextureSubImage3D(handle, 0, 0, 0, 0, width, height, 6, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage3D(handle, 0, 0, 0, 0, width, height, 6, glPixelFormat, glPixelType, data);
 
             break;
         } 
@@ -104,19 +109,19 @@ namespace Quanta
         switch(type)
         {
         case TextureType::Texture1D:
-            glTextureSubImage1D(handle, 0, xOffset, width, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage1D(handle, 0, xOffset, width, glPixelFormat, glPixelType, data);
 
             break;
         case TextureType::Texture2D:
-            glTextureSubImage2D(handle, 0, xOffset, yOffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage2D(handle, 0, xOffset, yOffset, width, height, glPixelFormat, glPixelType, data);
 
             break;
         case TextureType::Texture3D:
-            glTextureSubImage3D(handle, 0, xOffset, yOffset, zOffset, width, height, depth, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage3D(handle, 0, xOffset, yOffset, zOffset, width, height, depth, glPixelFormat, glPixelType, data);
 
             break;
         case TextureType::CubeMap:
-            glTextureSubImage3D(handle, 0, xOffset, yOffset, zOffset, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTextureSubImage3D(handle, 0, xOffset, yOffset, zOffset, width, height, 1, glPixelFormat, glPixelType, data);
 
             break;
         } 
@@ -125,6 +130,11 @@ namespace Quanta
     TextureType OpenGLTexture::GetType() const
     {
         return type;
+    }
+
+    TexelFormat OpenGLTexture::GetFormat() const
+    {
+        return format;
     }
 
     size_t OpenGLTexture::GetWidth() const

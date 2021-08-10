@@ -457,7 +457,7 @@ namespace Quanta::Renderer3D
 
         state->lightBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
 
-        std::shared_ptr<Texture> environmentMap = Texture::Create(TextureType::CubeMap, 1, 1, 1);
+        std::shared_ptr<Texture> environmentMap = Texture::Create(TextureType::CubeMap, TexelFormat::Rgba8I, 1, 1, 1);
 
         Color32 environmentColor { 255, 255, 255, 255 };
 
@@ -567,11 +567,11 @@ namespace Quanta::Renderer3D
         Color32 normal { 128, 128, 255, 0 };
         Color32 opacity { 0xFFFFFFFF };
 
-        std::shared_ptr<Texture> albedoTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
-        std::shared_ptr<Texture> diffuseTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
-        std::shared_ptr<Texture> specularTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
-        std::shared_ptr<Texture> normalTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
-        std::shared_ptr<Texture> opacityTexture = Texture::Create(TextureType::Texture2D, 1, 1, 1);
+        std::shared_ptr<Texture> albedoTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
+        std::shared_ptr<Texture> diffuseTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
+        std::shared_ptr<Texture> specularTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
+        std::shared_ptr<Texture> normalTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
+        std::shared_ptr<Texture> opacityTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
         
         albedoTexture->SetData(&albedo);
         diffuseTexture->SetData(&diffuse);

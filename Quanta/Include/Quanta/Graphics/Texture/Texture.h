@@ -4,6 +4,7 @@
 #include <string>
 
 #include "TextureType.h"
+#include "TexelFormat.h"
 #include "../Imaging/Image32.h"
 
 namespace Quanta
@@ -11,7 +12,7 @@ namespace Quanta
     class Texture
     {
     public:
-        static std::shared_ptr<Texture> Create(TextureType type, size_t width, size_t height, size_t depth);
+        static std::shared_ptr<Texture> Create(TextureType type, TexelFormat format, size_t width, size_t height, size_t depth);
 
         static std::shared_ptr<Texture> Load2D(const std::string& filepath);
 
@@ -23,6 +24,7 @@ namespace Quanta
         virtual void SetData(const void* data, size_t xOffset, size_t yOffset, size_t zOffset) = 0;
 
         virtual TextureType GetType() const = 0;
+        virtual TexelFormat GetFormat() const = 0;
 
         virtual size_t GetWidth() const = 0;
         virtual size_t GetHeight() const = 0;

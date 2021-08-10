@@ -63,7 +63,7 @@ int main()
 
     Quanta::Renderer3D::Initialize(*window);
 
-    std::shared_ptr<Quanta::Texture> skybox = Quanta::Texture::Create(Quanta::TextureType::CubeMap, 1024, 1024, 1);
+    std::shared_ptr<Quanta::Texture> skybox = Quanta::Texture::Create(Quanta::TextureType::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
 
     std::shared_ptr<Quanta::Image32> images[] 
     {
@@ -146,7 +146,7 @@ int main()
         backpackTransform *= glm::toMat4(glm::quat(rot));
 
         rot.y = time;
-        
+
         Quanta::Renderer3D::BeginPass();
         {
             Quanta::Renderer3D::SetView(camera.GetView(), camera.Position + camera.Front);

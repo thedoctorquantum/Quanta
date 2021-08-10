@@ -46,4 +46,40 @@ namespace Quanta
 
         return 0;
     }
+
+    GLenum TexelFormatToPixelFormat(TexelFormat format)
+    {
+        switch(format)
+        {
+        case TexelFormat::Rgba8I: return GL_RGBA;    
+        case TexelFormat::Rgba16F: return GL_RGBA;
+        case TexelFormat::Rgba32F: return GL_RGBA;                
+        }
+
+        return 0;
+    }
+
+    GLenum TexelFormatToInternalFormat(TexelFormat format)
+    {
+        switch(format)
+        {
+            case TexelFormat::Rgba8I: return GL_RGBA8;
+            case TexelFormat::Rgba16F: return GL_RGBA16F;
+            case TexelFormat::Rgba32F: return GL_RGBA32F;
+        }
+
+        return 0;
+    }
+    
+    GLenum TexelFormatToPixelType(TexelFormat format)
+    {
+        switch(format)
+        {
+            case TexelFormat::Rgba8I: return GL_UNSIGNED_BYTE;
+            case TexelFormat::Rgba16F: return GL_FLOAT;
+            case TexelFormat::Rgba32F: return GL_FLOAT;
+        }
+
+        return 0;
+    }
 }
