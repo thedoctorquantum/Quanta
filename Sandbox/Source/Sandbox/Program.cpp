@@ -8,45 +8,6 @@
 #include <glm/gtx/quaternion.hpp>
 #include <imgui.h>
 
-#define TO_RADIANS (static_cast<float>(M_PI) / 180.0f) 
-
-class Camera final
-{
-public:
-    glm::vec3 Position = glm::vec3(0.0f);
-    glm::vec3 Front = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 Rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    glm::mat4 GetView()
-    {
-        return glm::lookAt(Position, Position + Front, { 0.0f, 1.0f, 0.0f });
-    }
-};
-
-std::string ReadAllText(const std::string& filepath)
-{
-    std::stringstream contents;
-
-    std::ifstream file;
-
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    
-    try
-    {
-        file.open(filepath);
-        {
-            contents << file.rdbuf();
-        }
-        file.close();
-    }
-    catch(const std::exception& exception)
-    {
-        std::cerr << exception.what() << '\n';
-    }
-    
-    return std::move(contents.str());
-}
-
 int main()
 {
     std::shared_ptr<Quanta::Window> window = Quanta::Window::Create(Quanta::GraphicsApi::OpenGL);
@@ -61,7 +22,7 @@ int main()
     
     float time = 0;
 
-    Quanta::Renderer3D::Initialize(*window);
+    Quanta::Renderer3D::Create(*window);
 
     std::shared_ptr<Quanta::Texture> skybox = Quanta::Texture::Create(Quanta::TextureType::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
 
@@ -90,10 +51,8 @@ int main()
     
     std::shared_ptr<Quanta::Sampler> brickNormalSampler = Quanta::Sampler::Create(brickNormalMap);
 
-    Quanta::Model backpack = Quanta::Model::FromFile("Resources/Models/backpack/backpack.fbx");
-
-    //Quanta::Mesh cube = Quanta::Mesh::FromFile("Resources/Models/cube.glb");
-
+    Quanta::Model backpack = Quanta::Model::FromFile("Resources/Models/test_scene_01.fbx");
+    
     Quanta::Material brickMaterial;
 
     brickMaterial.SetAlbedoSampler(brickSampler);
@@ -105,23 +64,20 @@ int main()
     glm::vec3 pos = { 0.0f, 0.0f, 0.0f }; 
     glm::vec3 rot = { 0.0f, 0.0f, 0.0f };
 
-    Camera camera;
-
-    camera.Position = { 2.5f, 0.0f, 7.5f };
-    camera.Front = { 0.0f, 0.0f, -5.0f };
-    
     std::vector<Quanta::PointLight> lights(1);
     
     lights[0].Ambient = glm::vec3(1.0f);
     lights[0].Diffuse = { 0.5f, 0.5f, 0.5f };
     lights[0].Specular = { 1.0f, 1.0f, 1.0f };
     
-    lights[0].Position = glm::vec3(0.0f, 0.0f, 1.5f);
-    lights[0].Constant = 1.0f;
-    lights[0].Linear = 0.007f;
-    lights[0].Quadratic = 0.0002f;
+    lights[0].Position = glm::vec3(0.0f, 0.0f, 0.0f);
+    lights[0].Linear = 0.045f;
+    lights[0].Quadratic = 0.0075f;
+    lights[0].Intensity = 1.0f;
 
     Quanta::Model model = Quanta::Model::FromFile("Resources/Models/sponza/sponza.fbx");
+    
+    Quanta::Mesh cube = Quanta::Mesh::FromFile("Resources/Models/cube.glb");
 
     Quanta::DirectionalLight sun;
 
@@ -132,6 +88,12 @@ int main()
     sun.Specular = glm::vec3(0.5f);
     
     Quanta::Renderer3D::SetEnvironmentSampler(Quanta::Sampler::Create(skybox));
+
+    Quanta::Renderer3D::View view;
+
+    view.far = 10000.0f;
+    view.fieldOfView = 60.0f;
+    view.position = { 0.0f, 0.0f, 0.0f };
 
     while(window->Exists())
     {
@@ -145,18 +107,18 @@ int main()
         backpackTransform = glm::translate(backpackTransform, pos);
         backpackTransform *= glm::toMat4(glm::quat(rot));
 
-        rot.y = time;
+        //rot.y = time;
 
-        Quanta::Renderer3D::BeginPass();
+        Quanta::Renderer3D::BeginPass(view);
         {
-            Quanta::Renderer3D::SetView(camera.GetView(), camera.Position + camera.Front);
-
             Quanta::Renderer3D::SetDirectionalLight(sun);
             Quanta::Renderer3D::SetPointLights(lights.data(), lights.size());
             
-            Quanta::Renderer3D::DrawModel(model, glm::scale(glm::mat4(1.0f), glm::vec3(0.2f)));
+            Quanta::Renderer3D::DrawModel(model, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));
 
             Quanta::Renderer3D::DrawModel(backpack, backpackTransform);
+
+            Quanta::Renderer3D::DrawMesh(cube, brickMaterial, glm::mat4(1.0f));
         }
         Quanta::Renderer3D::EndPass();
 
@@ -164,8 +126,10 @@ int main()
         {
             ImGui::ShowMetricsWindow();
 
-            ImGui::DragFloat3("Pos", &pos.x, 0.025f);
-            ImGui::DragFloat3("Rot", &rot.x, 0.025f);
+            ImGui::DragFloat("Fov", &view.fieldOfView);
+
+            ImGui::DragFloat3("Pos", &pos.x);
+            ImGui::DragFloat3("Rot", &rot.x);
 
             float opacity = backpack.GetMaterials()[0].GetOpacity();
 
@@ -175,7 +139,7 @@ int main()
 
             ImGui::Spacing();
 
-            ImGui::DragFloat3("Sun Direction", &sun.Direction.x, 0.025f);
+            ImGui::DragFloat3("Sun Direction", &sun.Direction.x, 0.125f, -1.0f, 1.0f);
 
             ImGui::Spacing();
 
@@ -187,16 +151,17 @@ int main()
 
                 ImGui::Text("Light %u", static_cast<uint32_t>(i));
 
-                ImGui::DragFloat3("Pos", &light.Position.x, 0.025f);
-                ImGui::ColorEdit4("Color", &light.Ambient.x); 
+                ImGui::DragFloat3("Pos", &light.Position.x, 0.5f);
+                ImGui::ColorEdit4("Color", &light.Ambient.x, 0.5f); 
+                ImGui::DragFloat("Intensity", &light.Intensity, 0.5f);
 
                 ImGui::PopID();
             }
 
             ImGui::Spacing();
 
-            ImGui::DragFloat3("CamPos", &camera.Position.x, 0.5f);
-            ImGui::DragFloat3("CamRot", &camera.Rotation.x, 0.025f);
+            ImGui::DragFloat3("CamPos", &view.position.x, 0.125f);
+            ImGui::DragFloat3("CamRot", &view.rotation.x, 0.125f);
         }
         Quanta::ImGuiRenderer::End();
 
@@ -207,7 +172,7 @@ int main()
         Quanta::GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, 0);
     }
     
-    Quanta::Renderer3D::DeInitialize();
+    Quanta::Renderer3D::Destroy();
 
     Quanta::ImGuiRenderer::Shutdown();
 

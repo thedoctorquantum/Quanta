@@ -2,6 +2,7 @@
 #include <Quanta/Graphics/Pipeline/RasterPipeline.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/trigonometric.hpp>
 
 #include "../Debugging/Validation.h"
 
@@ -10,16 +11,19 @@ namespace Quanta::Renderer3D
     constexpr const char* vertexShaderSource = R"(
         #version 450
 
-        layout(std140, binding = 0) uniform Matrices
+        layout(std140, binding = 0) uniform UniformView
         {
             mat4 model;
             mat4 view;
-            mat4 projection;        
-            
+            mat4 projection;
+
+            mat4 modelViewProjection;
             mat4 viewProjection;
 
-            vec3 viewPosition;
-        } u_Matrices;
+            vec3 position;
+            vec3 rotation;
+            vec3 target;
+        } u_View;
 
         layout(location = 0) in vec3 a_Translation;
         layout(location = 1) in vec3 a_Normal;
@@ -39,7 +43,7 @@ namespace Quanta::Renderer3D
 
         void main()
         {
-            mat3 normalMatrix = transpose(inverse(mat3(u_Matrices.model)));
+            mat3 normalMatrix = transpose(inverse(mat3(u_View.model)));
 
             vec3 t = normalize(normalMatrix * a_Tangent);
             vec3 n = normalize(normalMatrix * a_Normal);
@@ -52,12 +56,12 @@ namespace Quanta::Renderer3D
             v_Out.uv = a_Uv;
             v_Out.color = a_Color;
 
-            vec4 translation = u_Matrices.model * vec4(a_Translation, 1.0);
+            vec4 translation = u_View.model * vec4(a_Translation, 1.0);
 
             v_Out.fragmentPosition = v_Out.tbn * vec3(translation);
-            v_Out.viewPosition = v_Out.tbn * u_Matrices.viewPosition;
+            v_Out.viewPosition = v_Out.tbn * u_View.position;
 
-            gl_Position = u_Matrices.viewProjection * translation;
+            gl_Position = u_View.viewProjection * translation;
         }
     )";
     
@@ -67,12 +71,12 @@ namespace Quanta::Renderer3D
         struct PointLight
         {
             vec3 position;
+            float intensity;
 
             vec3 ambient;
             vec3 diffuse;
             vec3 specular;
 
-            float constant;
             float linear;
             float quadratic;
         };
@@ -105,10 +109,10 @@ namespace Quanta::Renderer3D
             PointLight pointLights[];
         };
 
-        layout(binding = 0) uniform sampler2D u_AlbedoSampler;
-        layout(binding = 1) uniform sampler2D u_DiffuseSampler;
-        layout(binding = 2) uniform sampler2D u_SpecularSampler;
-        layout(binding = 3) uniform sampler2D u_NormalSampler;
+        layout(binding = 0) uniform sampler2D u_DiffuseSampler;
+        layout(binding = 1) uniform sampler2D u_SpecularSampler;
+        layout(binding = 2) uniform sampler2D u_NormalSampler;
+        layout(binding = 3) uniform samplerCube u_EnvironmentSampler;
         
         layout(location = 0) in Out
         {
@@ -150,8 +154,8 @@ namespace Quanta::Renderer3D
                 vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 
                 float distance = length(positionDifference);
-                float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-
+                float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * (distance * distance));    
+                
                 float diffuseFactor = max(dot(normal, lightDirection), 0.0);
                 float specularFactor = pow(max(dot(normal, halfwayDirection), 0.0), u_Material.shininess);
 
@@ -167,7 +171,7 @@ namespace Quanta::Renderer3D
             vec3 diffuseContribution = vec3(0.0);
             vec3 specularContribution = vec3(0.0);
 
-            //DirectionalLightContribute(normal, viewDirection, ambientContribution, diffuseContribution, specularContribution);
+            DirectionalLightContribute(normal, viewDirection, ambientContribution, diffuseContribution, specularContribution);
             PointLightContribute(normal, viewDirection, ambientContribution, diffuseContribution, specularContribution);
 
             ambientContribution *= ambient;
@@ -181,9 +185,12 @@ namespace Quanta::Renderer3D
         {
             vec3 viewDirection = normalize(v_In.viewPosition - v_In.fragmentPosition);
 
-            vec3 materialAlbedo = u_Material.albedo * vec3(texture(u_AlbedoSampler, v_In.uv));
-            vec3 materialDiffuse = u_Material.diffuse * vec3(texture(u_DiffuseSampler, v_In.uv));
-            vec3 materialSpecular = u_Material.specular * vec3(texture(u_SpecularSampler, v_In.uv));
+            vec3 diffuse = vec3(texture(u_DiffuseSampler, v_In.uv));
+            vec3 specular = vec3(texture(u_SpecularSampler, v_In.uv));
+
+            vec3 materialAlbedo = u_Material.albedo * diffuse;
+            vec3 materialDiffuse = u_Material.diffuse * diffuse;
+            vec3 materialSpecular = u_Material.specular * specular;
 
             vec3 normal = normalize(vec3(texture(u_NormalSampler, v_In.uv)) * 2.0 - 1.0);
 
@@ -199,12 +206,12 @@ namespace Quanta::Renderer3D
         struct PointLight
         {
             vec3 position;
+            float intensity;
 
             vec3 ambient;
             vec3 diffuse;
             vec3 specular;
-
-            float constant;
+            
             float linear;
             float quadratic;
         };
@@ -237,11 +244,10 @@ namespace Quanta::Renderer3D
             PointLight pointLights[];
         };
 
-        layout(binding = 0) uniform sampler2D u_AlbedoSampler;
-        layout(binding = 1) uniform sampler2D u_DiffuseSampler;
-        layout(binding = 2) uniform sampler2D u_SpecularSampler;
-        layout(binding = 3) uniform sampler2D u_NormalSampler;
-        layout(binding = 4) uniform sampler2D u_OpacitySampler;
+        layout(binding = 0) uniform sampler2D u_DiffuseSampler;
+        layout(binding = 1) uniform sampler2D u_SpecularSampler;
+        layout(binding = 2) uniform sampler2D u_NormalSampler;
+        layout(binding = 3) uniform sampler2D u_OpacitySampler;
         
         layout(location = 0) in Out
         {
@@ -283,11 +289,11 @@ namespace Quanta::Renderer3D
                 vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 
                 float distance = length(positionDifference);
-                float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+                float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * (distance * distance));    
 
                 float diffuseFactor = max(dot(normal, lightDirection), 0.0);
                 float specularFactor = pow(max(dot(normal, halfwayDirection), 0.0), u_Material.shininess);
-
+                
                 ambient += light.ambient * attenuation;
                 diffuse += light.diffuse * diffuseFactor * attenuation;
                 specular += light.specular * specularFactor * attenuation;
@@ -300,7 +306,7 @@ namespace Quanta::Renderer3D
             vec3 diffuseContribution = vec3(0.0);
             vec3 specularContribution = vec3(0.0);
 
-            //DirectionalLightContribute(normal, viewDirection, ambientContribution, diffuseContribution, specularContribution);
+            DirectionalLightContribute(normal, viewDirection, ambientContribution, diffuseContribution, specularContribution);
             PointLightContribute(normal, viewDirection, ambientContribution, diffuseContribution, specularContribution);
 
             ambientContribution *= ambient;
@@ -309,12 +315,12 @@ namespace Quanta::Renderer3D
 
             return ambientContribution + diffuseContribution + specularContribution;
         }
-
+        
         void main()
         {
             vec3 viewDirection = normalize(v_In.viewPosition - v_In.fragmentPosition);
 
-            vec3 materialAlbedo = u_Material.albedo * vec3(texture(u_AlbedoSampler, v_In.uv));
+            vec3 materialAlbedo = u_Material.albedo * vec3(texture(u_DiffuseSampler, v_In.uv));
             vec3 materialDiffuse = u_Material.diffuse * vec3(texture(u_DiffuseSampler, v_In.uv));
             vec3 materialSpecular = u_Material.specular * vec3(texture(u_SpecularSampler, v_In.uv));
             float materialOpacity = u_Material.opacity * texture(u_OpacitySampler, v_In.uv).r;
@@ -330,16 +336,19 @@ namespace Quanta::Renderer3D
     constexpr const char* environmentVertexShaderSource = R"(
         #version 450
 
-        layout(std140, binding = 0) uniform Matrices
+        layout(std140, binding = 0) uniform UniformView
         {
             mat4 model;
             mat4 view;
-            mat4 projection;        
-            
+            mat4 projection;
+
+            mat4 modelViewProjection;
             mat4 viewProjection;
 
-            vec3 viewPosition;
-        } u_Matrices;
+            vec3 position;
+            vec3 rotation;
+            vec3 target;
+        } u_View;
 
         layout(location = 0) in vec3 a_Translation; 
 
@@ -352,7 +361,7 @@ namespace Quanta::Renderer3D
         {
             v_Out.uvw = a_Translation;
 
-            gl_Position = u_Matrices.projection * mat4(mat3(u_Matrices.view)) * u_Matrices.model * vec4(a_Translation, 1.0);
+            gl_Position = u_View.projection * mat4(mat3(u_View.view)) * u_View.model * vec4(a_Translation, 1.0);
         }
     )";
 
@@ -373,22 +382,44 @@ namespace Quanta::Renderer3D
             a_Fragment = texture(u_EnvironmentSampler, v_In.uvw);
         }
     )";
+    
+    struct ShaderView final
+    {
+    public:
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 projection;
+
+        glm::mat4 modelViewProjection;
+        glm::mat4 viewProjection;
+
+        glm::vec3 position;
+
+        float padding1;
+
+        glm::vec3 rotation;
+
+        float padding2;
+
+        glm::vec3 target;
+
+        float padding3;
+    };
 
     struct ShaderMaterial final
     {
-    public:
         glm::vec3 albedo;
-    private:
+
         float padding1;
-    public:
+
         glm::vec3 diffuse;
-    private:
+
         float padding2;
-    public:
+
         glm::vec3 specular;
         float shininess;
         float opacity;
-    private:
+        
         glm::vec3 padding3;
     };
 
@@ -410,52 +441,51 @@ namespace Quanta::Renderer3D
     {
         const Window* window = nullptr;
 
-        float nearPlane = 0.1f;
-        float farPlane = 10000.0f;
+        glm::uvec4 viewport = glm::uvec4(0.0f);
+
+        float aspectRatio = 0.0f;
+
+        View view;
+        ShaderView shaderView;
 
         std::shared_ptr<RasterPipeline> opaquePipeline = nullptr;
         std::shared_ptr<RasterPipeline> transparentPipeline = nullptr;
         std::shared_ptr<RasterPipeline> environmentPipeline = nullptr;
 
-        std::shared_ptr<GraphicsBuffer> matrixUniforms = nullptr;
-        std::shared_ptr<GraphicsBuffer> materialUniforms = nullptr;
-        std::shared_ptr<GraphicsBuffer> directionalLightUniforms = nullptr;
-
-        std::shared_ptr<GraphicsBuffer> lightBuffer = nullptr;
+        std::shared_ptr<GraphicsBuffer> uniformView = nullptr;
+        std::shared_ptr<GraphicsBuffer> uniformMaterial = nullptr;
+        std::shared_ptr<GraphicsBuffer> uniformDirectionalLight = nullptr;
+        std::shared_ptr<GraphicsBuffer> uniformPointLights = nullptr;
 
         std::shared_ptr<Sampler> environmentSampler = nullptr;
         std::shared_ptr<Sampler> defaultEnvironmentSampler = nullptr;
 
         std::shared_ptr<Sampler> defaultAlbedoSampler = nullptr;
-        std::shared_ptr<Sampler> defaultDiffuseSampler = nullptr;
         std::shared_ptr<Sampler> defaultSpecularSampler = nullptr;
         std::shared_ptr<Sampler> defaultNormalSampler = nullptr;
         std::shared_ptr<Sampler> defaultOpacitySampler = nullptr;
 
         std::shared_ptr<VertexArray> environmentVertexArray = nullptr;
 
-        std::vector<PointLight> lights;
-
-        glm::mat4 viewMatrix = glm::mat4(1.0f);
-        glm::mat4 projectionMatrix = glm::mat4(1.0f);
-
-        glm::mat4 viewProjectionMatrix = glm::mat4(1.0f);
-
         std::vector<DrawCall> opaqueDraws;
         std::vector<DrawCall> transparentDraws;
     } static* state;
     
-    void Initialize(const Window& window)
+    static void OpaquePass();
+    static void TransparentPass();
+    static void DrawEnvironment();
+    
+    void Create(const Window& window)
     {
         state = new State;
 
         state->window = &window;
 
-        state->matrixUniforms = GraphicsBuffer::Create(BufferUsage::Static, (sizeof(glm::mat4) * 4) + sizeof(glm::vec4));
-        state->materialUniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(ShaderMaterial));
-        state->directionalLightUniforms = GraphicsBuffer::Create(BufferUsage::Static, sizeof(DirectionalLight));
+        state->uniformView = GraphicsBuffer::Create(BufferUsage::Static, sizeof(ShaderView));
+        state->uniformMaterial = GraphicsBuffer::Create(BufferUsage::Static, sizeof(ShaderMaterial));
+        state->uniformDirectionalLight = GraphicsBuffer::Create(BufferUsage::Static, sizeof(DirectionalLight));
 
-        state->lightBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
+        state->uniformPointLights = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
 
         std::shared_ptr<Texture> environmentMap = Texture::Create(TextureType::CubeMap, TexelFormat::Rgba8I, 1, 1, 1);
 
@@ -514,11 +544,11 @@ namespace Quanta::Renderer3D
 
         RasterPipelineDescription opaquePipelineDescription;
 
-        opaquePipelineDescription.UniformBuffers.push_back(state->matrixUniforms);
-        opaquePipelineDescription.UniformBuffers.push_back(state->materialUniforms);
-        opaquePipelineDescription.UniformBuffers.push_back(state->directionalLightUniforms);
+        opaquePipelineDescription.UniformBuffers.push_back(state->uniformView);
+        opaquePipelineDescription.UniformBuffers.push_back(state->uniformMaterial);
+        opaquePipelineDescription.UniformBuffers.push_back(state->uniformDirectionalLight);
 
-        opaquePipelineDescription.StorageBuffers.push_back(state->lightBuffer);
+        opaquePipelineDescription.StorageBuffers.push_back(state->uniformPointLights);
 
         opaquePipelineDescription.ShaderModules.push_back(vertexShader);
         opaquePipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, opaqueFragmentShaderSource));
@@ -532,25 +562,27 @@ namespace Quanta::Renderer3D
 
         RasterPipelineDescription transparentPipelineDescription;
 
-        transparentPipelineDescription.UniformBuffers.push_back(state->matrixUniforms);
-        transparentPipelineDescription.UniformBuffers.push_back(state->materialUniforms);
-        transparentPipelineDescription.UniformBuffers.push_back(state->directionalLightUniforms);
+        transparentPipelineDescription.UniformBuffers.push_back(state->uniformView);
+        transparentPipelineDescription.UniformBuffers.push_back(state->uniformMaterial);
+        transparentPipelineDescription.UniformBuffers.push_back(state->uniformDirectionalLight);
 
-        transparentPipelineDescription.StorageBuffers.push_back(state->lightBuffer);
+        transparentPipelineDescription.StorageBuffers.push_back(state->uniformPointLights);
 
         transparentPipelineDescription.ShaderModules.push_back(vertexShader);
         transparentPipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, transparentFragmentShaderSource));
 
         state->transparentPipeline = RasterPipeline::Create(transparentPipelineDescription);
         
+        state->transparentPipeline->SetPolygonFillMode(PolygonFillMode::Solid);
         state->transparentPipeline->SetEnableDepthWriting(true);
+        state->transparentPipeline->SetFaceCullMode(FaceCullMode::Back);
         state->transparentPipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
         state->transparentPipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
         state->transparentPipeline->SetBlendMode(BlendMode::Add);
 
         RasterPipelineDescription environmentPipelineDescription;
 
-        environmentPipelineDescription.UniformBuffers.push_back(state->matrixUniforms);
+        environmentPipelineDescription.UniformBuffers.push_back(state->uniformView);
 
         environmentPipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Vertex, environmentVertexShaderSource));
         environmentPipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, environmentFragmentShaderSource));
@@ -562,19 +594,16 @@ namespace Quanta::Renderer3D
         state->environmentPipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
 
         Color32 albedo { 0xFFFFFFFF };
-        Color32 diffuse { 0xFFFFFFFF };
         Color32 specular { 0xFFFFFFFF };
         Color32 normal { 128, 128, 255, 0 };
         Color32 opacity { 0xFFFFFFFF };
 
         std::shared_ptr<Texture> albedoTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
-        std::shared_ptr<Texture> diffuseTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
         std::shared_ptr<Texture> specularTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
         std::shared_ptr<Texture> normalTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
         std::shared_ptr<Texture> opacityTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
         
         albedoTexture->SetData(&albedo);
-        diffuseTexture->SetData(&diffuse);
         specularTexture->SetData(&specular);
         normalTexture->SetData(&normal);
         opacityTexture->SetData(&opacity);
@@ -583,11 +612,6 @@ namespace Quanta::Renderer3D
 
         state->defaultAlbedoSampler->SetMagnification(FilterMode::Nearest);
         state->defaultAlbedoSampler->SetMinification(FilterMode::Nearest);
-
-        state->defaultDiffuseSampler = Sampler::Create(diffuseTexture);
-        
-        state->defaultDiffuseSampler->SetMagnification(FilterMode::Nearest);
-        state->defaultDiffuseSampler->SetMinification(FilterMode::Nearest);
 
         state->defaultSpecularSampler = Sampler::Create(specularTexture);
 
@@ -600,236 +624,61 @@ namespace Quanta::Renderer3D
         state->defaultNormalSampler->SetMinification(FilterMode::Nearest);
 
         state->defaultOpacitySampler = Sampler::Create(opacityTexture);
-
+        
         state->defaultOpacitySampler->SetMagnification(FilterMode::Nearest);
         state->defaultOpacitySampler->SetMinification(FilterMode::Nearest);
     }
     
-    void DeInitialize()
+    void Destroy()
     {
         DEBUG_ASSERT(state != nullptr);
 
         delete state;
     }
-
-    const glm::mat4& GetView()
-    {
-        DEBUG_ASSERT(state != nullptr);
-
-        return state->viewMatrix;
-    }
-
-    void SetView(const glm::mat4& matrix, const glm::vec3& position)
-    {
-        DEBUG_ASSERT(state != nullptr);
-
-        state->viewMatrix = matrix;
-        
-        state->viewProjectionMatrix = state->projectionMatrix * state->viewMatrix;
-
-        state->matrixUniforms->SetData(&state->viewMatrix, sizeof(glm::mat4), sizeof(glm::mat4));
-        state->matrixUniforms->SetData(&state->viewProjectionMatrix, sizeof(glm::mat4), sizeof(glm::mat4) * 3);
-        state->matrixUniforms->SetData(&position, sizeof(glm::vec3), sizeof(glm::mat4) * 4);
-    }
     
-    void BeginPass()
+    void BeginPass(const View& view)
     {
         DEBUG_ASSERT(state != nullptr);
 
-        state->opaqueDraws.clear();
-        state->transparentDraws.clear();
+        state->viewport = { 0, 0, state->window->GetWidth(), state->window->GetHeight() };
+        state->aspectRatio = static_cast<float>(state->window->GetWidth()) / static_cast<float>(state->window->GetHeight());
+        
+        state->view = view;
 
-        state->projectionMatrix = glm::perspective(
-            45.0f * (static_cast<float>(M_PI) / 180.0f),
-            static_cast<float>(state->window->GetWidth()) / static_cast<float>(state->window->GetHeight()),
-            state->nearPlane, state->farPlane
-        );
+        glm::vec3 target {
+            cos(glm::radians(view.rotation.y)) * cos(glm::radians(view.rotation.x)),
+            sin(glm::radians(view.rotation.y)),
+            cos(glm::radians(view.rotation.y)) * sin(glm::radians(view.rotation.x))
+        };
 
-        state->matrixUniforms->SetData(&state->projectionMatrix, sizeof(glm::mat4), sizeof(glm::mat4) * 2);
+        target = glm::normalize(target);
+
+        state->shaderView.view = glm::lookAt(view.position, view.position + target, { 0.0f, 1.0f, 0.0f });
+        state->shaderView.projection = glm::perspective(glm::radians(view.fieldOfView), state->aspectRatio, view.near, view.far);
+
+        state->shaderView.viewProjection = state->shaderView.projection * state->shaderView.view;
+
+        state->shaderView.position = view.position;
+        state->shaderView.rotation = view.rotation;
+        state->shaderView.target = target;
     }
 
     void EndPass()
     {
         DEBUG_ASSERT(state != nullptr);
-        
-        glm::uvec4 viewport { 0, 0, state->window->GetWidth(), state->window->GetHeight() };
 
-        if(state->opaqueDraws.size() > 0)
-        {
-            state->opaquePipeline->SetViewport(viewport);
+        state->uniformView->SetData(&state->shaderView, sizeof(state->shaderView));
 
-            GraphicsDevice::SetRasterPipeline(state->opaquePipeline.get());
-        
-            for(const DrawCall& draw : state->opaqueDraws)
-            {
-                DEBUG_ASSERT(draw.mesh != nullptr && draw.material != nullptr);
-
-                const Mesh& mesh = *draw.mesh;
-                const Material& material = *draw.material;
-                const glm::mat4& transform = draw.transform;
-
-                const std::shared_ptr<VertexArray>& vertexArray = mesh.GetVertexArray();
-
-                DEBUG_ASSERT(vertexArray != nullptr);
-
-                GraphicsDevice::SetVertexArray(vertexArray.get());
-
-                state->matrixUniforms->SetData(&transform, sizeof(transform));
-
-                ShaderMaterial materialData;
-
-                materialData.albedo = material.GetAlbedo();
-                materialData.diffuse = material.GetDiffuse();
-                materialData.specular = material.GetSpecular();
-                materialData.shininess = material.GetShininess();
-                materialData.opacity = material.GetOpacity();
-
-                state->materialUniforms->SetData(&materialData, sizeof(materialData));
-
-                const Sampler* albedo = state->defaultAlbedoSampler.get();
-                const Sampler* diffuse = state->defaultDiffuseSampler.get();
-                const Sampler* specular = state->defaultSpecularSampler.get();
-                const Sampler* normal = state->defaultNormalSampler.get();
-
-                if(material.GetAlbedoSampler())
-                {
-                    albedo = material.GetAlbedoSampler().get();
-                }
-
-                if(material.GetDiffuseSampler())
-                {
-                    diffuse = material.GetDiffuseSampler().get();
-                }
-
-                if(material.GetSpecularSampler())
-                {
-                    specular = material.GetSpecularSampler().get();
-                }
-
-                if(material.GetNormalSampler())
-                {
-                    normal = material.GetNormalSampler().get();
-                }
-
-                GraphicsDevice::BindSampler(albedo, 0);
-                GraphicsDevice::BindSampler(diffuse, 1);
-                GraphicsDevice::BindSampler(specular, 2);
-                GraphicsDevice::BindSampler(normal, 3);
-                
-                DrawCommand command;
-
-                command.Count = mesh.GetIndexCount();
-
-                GraphicsDevice::DispatchDraw(command);
-            }
-        }
-
-        GraphicsDevice::SetRasterPipeline(state->environmentPipeline.get());
-
-        const Sampler* environmentSampler = state->defaultEnvironmentSampler.get();
-
-        if(state->environmentSampler != nullptr)
-        {
-            environmentSampler = state->environmentSampler.get();
-        }
-
-        glm::mat4 environmentTransform = glm::scale(glm::mat4(1.0f), glm::vec3(state->farPlane));
-
-        state->matrixUniforms->SetData(&environmentTransform, sizeof(environmentTransform));
-
-        GraphicsDevice::SetVertexArray(state->environmentVertexArray.get());
-
-        GraphicsDevice::BindSampler(environmentSampler, 0); 
-
-        DrawCommand environmentDraw;
-
-        environmentDraw.Count = state->environmentVertexArray->GetIndexBuffer()->GetSize();
-
-        GraphicsDevice::DispatchDraw(environmentDraw);
-
-        if(state->transparentDraws.size() > 0)
-        {
-            state->transparentPipeline->SetViewport(viewport);
-
-            GraphicsDevice::SetRasterPipeline(state->transparentPipeline.get());
-
-            for(const DrawCall& draw : state->transparentDraws)
-            {
-                DEBUG_ASSERT(draw.mesh != nullptr && draw.material != nullptr);
-
-                const Mesh& mesh = *draw.mesh;
-                const Material& material = *draw.material;
-                const glm::mat4& transform = draw.transform;
-
-                const std::shared_ptr<VertexArray>& vertexArray = mesh.GetVertexArray();
-
-                DEBUG_ASSERT(vertexArray != nullptr);
-
-                GraphicsDevice::SetVertexArray(vertexArray.get());
-
-                state->matrixUniforms->SetData(&transform, sizeof(transform));
-
-                ShaderMaterial materialData;
-
-                materialData.albedo = material.GetAlbedo();
-                materialData.diffuse = material.GetDiffuse();
-                materialData.specular = material.GetSpecular();
-                materialData.shininess = material.GetShininess();
-                materialData.opacity = material.GetOpacity();
-
-                state->materialUniforms->SetData(&materialData, sizeof(materialData));
-
-                const Sampler* albedoSampler = state->defaultAlbedoSampler.get();
-                const Sampler* diffuseSampler = state->defaultDiffuseSampler.get();
-                const Sampler* specularSampler = state->defaultSpecularSampler.get();
-                const Sampler* normalSampler = state->defaultNormalSampler.get();
-                const Sampler* opacitySampler = state->defaultOpacitySampler.get();
-
-                if(material.GetAlbedoSampler())
-                {
-                    albedoSampler = material.GetAlbedoSampler().get();
-                }
-
-                if(material.GetDiffuseSampler())
-                {
-                    diffuseSampler = material.GetDiffuseSampler().get();
-                }
-
-                if(material.GetSpecularSampler())
-                {
-                    specularSampler = material.GetSpecularSampler().get();
-                }
-
-                if(material.GetNormalSampler())
-                {
-                    normalSampler = material.GetNormalSampler().get();
-                }
-
-                if(material.GetOpacitySampler())
-                {
-                    opacitySampler = material.GetOpacitySampler().get();
-                }
-
-                GraphicsDevice::BindSampler(albedoSampler, 0);
-                GraphicsDevice::BindSampler(diffuseSampler, 1);
-                GraphicsDevice::BindSampler(specularSampler, 2);
-                GraphicsDevice::BindSampler(normalSampler, 3);
-                GraphicsDevice::BindSampler(opacitySampler, 4);
-                
-                DrawCommand command;
-
-                command.Count = mesh.GetIndexCount();
-
-                GraphicsDevice::DispatchDraw(command);
-            }
-        }
+        OpaquePass();   
+        DrawEnvironment();     
+        TransparentPass();
     }
     
     void SetDirectionalLight(const DirectionalLight& light)
     {
         DEBUG_ASSERT(state != nullptr);
 
-        state->directionalLightUniforms->SetData(&light, sizeof(light));
+        state->uniformDirectionalLight->SetData(&light, sizeof(light));
     }
 
     void SetPointLights(const PointLight* lights, size_t count)
@@ -839,12 +688,12 @@ namespace Quanta::Renderer3D
 
         size_t size = count * sizeof(PointLight);
 
-        if(size > state->lightBuffer->GetSize())
+        if(size > state->uniformPointLights->GetSize())
         {
-            GraphicsBuffer::Resize(*state->lightBuffer, size);
+            GraphicsBuffer::Resize(*state->uniformPointLights, size);
         }
 
-        state->lightBuffer->SetData(lights, size);
+        state->uniformPointLights->SetData(lights, size);
     }
     
     void SetEnvironmentSampler(const std::shared_ptr<Sampler>& value)
@@ -872,7 +721,180 @@ namespace Quanta::Renderer3D
     {
         for(const Model::Part& part : model.GetParts())
         {
-            DrawMesh(part.mesh, model.GetMaterials()[part.materialIndex], transform);
+            DrawMesh(part.mesh, model.GetMaterials()[part.materialIndex], transform * part.transform);
         }
+    }
+
+    static void OpaquePass()
+    {
+        if(state->opaqueDraws.size() == 0) return;
+
+        state->opaquePipeline->SetViewport(state->viewport);
+
+        GraphicsDevice::SetRasterPipeline(state->opaquePipeline.get());
+
+        for(const DrawCall& draw : state->opaqueDraws)
+        {
+            DEBUG_ASSERT(draw.mesh != nullptr && draw.material != nullptr);
+
+            const Mesh& mesh = *draw.mesh;
+            const Material& material = *draw.material;
+            const glm::mat4& transform = draw.transform;
+
+            const std::shared_ptr<VertexArray>& vertexArray = mesh.GetVertexArray();
+
+            DEBUG_ASSERT(vertexArray != nullptr);
+
+            GraphicsDevice::SetVertexArray(vertexArray.get());
+
+            glm::mat4 modelViewProjection = transform * state->shaderView.viewProjection;
+
+            state->uniformView->SetData(&transform, sizeof(transform), offsetof(ShaderView, ShaderView::model));
+            state->uniformView->SetData(&modelViewProjection, sizeof(modelViewProjection), offsetof(ShaderView, ShaderView::modelViewProjection));
+
+            ShaderMaterial materialData;
+
+            materialData.albedo = material.GetAlbedo();
+            materialData.diffuse = material.GetDiffuse();
+            materialData.specular = material.GetSpecular();
+            materialData.shininess = material.GetShininess();
+            materialData.opacity = material.GetOpacity();
+
+            state->uniformMaterial->SetData(&materialData, sizeof(materialData));
+
+            const Sampler* albedo = state->defaultAlbedoSampler.get();
+            const Sampler* specular = state->defaultSpecularSampler.get();
+            const Sampler* normal = state->defaultNormalSampler.get();
+
+            if(material.GetAlbedoSampler())
+            {
+                albedo = material.GetAlbedoSampler().get();
+            }
+
+            if(material.GetSpecularSampler())
+            {
+                specular = material.GetSpecularSampler().get();
+            }
+
+            if(material.GetNormalSampler())
+            {
+                normal = material.GetNormalSampler().get();
+            }
+
+            GraphicsDevice::BindSampler(albedo, 0);
+            GraphicsDevice::BindSampler(specular, 1);
+            GraphicsDevice::BindSampler(normal, 2);
+            
+            DrawCommand command;
+
+            command.Count = mesh.GetIndexCount();
+
+            GraphicsDevice::DispatchDraw(command);
+        }
+
+        state->opaqueDraws.clear();
+    }
+    
+    static void TransparentPass()
+    {
+        if(state->transparentDraws.size() == 0) return;
+
+        state->transparentPipeline->SetViewport(state->viewport);
+
+        GraphicsDevice::SetRasterPipeline(state->transparentPipeline.get());
+
+        for(const DrawCall& draw : state->transparentDraws)
+        {
+            DEBUG_ASSERT(draw.mesh != nullptr && draw.material != nullptr);
+
+            const Mesh& mesh = *draw.mesh;
+            const Material& material = *draw.material;
+            const glm::mat4& transform = draw.transform;
+
+            const std::shared_ptr<VertexArray>& vertexArray = mesh.GetVertexArray();
+
+            DEBUG_ASSERT(vertexArray != nullptr);
+
+            GraphicsDevice::SetVertexArray(vertexArray.get());
+
+            glm::mat4 modelViewProjection = transform * state->shaderView.viewProjection;
+
+            state->uniformView->SetData(&transform, sizeof(transform), offsetof(ShaderView, ShaderView::model));
+            state->uniformView->SetData(&modelViewProjection, sizeof(modelViewProjection), offsetof(ShaderView, ShaderView::modelViewProjection));
+
+            ShaderMaterial materialData;
+
+            materialData.albedo = material.GetAlbedo();
+            materialData.diffuse = material.GetDiffuse();
+            materialData.specular = material.GetSpecular();
+            materialData.shininess = material.GetShininess();
+            materialData.opacity = material.GetOpacity();
+
+            state->uniformMaterial->SetData(&materialData, sizeof(materialData));
+
+            const Sampler* albedoSampler = state->defaultAlbedoSampler.get();
+            const Sampler* specularSampler = state->defaultSpecularSampler.get();
+            const Sampler* normalSampler = state->defaultNormalSampler.get();
+            const Sampler* opacitySampler = state->defaultOpacitySampler.get();
+
+            if(material.GetAlbedoSampler())
+            {
+                albedoSampler = material.GetAlbedoSampler().get();
+            }
+
+            if(material.GetSpecularSampler())
+            {
+                specularSampler = material.GetSpecularSampler().get();
+            }
+
+            if(material.GetNormalSampler())
+            {
+                normalSampler = material.GetNormalSampler().get();
+            }
+
+            if(material.GetOpacitySampler())
+            {
+                opacitySampler = material.GetOpacitySampler().get();
+            }
+
+            GraphicsDevice::BindSampler(albedoSampler, 0);
+            GraphicsDevice::BindSampler(specularSampler, 1);
+            GraphicsDevice::BindSampler(normalSampler, 2);
+            GraphicsDevice::BindSampler(opacitySampler, 3);
+            
+            DrawCommand command;
+
+            command.Count = mesh.GetIndexCount();
+
+            GraphicsDevice::DispatchDraw(command);
+        }
+
+        state->transparentDraws.clear();
+    }
+    
+    static void DrawEnvironment()
+    {
+        GraphicsDevice::SetRasterPipeline(state->environmentPipeline.get());
+
+        glm::mat4 transform = glm::scale(glm::mat4(1.0f), glm::vec3(state->view.far));
+
+        state->uniformView->SetData(&transform, sizeof(transform), offsetof(ShaderView, ShaderView::model));
+
+        GraphicsDevice::SetVertexArray(state->environmentVertexArray.get());
+
+        const Sampler* sampler = state->defaultEnvironmentSampler.get();
+
+        if(state->environmentSampler != nullptr)
+        {
+            sampler = state->environmentSampler.get();
+        }
+
+        GraphicsDevice::BindSampler(sampler, 0); 
+
+        DrawCommand draw;
+
+        draw.Count = state->environmentVertexArray->GetIndexBuffer()->GetSize();
+
+        GraphicsDevice::DispatchDraw(draw);
     }
 }

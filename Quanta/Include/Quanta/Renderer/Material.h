@@ -37,9 +37,6 @@ namespace Quanta
         std::shared_ptr<Sampler> GetAlbedoSampler() const;
         void SetAlbedoSampler(std::shared_ptr<Sampler>);
 
-        std::shared_ptr<Sampler> GetDiffuseSampler() const;
-        void SetDiffuseSampler(std::shared_ptr<Sampler>);
-
         std::shared_ptr<Sampler> GetSpecularSampler() const;
         void SetSpecularSampler(std::shared_ptr<Sampler>);
         
@@ -56,7 +53,6 @@ namespace Quanta
         float opacity = 1.0f;
         
         std::shared_ptr<Sampler> albedoSampler = nullptr;
-        std::shared_ptr<Sampler> diffuseSampler = nullptr;
         std::shared_ptr<Sampler> specularSampler = nullptr;
         std::shared_ptr<Sampler> normalSampler = nullptr;
         std::shared_ptr<Sampler> opacitySampler = nullptr;

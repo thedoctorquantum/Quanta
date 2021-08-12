@@ -20,7 +20,6 @@ namespace Quanta
     Material& Material::operator=(Material&& other)
     {
         albedoSampler = other.albedoSampler;
-        diffuseSampler = other.diffuseSampler;
         specularSampler = other.specularSampler;
         normalSampler = other.normalSampler;
         opacitySampler = other.opacitySampler;
@@ -32,7 +31,6 @@ namespace Quanta
         opacity = other.opacity;
 
         other.albedoSampler = nullptr;
-        other.diffuseSampler = nullptr;
         other.specularSampler = nullptr;
         other.normalSampler = nullptr; 
         other.opacitySampler = nullptr;
@@ -102,16 +100,6 @@ namespace Quanta
     void Material::SetAlbedoSampler(std::shared_ptr<Sampler> value)
     {
         albedoSampler = value;
-    }
-
-    std::shared_ptr<Sampler> Material::GetDiffuseSampler() const
-    {
-        return diffuseSampler;
-    }
-
-    void Material::SetDiffuseSampler(std::shared_ptr<Sampler> value)
-    {
-        diffuseSampler = value;
     }
         
     std::shared_ptr<Sampler> Material::GetSpecularSampler() const

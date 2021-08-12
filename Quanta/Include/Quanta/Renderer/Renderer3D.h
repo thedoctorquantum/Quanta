@@ -11,13 +11,21 @@
 
 namespace Quanta::Renderer3D
 {
-    void Initialize(const Window& window);
-    void DeInitialize();
+    struct View final
+    {
+    public:
+        glm::vec3 position = glm::vec3(0.0f);
+        glm::vec3 rotation = glm::vec3(0.0f);
+        
+        float fieldOfView = 45.0f;
+        float near = 0.1f;
+        float far = 1000.0f;
+    };
+    
+    void Create(const Window& window);
+    void Destroy();
 
-    const glm::mat4& GetView();
-    void SetView(const glm::mat4& matrix, const glm::vec3& position);
-
-    void BeginPass();
+    void BeginPass(const View& view);
     void EndPass();
     
     void SetDirectionalLight(const DirectionalLight& light);

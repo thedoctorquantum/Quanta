@@ -3,6 +3,9 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <algorithm>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "../Debugging/Validation.h"
 
@@ -20,91 +23,18 @@ namespace Quanta
         Assimp::Importer importer;
 
         Model model;
-
+        
         const aiScene* scene = importer.ReadFile(filepath, 
             aiProcess_Triangulate | 
             aiProcess_CalcTangentSpace |
             aiProcess_FlipUVs |
-            aiProcess_RemoveRedundantMaterials
+            aiProcess_RemoveRedundantMaterials |
+            aiProcess_PreTransformVertices |
+            aiProcess_GlobalScale |
+            aiProcess_OptimizeMeshes 
         ); 
-
+        
         DEBUG_ASSERT(scene != nullptr);
-
-        std::string directory = GetDirectory(filepath);
-
-        for(size_t i = 0; i < scene->mNumMaterials; i++)
-        {
-            aiMaterial* materialData = scene->mMaterials[i];
-
-            Material material;
-
-            aiColor3D color = aiColor3D(1.0f);
-            float shininess = 1.0f;
-
-            if(materialData->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn_SUCCESS)
-            {
-                material.SetDiffuse({ color.r, color.g, color.b });
-            }
-            
-            if(materialData->Get(AI_MATKEY_COLOR_SPECULAR, color) == aiReturn_SUCCESS)
-            {
-                material.SetSpecular({ color.r, color.g, color.b });
-            }
-
-            if(materialData->Get(AI_MATKEY_SHININESS, shininess) == aiReturn_SUCCESS)
-            {
-                material.SetShininess(shininess);
-            }
-
-            aiString path;
-            
-            if(materialData->GetTexture(aiTextureType_DIFFUSE, 0, &path) == aiReturn_SUCCESS)
-            {                
-                std::string fullPath = directory + '/' + path.data;
-                
-                std::shared_ptr<Texture> albedo = Texture::Load2D(fullPath);
-                
-                material.SetAlbedoSampler(Sampler::Create(albedo));   
-            }
-            
-            if(materialData->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &path) == aiReturn_SUCCESS)
-            {
-                std::string fullPath = directory + '/' + path.data;
-
-                std::shared_ptr<Texture> diffuse = Texture::Load2D(fullPath);
-                
-                material.SetDiffuseSampler(Sampler::Create(diffuse));
-            }
-
-            if(materialData->GetTexture(aiTextureType_SPECULAR, 0, &path) == aiReturn_SUCCESS)
-            {
-                std::string fullPath = directory + '/' + path.data;
-
-                std::shared_ptr<Texture> specular = Texture::Load2D(fullPath);
-                
-                material.SetSpecularSampler(Sampler::Create(specular));
-            }
-
-            if(materialData->GetTexture(aiTextureType_NORMALS, 0, &path) == aiReturn_SUCCESS)
-            {
-                std::string fullPath = directory + '/' + path.data;
-
-                std::shared_ptr<Texture> normal = Texture::Load2D(fullPath);
-                
-                material.SetNormalSampler(Sampler::Create(normal));
-            }
-
-            if(materialData->GetTexture(aiTextureType_OPACITY, 0, &path) == aiReturn_SUCCESS)
-            {
-                std::string fullPath = directory + '/' + path.data;
-
-                std::shared_ptr<Texture> opacity = Texture::Load2D(fullPath);
-                
-                material.SetOpacitySampler(Sampler::Create(opacity));
-            }
-
-            model.materials.push_back(std::move(material));
-        }
 
         for(size_t i = 0; i < scene->mNumMeshes; i++)
         {
@@ -160,7 +90,80 @@ namespace Quanta
             mesh.SetVertices(vertices.data(), vertices.size());
             mesh.SetIndices(indices.data(), indices.size());    
 
-            model.parts.push_back({ std::move(mesh), meshData->mMaterialIndex });
+            model.parts.push_back({ std::move(mesh), glm::mat4(1.0f), meshData->mMaterialIndex });    
+        }
+
+        std::string directory = GetDirectory(filepath);
+
+        for(size_t i = 0; i < scene->mNumMaterials; i++)
+        {
+            aiMaterial* materialData = scene->mMaterials[i];
+
+            Material material;
+
+            aiColor3D color = aiColor3D(1.0f);
+            float shininess = 1.0f;
+            float opacity = 1.0f;
+
+            if(materialData->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn_SUCCESS)
+            {
+                material.SetAlbedo({ color.r, color.g, color.b });
+            }
+            
+            if(materialData->Get(AI_MATKEY_COLOR_SPECULAR, color) == aiReturn_SUCCESS)
+            {
+                material.SetSpecular({ color.r, color.g, color.b });
+            }
+
+            if(materialData->Get(AI_MATKEY_SHININESS, shininess) == aiReturn_SUCCESS)
+            {
+                material.SetShininess(shininess);
+            }
+
+            if(materialData->Get(AI_MATKEY_OPACITY, opacity) == aiReturn_SUCCESS)
+            {
+                material.SetOpacity(opacity);
+            }
+
+            aiString path;
+            
+            if(materialData->GetTexture(aiTextureType_DIFFUSE, 0, &path) == aiReturn_SUCCESS)
+            {                
+                std::string fullPath = directory + '/' + path.data;
+                
+                std::shared_ptr<Texture> albedo = Texture::Load2D(fullPath);
+                
+                material.SetAlbedoSampler(Sampler::Create(albedo));   
+            }
+            
+            if(materialData->GetTexture(aiTextureType_SPECULAR, 0, &path) == aiReturn_SUCCESS)
+            {
+                std::string fullPath = directory + '/' + path.data;
+
+                std::shared_ptr<Texture> specular = Texture::Load2D(fullPath);
+                
+                material.SetSpecularSampler(Sampler::Create(specular));
+            }
+
+            if(materialData->GetTexture(aiTextureType_NORMALS, 0, &path) == aiReturn_SUCCESS)
+            {
+                std::string fullPath = directory + '/' + path.data;
+
+                std::shared_ptr<Texture> normal = Texture::Load2D(fullPath);
+                
+                material.SetNormalSampler(Sampler::Create(normal));
+            }
+
+            if(materialData->GetTexture(aiTextureType_OPACITY, 0, &path) == aiReturn_SUCCESS)
+            {
+                std::string fullPath = directory + '/' + path.data;
+
+                std::shared_ptr<Texture> opacity = Texture::Load2D(fullPath);
+                
+                material.SetOpacitySampler(Sampler::Create(opacity));
+            }
+
+            model.materials.push_back(std::move(material));
         }
 
         return model;
