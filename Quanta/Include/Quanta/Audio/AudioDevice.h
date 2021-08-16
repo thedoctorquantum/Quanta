@@ -9,8 +9,8 @@ namespace Quanta
     class AudioDevice
     {
     public:
-        static void Initialize(AudioApi api);
-        static void DeInitialize(); 
+        static void Create(AudioApi api);
+        static void Destroy(); 
         
         static AudioApi GetApi();
 

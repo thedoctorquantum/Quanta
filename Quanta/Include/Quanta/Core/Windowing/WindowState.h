@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class WindowState : uint8_t
+    enum class WindowState : UInt8
     {
         Maximized,
         Minimized

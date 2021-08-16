@@ -11,7 +11,7 @@ namespace Quanta
     class OpenGLGraphicsDevice final : public GraphicsDevice
     {
     public:
-        OpenGLGraphicsDevice(const Window* window);
+        OpenGLGraphicsDevice(const Window& window);
     private:
         const OpenGLVertexArray* vertexArray = nullptr;
         const OpenGLRasterPipeline* rasterPipeline = nullptr;

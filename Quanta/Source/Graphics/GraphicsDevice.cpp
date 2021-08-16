@@ -11,9 +11,9 @@ namespace Quanta
         GraphicsApi api = GraphicsApi::OpenGL;
     } static state;
     
-    void GraphicsDevice::Initialize(const Window* window)
+    void GraphicsDevice::Create(const Window& window)
     {
-        GraphicsApi api = window->GetGraphicsApi();
+        GraphicsApi api = window.GetGraphicsApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
 
@@ -28,7 +28,7 @@ namespace Quanta
         state.api = api;
     }
     
-    void GraphicsDevice::DeInitialize()
+    void GraphicsDevice::Destroy()
     {
         delete state.device;
     }

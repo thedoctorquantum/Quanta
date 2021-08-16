@@ -11,10 +11,10 @@
 
 namespace Quanta
 {
-    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const Window* window)
+    OpenGLGraphicsDevice::OpenGLGraphicsDevice(const Window& window)
     {
-        DEBUG_ASSERT(window->GetGraphicsApi() == GraphicsApi::OpenGL);
-
+        DEBUG_ASSERT(window.GetGraphicsApi() == GraphicsApi::OpenGL);
+        
         bool isLoaded = gladLoadGL();
 
         DEBUG_ASSERT(isLoaded);

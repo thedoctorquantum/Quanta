@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <functional>
 
@@ -10,19 +9,17 @@ namespace Quanta
     class Event final
     {
     public:
-        typedef std::function<void(Args...)> Handler;
+        using Handler = std::function<void(Args...)>;
 
-        inline void operator+=(const Handler& handler)
+        void operator+=(const Handler& handler)
         {
             listeners.push_back(handler);
         }
 
-        inline void operator()(Args... args) const
+        void operator()(Args... args) const
         {
-            for(size_t i = 0; i < listeners.size(); i++)
+            for(const Handler& handler : listeners)
             {
-                const Handler& handler = listeners[i];
-
                 handler(args...);
             }
         }

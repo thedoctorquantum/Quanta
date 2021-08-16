@@ -110,6 +110,11 @@ namespace Quanta
         glfwDestroyWindow(handle);
         glfwTerminate();
     }
+    
+    void GlfwWindow::Close()
+    {
+        glfwSetWindowShouldClose(handle, true);
+    }
 
     bool GlfwWindow::Exists() const
     {
@@ -272,7 +277,29 @@ namespace Quanta
     {
         glfwSetWindowSize(handle, GetWidth(), value);
     }
+
+    const std::string& GlfwWindow::GetTitle() const
+    {
+        return title;
+    }
     
+    void GlfwWindow::SetTitle(const std::string& value)
+    {
+        title = value;
+
+        glfwSetWindowTitle(handle, title.c_str());
+    }
+
+    double GlfwWindow::GetTime() const
+    {
+        return glfwGetTime();
+    }
+
+    GraphicsApi GlfwWindow::GetGraphicsApi() const
+    {
+        return graphicsApi;
+    }
+
     const GLFWwindow* GlfwWindow::GetHandle() const
     {
         return handle;
@@ -281,10 +308,5 @@ namespace Quanta
     GLFWwindow* GlfwWindow::GetHandle() 
     {
         return handle;
-    }
-
-    GraphicsApi GlfwWindow::GetGraphicsApi() const
-    {
-        return graphicsApi;
     }
 }

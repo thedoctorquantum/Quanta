@@ -14,8 +14,8 @@ namespace Quanta
     class GraphicsDevice
     {
     public:
-        static void Initialize(const Window* window);
-        static void DeInitialize();
+        static void Create(const Window& window);
+        static void Destroy();
 
         static void ClearBackBuffer(const glm::vec4& color, float depth, int stencil);
 

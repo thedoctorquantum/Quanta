@@ -14,7 +14,8 @@ namespace Quanta
         GlfwWindow(const GlfwWindow&) = delete;
 
         GlfwWindow& operator=(const GlfwWindow&) = delete;
-
+        
+        void Close() override;
         bool Exists() const override;
         void PollEvents() const override;
         void SwapBuffers() const override;
@@ -39,16 +40,21 @@ namespace Quanta
         glm::uvec4 GetBounds() const override;
 
         uint32_t GetX() const override;
-        void SetX(uint32_t value) override;
+        void SetX(uint32_t) override;
 
         uint32_t GetY() const override;
-        void SetY(uint32_t value) override;
+        void SetY(uint32_t) override;
 
         uint32_t GetWidth() const override;
-        void SetWidth(uint32_t value) override;
+        void SetWidth(uint32_t) override;
         
         uint32_t GetHeight() const override;
-        void SetHeight(uint32_t value) override;
+        void SetHeight(uint32_t) override;
+
+        const std::string& GetTitle() const override;
+        void SetTitle(const std::string&) override;
+
+        double GetTime() const override; 
 
         GraphicsApi GetGraphicsApi() const override;
         
@@ -57,6 +63,8 @@ namespace Quanta
     private:
         GLFWwindow* handle;
         GraphicsApi graphicsApi;
+
+        std::string title;
 
         WindowState state;
 

@@ -133,7 +133,7 @@ namespace Quanta::Renderer3D
             vec3 halfwayDirection = normalize(lightDirection + viewDirection);
 
             float diffuseFactor = max(dot(normal, lightDirection), 0.0);
-            float specularFactor = pow(max(dot(normal, halfwayDirection), 0.0), u_Material.shininess);
+            float specularFactor = max(dot(normal, halfwayDirection), 0.0);
 
             ambient += directionalLight.ambient;
             diffuse += directionalLight.diffuse * diffuseFactor;
@@ -157,7 +157,7 @@ namespace Quanta::Renderer3D
                 float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * (distance * distance));    
                 
                 float diffuseFactor = max(dot(normal, lightDirection), 0.0);
-                float specularFactor = pow(max(dot(normal, halfwayDirection), 0.0), u_Material.shininess);
+                float specularFactor = max(dot(normal, halfwayDirection), 0.0);
 
                 ambient += light.ambient * attenuation;
                 diffuse += light.diffuse * diffuseFactor * attenuation;
@@ -176,7 +176,7 @@ namespace Quanta::Renderer3D
 
             ambientContribution *= ambient;
             diffuseContribution *= diffuse;
-            specularContribution *= specular;
+            specularContribution *= pow(specular * float(diffuse != 0.0f), vec3(u_Material.shininess));
 
             return ambientContribution + diffuseContribution + specularContribution;
         }
@@ -311,7 +311,7 @@ namespace Quanta::Renderer3D
 
             ambientContribution *= ambient;
             diffuseContribution *= diffuse;
-            specularContribution *= specular;
+            specularContribution *= specular * float(diffuse != 0.0f);
 
             return ambientContribution + diffuseContribution + specularContribution;
         }

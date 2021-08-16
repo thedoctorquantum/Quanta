@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class Key : int16_t
+    enum class Key : Int16
     {
         Unknown = -1,
         Space = 32,

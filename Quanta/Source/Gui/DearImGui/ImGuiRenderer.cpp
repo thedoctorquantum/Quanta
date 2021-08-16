@@ -21,11 +21,33 @@ namespace Quanta
         std::shared_ptr<Texture> fontTexture = nullptr;
         std::shared_ptr<Sampler> fontSampler = nullptr;
     
-        Window* window = nullptr;
+        std::shared_ptr<Window> window = nullptr;
 
         ImGuiContext* context = nullptr;
         ImGuiIO* io = nullptr;
     } static* state;
+    
+    static void BuildFontAtlas()
+    {
+        if(state->io->Fonts->IsBuilt()) return;
+
+        unsigned char* pixels = nullptr;
+        int width = 0;
+        int height = 0;
+
+        state->io->Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+
+        state->fontTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, width, height, 1);
+
+        state->fontTexture->SetData(pixels);
+
+        state->fontSampler = Sampler::Create(state->fontTexture);
+
+        state->fontSampler->SetMagnification(FilterMode::Linear);
+        state->fontSampler->SetMinification(FilterMode::Linear);
+
+        state->io->Fonts->SetTexID(state->fontSampler.get());
+    }
 
     void OnKeyDown(Key key)
     {
@@ -63,11 +85,11 @@ namespace Quanta
         state->io->AddInputCharacter(character);
     }
     
-    void ImGuiRenderer::Initialize(Window& window)
+    void ImGuiRenderer::Create(const std::shared_ptr<Window>& window)
     {
         state = new State;
 
-        state->window = &window;
+        state->window = window;
 
         state->context = ImGui::CreateContext();
 
@@ -84,13 +106,13 @@ namespace Quanta
         state->io->BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
         state->io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-        window.AddKeyDownCallback(OnKeyDown);
-        window.AddKeyUpCallback(OnKeyUp);
-        window.AddMouseDownCallback(OnMouseDown);
-        window.AddMouseUpCallback(OnMouseUp);
-        window.AddMouseMoveCallback(OnMouseMove);
-        window.AddMouseScrollCallback(OnMouseScroll);
-        window.AddCharacterDownCallback(OnCharacterDown);
+        window->AddKeyDownCallback(OnKeyDown);
+        window->AddKeyUpCallback(OnKeyUp);
+        window->AddMouseDownCallback(OnMouseDown);
+        window->AddMouseUpCallback(OnMouseUp);
+        window->AddMouseMoveCallback(OnMouseMove);
+        window->AddMouseScrollCallback(OnMouseScroll);
+        window->AddCharacterDownCallback(OnCharacterDown);
         
         std::string vertexSource =
             R"(
@@ -181,23 +203,6 @@ namespace Quanta
         state->vertexArray->SetVertexBuffer(state->vertexBuffer, layout);
         state->vertexArray->SetIndexBuffer(state->indexBuffer, IndexType::UInt16);
 
-        unsigned char* pixels = nullptr;
-        int width = 0;
-        int height = 0;
-
-        state->io->Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-
-        state->fontTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, width, height, 1);
-
-        state->fontTexture->SetData(pixels);
-
-        state->fontSampler = Sampler::Create(state->fontTexture);
-
-        state->fontSampler->SetMagnification(FilterMode::Nearest);
-        state->fontSampler->SetMinification(FilterMode::Nearest);
-
-        state->io->Fonts->SetTexID(state->fontSampler.get());
-
         state->io->KeyMap[ImGuiKey_Tab] = static_cast<int>(Key::Tab);
         state->io->KeyMap[ImGuiKey_LeftArrow] = static_cast<int>(Key::Left);
         state->io->KeyMap[ImGuiKey_RightArrow] = static_cast<int>(Key::Right);
@@ -219,13 +224,15 @@ namespace Quanta
         state->io->KeyMap[ImGuiKey_Z] = static_cast<int>(Key::Z);
     }
 
-    void ImGuiRenderer::Shutdown()
+    void ImGuiRenderer::Destroy()
     {
         delete state;
     }
 
     void ImGuiRenderer::Begin(float elapsed)
     {
+        BuildFontAtlas();
+        
         state->io->DisplaySize = ImVec2(static_cast<float>(state->window->GetWidth()), static_cast<float>(state->window->GetHeight()));
         state->io->DeltaTime = elapsed;
         state->io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);

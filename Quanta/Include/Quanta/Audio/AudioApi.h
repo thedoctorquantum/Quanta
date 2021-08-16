@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class AudioApi : uint8_t
+    enum class AudioApi : UInt8
     {
         OpenAL
     };

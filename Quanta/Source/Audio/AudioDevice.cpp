@@ -11,7 +11,7 @@ namespace Quanta
         AudioDevice* device = nullptr;
     } static state;
 
-    void AudioDevice::Initialize(AudioApi api)
+    void AudioDevice::Create(AudioApi api)
     {
         DEBUG_ASSERT(api == AudioApi::OpenAL);
 
@@ -24,7 +24,7 @@ namespace Quanta
         }
     }
 
-    void AudioDevice::DeInitialize()
+    void AudioDevice::Destroy()
     {
         delete state.device;
     }

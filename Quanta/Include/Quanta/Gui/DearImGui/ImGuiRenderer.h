@@ -4,8 +4,8 @@
 
 namespace Quanta::ImGuiRenderer
 {
-    void Initialize(Window& window);
-    void Shutdown();
+    void Create(const std::shared_ptr<Window>& window);
+    void Destroy();
 
     void Begin(float elapsed);
     void End();
