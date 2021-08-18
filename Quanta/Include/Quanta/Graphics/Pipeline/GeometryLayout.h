@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class GeometryLayout : uint8_t
+    enum class GeometryLayout : UInt8
     {
         Triangle,
         TriangleStrip,

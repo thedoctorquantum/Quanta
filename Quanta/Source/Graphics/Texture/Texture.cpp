@@ -2,11 +2,11 @@
 #include <Quanta/Graphics/GraphicsDevice.h>
 
 #include "../../Debugging/Validation.h"
-#include "../../Platform/OpenGL/OpenGLTexture.h"
+#include "../../Platform/OpenGL/Texture.h"
 
 namespace Quanta
 {
-    std::shared_ptr<Texture> Texture::Create(TextureType type, TexelFormat format, size_t width, size_t height, size_t depth)
+    std::shared_ptr<Texture> Texture::Create(TextureType type, TexelFormat format, Size width, Size height, Size depth)
     {
         GraphicsApi api = GraphicsDevice::GetApi();
 
@@ -15,7 +15,7 @@ namespace Quanta
         switch(api)
         {
         case GraphicsApi::OpenGL:
-            return std::make_shared<OpenGLTexture>(type, format, width, height, depth);
+            return std::make_shared<OpenGL::Texture>(type, format, width, height, depth);
         }
         
         return nullptr;
@@ -41,6 +41,4 @@ namespace Quanta
 
         return texture;
     }
-
-    Texture::~Texture() = default;
 }

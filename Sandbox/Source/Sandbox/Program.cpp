@@ -42,8 +42,8 @@ Sandbox::Sandbox()
     
     Quanta::ImGuiRenderer::Create(window);
     Quanta::Renderer3D::Create(*window);
-
-    view.position = { 0.0f, 0.0f, 0.0f };
+    
+    view.matrix = glm::lookAt(glm::vec3(0.0), glm::vec3(0.0), { 0.0f, 1.0f, 0.0f });
 
     view.fieldOfView = 60.0f;
     view.far = 10000.0f;
@@ -163,8 +163,8 @@ void Sandbox::OnUpdate(float frameTime)
 
         ImGui::Spacing();
 
-        ImGui::DragFloat3("CamPos", &view.position.x, 0.125f);
-        ImGui::DragFloat3("CamRot", &view.rotation.x, 0.125f);
+        //ImGui::DragFloat3("CamPos", &view.position.x, 0.125f);
+        //ImGui::DragFloat3("CamRot", &view.rotation.x, 0.125f);
     }
     Quanta::ImGuiRenderer::End();
 

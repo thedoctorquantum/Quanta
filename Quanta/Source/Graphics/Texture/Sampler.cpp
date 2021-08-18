@@ -1,7 +1,7 @@
 #include <Quanta/Graphics/Texture/Sampler.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 
-#include "../../Platform/OpenGL/OpenGLSampler.h"
+#include "../../Platform/OpenGL/Sampler.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
@@ -17,11 +17,9 @@ namespace Quanta
         switch(api)
         {
         case GraphicsApi::OpenGL:
-            return std::make_shared<OpenGLSampler>(texture);            
+            return std::make_shared<OpenGL::Sampler>(texture);            
         }
         
         return nullptr;
     }
-    
-    Sampler::~Sampler() = default;
 }

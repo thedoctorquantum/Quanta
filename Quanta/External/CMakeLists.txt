@@ -19,6 +19,4 @@ add_library("imgui"
     "${CMAKE_CURRENT_SOURCE_DIR}/imgui/imstb_truetype.h"
 )
 
-set_target_properties("imgui" PROPERTIES LINKER_LANGUAGE CXX)
-
 target_include_directories("imgui" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui")

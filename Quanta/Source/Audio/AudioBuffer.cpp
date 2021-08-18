@@ -2,7 +2,7 @@
 #include <Quanta/Audio/AudioDevice.h>
 #include <sndfile.h>
 
-#include "../Platform/OpenAL/OpenALAudioBuffer.h"
+#include "../Platform/OpenAL/AudioBuffer.h"
 #include "../Debugging/Validation.h"
 
 namespace Quanta
@@ -16,7 +16,7 @@ namespace Quanta
         switch(api)
         {
         case AudioApi::OpenAL:
-            return std::make_shared<OpenALAudioBuffer>();
+            return std::make_shared<OpenAL::AudioBuffer>();
         }
 
         return nullptr;
@@ -58,7 +58,7 @@ namespace Quanta
             break;
         }
 
-        int16_t* buffer = new int16_t[sfinfo.frames * sfinfo.channels * sizeof(int16_t)];
+        int16_t* buffer = new int16_t[sfinfo.frames * sfinfo.channels];
 
         sf_count_t frameCount = sf_readf_short(sndfile, buffer, sfinfo.frames);
 

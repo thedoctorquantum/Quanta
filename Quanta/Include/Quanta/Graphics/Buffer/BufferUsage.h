@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class BufferUsage : uint8_t
+    enum class BufferUsage : UInt8
     {
         Static,
         Dynamic

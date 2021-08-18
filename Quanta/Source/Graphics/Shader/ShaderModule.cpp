@@ -1,8 +1,7 @@
-#include <iostream>
 #include <Quanta/Graphics/Shader/ShaderModule.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 
-#include "../../Platform/OpenGL/OpenGLShaderModule.h"
+#include "../../Platform/OpenGL/ShaderModule.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
@@ -16,7 +15,7 @@ namespace Quanta
         switch(api)
         {
         case GraphicsApi::OpenGL:
-            return std::make_shared<OpenGLShaderModule>(type, source);
+            return std::make_shared<OpenGL::ShaderModule>(type, source);
         }
 
         return nullptr;

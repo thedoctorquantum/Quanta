@@ -165,10 +165,10 @@ namespace Quanta
         DEBUG_ASSERT(vertices != nullptr);
 
         size_t size = count * sizeof(Vertex);
- 
+
         if(count > vertexCount)
         {
-            GraphicsBuffer::Resize(*vertexArray->GetVertexBuffer(), size);
+            vertexArray->GetVertexBuffer()->Resize(size);
         }
 
         vertexArray->GetVertexBuffer()->SetData(vertices, size);
@@ -181,10 +181,10 @@ namespace Quanta
         DEBUG_ASSERT(indices != nullptr);
 
         size_t size = count * sizeof(uint32_t);
-
+        
         if(count > indexCount)
         {
-            GraphicsBuffer::Resize(*vertexArray->GetIndexBuffer(), size);
+            vertexArray->GetIndexBuffer()->Resize(size);
         }
 
         vertexArray->GetIndexBuffer()->SetData(indices, size);

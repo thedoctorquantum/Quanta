@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class TexelFormat : uint8_t
+    enum class TexelFormat : UInt8
     {
         Rgba8I,
         Rgba16F,

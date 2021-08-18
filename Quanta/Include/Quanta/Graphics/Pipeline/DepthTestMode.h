@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class DepthTestMode : uint8_t
+    enum class DepthTestMode : UInt8
     {
         None,
         Always,

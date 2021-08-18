@@ -1,7 +1,7 @@
 #include <Quanta/Graphics/Buffer/VertexArray.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 
-#include "../../Platform/OpenGL/OpenGLVertexArray.h"
+#include "../../Platform/OpenGL/VertexArray.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
@@ -14,11 +14,10 @@ namespace Quanta
         
         switch(api)
         {
-        case GraphicsApi::OpenGL: return std::make_shared<OpenGLVertexArray>();
+        case GraphicsApi::OpenGL: 
+            return std::make_shared<OpenGL::VertexArray>();
         }
 
         return nullptr;
     }
-    
-    VertexArray::~VertexArray() = default;
 }

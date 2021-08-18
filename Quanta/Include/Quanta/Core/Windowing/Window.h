@@ -17,7 +17,7 @@ namespace Quanta
     public:
         static std::shared_ptr<Window> Create(GraphicsApi graphicsApi);
 
-        virtual ~Window() = 0;
+        virtual ~Window() = default;
 
         virtual void Close() = 0;
         virtual bool Exists() const = 0;

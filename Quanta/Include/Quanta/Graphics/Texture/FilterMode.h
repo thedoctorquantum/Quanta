@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class FilterMode : uint8_t
+    enum class FilterMode : UInt8
     {
         Nearest,
         Linear,

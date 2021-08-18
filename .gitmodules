@@ -17,3 +17,6 @@
 [submodule "Quanta/External/assimp"]
 	path = Quanta/External/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "QuantaEditor/External/ImGuizmo"]
+	path = QuantaEditor/External/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git

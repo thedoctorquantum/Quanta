@@ -1,7 +1,6 @@
 #pragma once
 
-#include <cstdint>
-#include <cstddef>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
@@ -9,25 +8,25 @@ namespace Quanta
     {
         union 
         {
-            uint32_t PackedValue = 0;
+            UInt32 PackedValue = 0;
             
-            uint8_t RedGreenBlueAlpha[4];
+            UInt8 RedGreenBlueAlpha[4];
             
             struct 
             {
-                uint8_t Red;
-                uint8_t Green;
-                uint8_t Blue;
-                uint8_t Alpha;
+                UInt8 Red;
+                UInt8 Green;
+                UInt8 Blue;
+                UInt8 Alpha;
             };
         };
         
-        uint8_t& operator[](size_t index);
-        const uint8_t& operator[](size_t index) const;
+        UInt8& operator[](Size index);
+        const UInt8& operator[](Size index) const;
         
         Color32() = default;
 
-        Color32(uint32_t value);
-        Color32(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha);
+        Color32(UInt32 value);
+        Color32(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha);
     };   
 }

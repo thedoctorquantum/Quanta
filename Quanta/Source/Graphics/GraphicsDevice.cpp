@@ -1,6 +1,6 @@
 #include <Quanta/Graphics/GraphicsDevice.h>
 
-#include "../Platform/OpenGL/OpenGLGraphicsDevice.h"
+#include "../Platform/OpenGL/GraphicsDevice.h"
 #include "../Debugging/Validation.h"
 
 namespace Quanta
@@ -20,7 +20,7 @@ namespace Quanta
         switch(api)
         {
         case GraphicsApi::OpenGL:
-            state.device = new OpenGLGraphicsDevice(window);
+            state.device = new OpenGL::GraphicsDevice(window);
 
             break;
         }

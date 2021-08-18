@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class FaceCullMode : uint8_t
+    enum class FaceCullMode : UInt8
     {
         None,
         Front,

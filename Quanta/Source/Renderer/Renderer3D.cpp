@@ -2,6 +2,7 @@
 #include <Quanta/Graphics/Pipeline/RasterPipeline.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/trigonometric.hpp>
 
 #include "../Debugging/Validation.h"
@@ -542,7 +543,7 @@ namespace Quanta::Renderer3D
 
         std::shared_ptr<ShaderModule> vertexShader = ShaderModule::Create(ShaderType::Vertex, vertexShaderSource);
 
-        RasterPipelineDescription opaquePipelineDescription;
+        RasterPipeline::Description opaquePipelineDescription;
 
         opaquePipelineDescription.UniformBuffers.push_back(state->uniformView);
         opaquePipelineDescription.UniformBuffers.push_back(state->uniformMaterial);
@@ -560,7 +561,7 @@ namespace Quanta::Renderer3D
         state->opaquePipeline->SetEnableDepthWriting(true);
         state->opaquePipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
 
-        RasterPipelineDescription transparentPipelineDescription;
+        RasterPipeline::Description transparentPipelineDescription;
 
         transparentPipelineDescription.UniformBuffers.push_back(state->uniformView);
         transparentPipelineDescription.UniformBuffers.push_back(state->uniformMaterial);
@@ -580,7 +581,7 @@ namespace Quanta::Renderer3D
         state->transparentPipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
         state->transparentPipeline->SetBlendMode(BlendMode::Add);
 
-        RasterPipelineDescription environmentPipelineDescription;
+        RasterPipeline::Description environmentPipelineDescription;
 
         environmentPipelineDescription.UniformBuffers.push_back(state->uniformView);
 
@@ -645,22 +646,14 @@ namespace Quanta::Renderer3D
         
         state->view = view;
 
-        glm::vec3 target {
-            cos(glm::radians(view.rotation.y)) * cos(glm::radians(view.rotation.x)),
-            sin(glm::radians(view.rotation.y)),
-            cos(glm::radians(view.rotation.y)) * sin(glm::radians(view.rotation.x))
-        };
-
-        target = glm::normalize(target);
-
-        state->shaderView.view = glm::lookAt(view.position, view.position + target, { 0.0f, 1.0f, 0.0f });
+        state->shaderView.view = view.matrix;
         state->shaderView.projection = glm::perspective(glm::radians(view.fieldOfView), state->aspectRatio, view.near, view.far);
 
         state->shaderView.viewProjection = state->shaderView.projection * state->shaderView.view;
 
-        state->shaderView.position = view.position;
-        state->shaderView.rotation = view.rotation;
-        state->shaderView.target = target;
+        state->shaderView.position = { view.matrix[3].x, view.matrix[3].y, view.matrix[3].z };
+        state->shaderView.rotation = glm::vec3(0.0f);
+        state->shaderView.target = glm::vec3(0.0f);
     }
 
     void EndPass()
@@ -673,6 +666,16 @@ namespace Quanta::Renderer3D
         DrawEnvironment();     
         TransparentPass();
     }
+
+    glm::mat4 GetProjectionMatrix()
+    {
+        return state->shaderView.projection;
+    }
+    
+    glm::mat4 GetViewMatrix()
+    {
+        return state->shaderView.view;
+    }
     
     void SetDirectionalLight(const DirectionalLight& light)
     {
@@ -680,7 +683,7 @@ namespace Quanta::Renderer3D
 
         state->uniformDirectionalLight->SetData(&light, sizeof(light));
     }
-
+    
     void SetPointLights(const PointLight* lights, size_t count)
     {
         DEBUG_ASSERT(lights != nullptr);
@@ -690,7 +693,7 @@ namespace Quanta::Renderer3D
 
         if(size > state->uniformPointLights->GetSize())
         {
-            GraphicsBuffer::Resize(*state->uniformPointLights, size);
+            state->uniformPointLights->Resize(size);
         }
 
         state->uniformPointLights->SetData(lights, size);

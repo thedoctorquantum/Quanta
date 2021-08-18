@@ -8,4 +8,3 @@
 #include "Pipeline/GeometryWinding.h"
 #include "Pipeline/PolygonFillMode.h"
 #include "Pipeline/RasterPipeline.h"
-#include "Pipeline/RasterPipelineDescription.h"

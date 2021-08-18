@@ -1,14 +1,12 @@
-#include <iostream>
-#include <glad/glad.h>
 #include <Quanta/Graphics/Pipeline/RasterPipeline.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 
-#include "../../Platform/OpenGL/OpenGLRasterPipeline.h"
+#include "../../Platform/OpenGL/RasterPipeline.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
-    std::shared_ptr<RasterPipeline> RasterPipeline::Create(const RasterPipelineDescription& description)
+    std::shared_ptr<RasterPipeline> RasterPipeline::Create(const RasterPipeline::Description& description)
     {
         GraphicsApi api = GraphicsDevice::GetApi();
 
@@ -17,11 +15,9 @@ namespace Quanta
         switch(api)
         {
         case GraphicsApi::OpenGL: 
-            return std::make_shared<OpenGLRasterPipeline>(description);
+            return std::make_shared<OpenGL::RasterPipeline>(description);
         }
         
         return nullptr;
     } 
-
-    RasterPipeline::~RasterPipeline() = default;
 }

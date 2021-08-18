@@ -11,7 +11,7 @@ namespace Quanta
     public:
         static std::shared_ptr<Sampler> Create(const std::shared_ptr<Texture>& texture);
 
-        virtual ~Sampler() = 0;
+        virtual ~Sampler() = default;
 
         virtual const std::shared_ptr<Texture>& GetTexture() const = 0; 
         

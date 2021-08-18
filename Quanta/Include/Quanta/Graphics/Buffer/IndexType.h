@@ -1,10 +1,10 @@
 #pragma once 
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class IndexType : uint8_t
+    enum class IndexType : UInt8
     {
         UInt8,
         UInt16,

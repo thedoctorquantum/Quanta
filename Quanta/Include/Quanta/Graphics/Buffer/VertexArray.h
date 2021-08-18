@@ -13,7 +13,7 @@ namespace Quanta
     public:
         static std::shared_ptr<VertexArray> Create();
 
-        virtual ~VertexArray() = 0;
+        virtual ~VertexArray() = default;
 
         virtual void SetVertexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, const VertexLayout& layout) = 0;
         virtual void SetIndexBuffer(const std::shared_ptr<GraphicsBuffer>& buffer, IndexType type) = 0;

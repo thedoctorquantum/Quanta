@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class BlendFactor : uint8_t
+    enum class BlendFactor : UInt8
     {
         Zero,
         One,

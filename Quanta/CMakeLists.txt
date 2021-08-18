@@ -2,8 +2,6 @@ file(GLOB_RECURSE SOURCE Source/*.c Source/*.h Source/*.cpp Source/*.hpp)
 
 add_library("${CMAKE_PROJECT_NAME}" STATIC "${SOURCE}")
 
-set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINKER_LANGUAGE CXX)
-
 target_include_directories("${CMAKE_PROJECT_NAME}" 
     PUBLIC 
     

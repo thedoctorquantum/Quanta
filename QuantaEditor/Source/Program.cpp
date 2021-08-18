@@ -5,7 +5,7 @@
 #include "Editor.h"
 
 int main()
-{
+{   
     auto editor = std::make_unique<Quanta::Editor>();
 
     editor->Run();

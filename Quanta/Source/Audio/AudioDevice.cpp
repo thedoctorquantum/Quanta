@@ -1,6 +1,6 @@
 #include <Quanta/Audio/AudioDevice.h>
 
-#include "../Platform/OpenAL/OpenALAudioDevice.h"
+#include "../Platform/OpenAL/AudioDevice.h"
 #include "../Debugging/Validation.h"
 
 namespace Quanta
@@ -18,7 +18,7 @@ namespace Quanta
         switch(api)
         {
         case AudioApi::OpenAL:
-            state.device = new OpenALAudioDevice();
+            state.device = new OpenAL::AudioDevice();
 
             break;
         }

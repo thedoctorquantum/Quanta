@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    const VertexElement& VertexLayout::operator[](uint32_t index) const
+    const VertexElement& VertexLayout::operator[](Size index) const
     {
         DEBUG_ASSERT(index < elements.size());
         
@@ -13,20 +13,20 @@ namespace Quanta
     
     void VertexLayout::Add(const VertexElement& element) 
     {
-        DEBUG_ASSERT(element.Count != 0);
-        DEBUG_ASSERT(element.Size != 0);
+        DEBUG_ASSERT(element.count != 0);
+        DEBUG_ASSERT(element.size != 0);
         
         elements.push_back(element);
 
-        stride += element.Count * element.Size;
+        stride += element.count * element.size;
     }
 
-    uint32_t VertexLayout::GetCount() const
+    Size VertexLayout::GetCount() const
     {
         return elements.size();
     }
 
-    uint32_t VertexLayout::GetStride() const
+    Size VertexLayout::GetStride() const
     {
         return stride;
     }

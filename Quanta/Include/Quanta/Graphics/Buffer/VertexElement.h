@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstddef>
-
 #include "BufferPrimitive.h"
 
 namespace Quanta
@@ -9,11 +7,11 @@ namespace Quanta
     struct VertexElement final
     {
     public:
-        BufferPrimitive Primitve = BufferPrimitive::Float;
-        uint32_t Count = 0;
-        size_t Size = 0;
-        bool Normalized = false;
+        BufferPrimitive primitve = BufferPrimitive::Float;
+        UInt32 count = 0;
+        Size size = 0;
+        bool normalized = false;
         
-        VertexElement(BufferPrimitive primitive, uint32_t count, size_t size, bool normalized);
+        VertexElement(BufferPrimitive primitive, UInt32 count, Size size, bool normalized);
     };
 }

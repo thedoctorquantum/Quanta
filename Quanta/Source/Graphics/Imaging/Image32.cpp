@@ -1,12 +1,11 @@
-#include <stb_image.h>
-#include <iostream>
 #include <Quanta/Graphics/Imaging/Image32.h>
+#include <stb_image.h>
 
 #include "../../Debugging/Validation.h"
 
 namespace Quanta
 {
-    Image32::Image32(size_t width, size_t height)
+    Image32::Image32(Size width, Size height)
     {
         DEBUG_ASSERT(width != 0);
         DEBUG_ASSERT(height != 0);
@@ -17,7 +16,7 @@ namespace Quanta
         this->height = height;
     }
 
-    Image32::Image32(Color32* data, size_t width, size_t height)
+    Image32::Image32(Color32* data, Size width, Size height)
     {
         DEBUG_ASSERT(data != nullptr);   
         DEBUG_ASSERT(width != 0);
@@ -48,11 +47,11 @@ namespace Quanta
     
     std::shared_ptr<Image32> Image32::FromFile(const std::string& filepath)
     {
-        int32_t width;
-        int32_t height;
-        int32_t channels;
+        int width;
+        int height;
+        int channels;
 
-        uint8_t* data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        stbi_uc* data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         
         DEBUG_ASSERT(data != nullptr);
         
@@ -76,21 +75,21 @@ namespace Quanta
         return *this;
     }
 
-    Color32& Image32::operator[](size_t index)
+    Color32& Image32::operator[](Size index)
     {
         DEBUG_ASSERT(index < width * height);
 
         return data[index];
     }
     
-    const Color32& Image32::operator[](size_t index) const
+    const Color32& Image32::operator[](Size index) const
     {
         DEBUG_ASSERT(index < width * height);
 
         return data[index];
     }
 
-    Color32& Image32::operator()(size_t x, size_t y)
+    Color32& Image32::operator()(Size x, Size y)
     {
         DEBUG_ASSERT(x < width);
         DEBUG_ASSERT(y < height);
@@ -98,7 +97,7 @@ namespace Quanta
         return data[x + width * y];
     }
     
-    const Color32& Image32::operator()(size_t x, size_t y) const
+    const Color32& Image32::operator()(Size x, Size y) const
     {
         return this->operator()(x, y);
     }
@@ -113,12 +112,12 @@ namespace Quanta
         return data;
     }
     
-    size_t Image32::GetWidth() const
+    Size Image32::GetWidth() const
     {
         return width;
     }
 
-    size_t Image32::GetHeight() const
+    Size Image32::GetHeight() const
     {
         return height;
     }

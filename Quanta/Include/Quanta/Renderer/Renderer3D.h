@@ -14,9 +14,8 @@ namespace Quanta::Renderer3D
     struct View final
     {
     public:
-        glm::vec3 position = glm::vec3(0.0f);
-        glm::vec3 rotation = glm::vec3(0.0f);
-        
+        glm::mat4 matrix = glm::mat4(1.0f); 
+
         float fieldOfView = 45.0f;
         float near = 0.1f;
         float far = 1000.0f;
@@ -27,6 +26,11 @@ namespace Quanta::Renderer3D
 
     void BeginPass(const View& view);
     void EndPass();
+
+    glm::mat4 GetProjectionMatrix();
+    glm::mat4 GetViewMatrix();
+
+    void SetViewProjection(const glm::mat4&);
     
     void SetDirectionalLight(const DirectionalLight& light);
 

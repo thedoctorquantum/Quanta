@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class ShaderType : uint8_t
+    enum class ShaderType : UInt8
     {
         Vertex,
         Pixel,

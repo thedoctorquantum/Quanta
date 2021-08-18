@@ -1,8 +1,13 @@
 #include <iostream>
 #include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
+#include <Quanta/Graphics/GraphicsDevice.h>
 #include <imgui.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Editor.h"
+#include "Gizmo/ImGuizmo.h"
 
 namespace Quanta
 {
@@ -11,6 +16,7 @@ namespace Quanta
         window->SetTitle("Quanta Editor");
         window->SetState(WindowState::Maximized);
 
+        Renderer3D::Create(*window);
         ImGuiRenderer::Create(window);
 
         ImGuiIO& io = ImGui::GetIO();
@@ -70,18 +76,41 @@ namespace Quanta
         style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
         style.GrabRounding = style.FrameRounding = 2.3f;
+
+        model = Model::FromFile("Resources/Models/test_scene_01.fbx");
+
+        view.fieldOfView = 70.0f;
+        view.far = 10000.0f;
+        view.matrix = glm::mat4(1.0f);
     }
     
     Editor::~Editor()
     {
+        Renderer3D::Destroy();
         ImGuiRenderer::Destroy();
     }
     
     void Editor::OnUpdate(float frameTime)
     {
+        GraphicsDevice::ClearBackBuffer(glm::vec4(1.0f), 1.0f, 0);
+
+        static DirectionalLight light;
+
+        static glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 0.0f });
+
+        Renderer3D::BeginPass(view);
+        {
+            Renderer3D::SetDirectionalLight(light);
+
+            Renderer3D::DrawModel(model, transform);
+        }
+        Renderer3D::EndPass();
+
         ImGuiRenderer::Begin(frameTime);
         {
-            ImGui::DockSpaceOverViewport();
+            ImGuizmo::BeginFrame();
+
+            //ImGui::DockSpaceOverViewport();
 
             if(ImGui::BeginMainMenuBar());
             {
@@ -99,8 +128,22 @@ namespace Quanta
             }
 
             ImGui::ShowMetricsWindow();  
-            ImGui::ShowDemoWindow();          
+            ImGui::ShowDemoWindow();   
+
+            ImGuizmo::SetRect(0, 0, static_cast<float>(window->GetWidth()), static_cast<float>(window->GetHeight()));
+            ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
+            ImGuizmo::AllowAxisFlip(false);
+ 
+            ImGuizmo::ViewManipulate(glm::value_ptr(view.matrix), 100, ImVec2 { 0, 0 }, ImVec2 { 128, 128 }, 0x00FFFFFF);
+
+            glm::mat4 proj = Renderer3D::GetProjectionMatrix();
+            
+            ImGuizmo::Enable(true);
+            
+            ImGuizmo::Manipulate(glm::value_ptr(view.matrix), glm::value_ptr(proj), ImGuizmo::OPERATION::UNIVERSAL, ImGuizmo::MODE::WORLD, glm::value_ptr(transform));
         }   
         ImGuiRenderer::End();
+
+        GraphicsDevice::SetRasterPipeline(nullptr);
     }
 }

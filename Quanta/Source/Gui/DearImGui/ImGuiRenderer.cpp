@@ -162,7 +162,7 @@ namespace Quanta
 
         state->uniformBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::mat4));
 
-        RasterPipelineDescription pipelineDescription;
+        RasterPipeline::Description pipelineDescription;
 
         pipelineDescription.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Vertex, vertexSource));
         pipelineDescription.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Pixel, fragmentSource));
@@ -266,12 +266,12 @@ namespace Quanta
 
         if(totalVertexBuffersize > state->vertexBuffer->GetSize())
         {
-            GraphicsBuffer::Resize(*state->vertexBuffer, totalVertexBuffersize * 2);
+            state->vertexBuffer->Resize(totalVertexBuffersize * 2);
         }
-    
+            
         if(totalIndexBufferSize > state->indexBuffer->GetSize())
         {
-            GraphicsBuffer::Resize(*state->indexBuffer, totalIndexBufferSize * 2);
+            state->indexBuffer->Resize(totalIndexBufferSize * 2);
         }
         
         size_t vertexOffset = 0;

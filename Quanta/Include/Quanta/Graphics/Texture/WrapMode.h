@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class WrapMode : uint8_t
+    enum class WrapMode : UInt8
     {
         Repeat,
         MirroredRepeat,
