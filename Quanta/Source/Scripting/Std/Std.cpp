@@ -1,6 +1,7 @@
 #include "Std.h"
-#include "TypeDefs.h"
-#include "Functions.h"
+#include "TypeDefs/TypeDefs.h"
+#include "Classes/Classes.h"
+#include "Functions/Functions.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta::As_Std
@@ -12,6 +13,9 @@ namespace Quanta::As_Std
         engine->SetDefaultNamespace(ScriptNameSpace);
 
         RegisterTypeDefs(engine);
+        RegisterClasses(engine);
         RegisterFunctions(engine);
+
+        engine->SetDefaultNamespace("");
     }
 }

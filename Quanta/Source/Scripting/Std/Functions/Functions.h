@@ -3,7 +3,7 @@
 #include <angelscript.h>
 #include <string>
 
-#include "TypeDefs.h"
+#include "../TypeDefs/TypeDefs.h"
 
 namespace Quanta::As_Std
 {
