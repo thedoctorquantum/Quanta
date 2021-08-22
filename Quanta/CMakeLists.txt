@@ -5,7 +5,8 @@ add_library("${CMAKE_PROJECT_NAME}" STATIC "${SOURCE}")
 target_include_directories("${CMAKE_PROJECT_NAME}" 
     PUBLIC 
     
-    "${CMAKE_CURRENT_SOURCE_DIR}/Include/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/angelscript/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/glm"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui"
 )
@@ -17,6 +18,7 @@ target_precompile_headers("${CMAKE_PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURC
 target_link_libraries("${CMAKE_PROJECT_NAME}" 
     PUBLIC 
     
+    "angelscript"
     "imgui"
     
     PRIVATE 

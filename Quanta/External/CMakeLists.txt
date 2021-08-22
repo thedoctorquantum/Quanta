@@ -1,3 +1,4 @@
+add_subdirectory("angelscript")
 add_subdirectory("assimp")
 add_subdirectory("glad")
 add_subdirectory("glfw")
