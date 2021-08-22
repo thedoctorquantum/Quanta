@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include "../Math/Integer.h"
 
 namespace Quanta
 {
-    enum class MouseButton : uint8_t
+    enum class MouseButton : UInt8
     {
         One = 0,
         Two = 1,

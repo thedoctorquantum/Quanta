@@ -6,3 +6,4 @@
 #include "Gui.h"
 #include "Input.h"
 #include "Renderer.h"
+#include "Scripting.h"

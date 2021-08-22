@@ -1,10 +1,11 @@
-#include <iostream>
 #include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
+#include <iostream>
 #include <imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <cstdio>
 
 #include "Editor.h"
 #include "Gizmo/ImGuizmo.h"
@@ -82,6 +83,28 @@ namespace Quanta
         view.fieldOfView = 70.0f;
         view.far = 10000.0f;
         view.matrix = glm::mat4(1.0f);
+
+        scriptRuntime = std::make_shared<ScriptRuntime>();
+        
+        std::string source;
+
+        FILE* file = fopen("Resources/Scripts/test.as", "r");
+
+        assert(file != nullptr);
+
+        fseek(file, 0, SEEK_END);
+	    std::size_t len = ftell(file);
+	    fseek(file, 0, SEEK_SET);
+
+        source.resize(len);
+
+        std::size_t result = fread(&source[0], len, 1, file);
+
+        fclose(file);
+
+        script = std::make_unique<Script>(scriptRuntime, source);
+
+        Int32 res = script->Main();
     }
     
     Editor::~Editor()

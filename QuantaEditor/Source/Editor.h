@@ -2,6 +2,8 @@
 
 #include <Quanta/Core/Application.h>
 #include <Quanta/Renderer/Renderer3D.h>
+#include <Quanta/Scripting/ScriptRuntime.h>
+#include <Quanta/Scripting/Script.h>
 
 namespace Quanta
 {
@@ -16,5 +18,8 @@ namespace Quanta
         Renderer3D::View view;
 
         Model model;
+
+        std::shared_ptr<ScriptRuntime> scriptRuntime = nullptr;
+        std::unique_ptr<Script> script = nullptr;
     };
 }

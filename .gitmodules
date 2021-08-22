@@ -20,3 +20,6 @@
 [submodule "QuantaEditor/External/ImGuizmo"]
 	path = QuantaEditor/External/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo.git
+[submodule "Quanta/External/angelscript-mirror"]
+	path = Quanta/External/angelscript-mirror
+	url = https://github.com/codecat/angelscript-mirror.git

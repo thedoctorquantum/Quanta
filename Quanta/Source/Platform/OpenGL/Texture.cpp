@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 
 #include "Texture.h"
-#include "GLEnumConversions.h"
+#include "Conversions.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta::OpenGL
