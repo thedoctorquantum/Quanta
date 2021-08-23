@@ -7,6 +7,7 @@
 #include <map>     
 
 #include "String.h"
+#include "Vectors.h"
 
 namespace Quanta::As_Std
 {
@@ -332,6 +333,22 @@ namespace Quanta::As_Std::String
 
         return &str[i];
     }
+    
+    static std::string operator+(const std::string& string, vec2f32 vec)
+    {
+        std::ostringstream stream;
+        
+        stream << "(";
+        stream << vec.x;
+
+        stream << ',';
+
+        stream << ' ';
+        stream << vec.y;
+        stream << ')';
+
+        return string + stream.str();
+    } 
 
     // AngelScript signature:
     // int string::opCmp(const string &in) const
@@ -743,7 +760,7 @@ namespace Quanta::As_Std::String
         // Register the string type
     #if AS_CAN_USE_CPP11
         // With C++11 it is possible to use asGetTypeTraits to automatically determine the correct flags to use
-        r = engine->RegisterObjectType("String", sizeof(std::string), asOBJ_VALUE | asGetTypeTraits<std::string>()); assert( r >= 0 );
+        r = engine->RegisterObjectType("String", sizeof(std::string), asOBJ_VALUE | asOBJ_ASHANDLE | asGetTypeTraits<std::string>()); assert( r >= 0 );
     #else
         r = engine->RegisterObjectType("String", sizeof(string), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK); assert( r >= 0 );
     #endif
@@ -810,6 +827,8 @@ namespace Quanta::As_Std::String
         r = engine->RegisterObjectMethod("String", "String opAdd(bool) const", asFUNCTION(AddStringBool), asCALL_CDECL_OBJFIRST); assert( r >= 0 );
         r = engine->RegisterObjectMethod("String", "String opAdd_r(bool) const", asFUNCTION(AddBoolString), asCALL_CDECL_OBJLAST); assert( r >= 0 );
 
+        r = engine->RegisterObjectMethod("String", "String opAdd(vec2f32) const", asFUNCTIONPR(operator+, (const std::string&, vec2f32), std::string), asCALL_CDECL_OBJFIRST); assert( r >= 0 );
+
         // Utilities
         r = engine->RegisterObjectMethod("String", "String substr(uint start = 0, int count = -1) const", asFUNCTION(StringSubString), asCALL_CDECL_OBJLAST); assert( r >= 0 );
         r = engine->RegisterObjectMethod("String", "int findFirst(const String &in, uint start = 0) const", asFUNCTION(StringFindFirst), asCALL_CDECL_OBJLAST); assert( r >= 0 );
@@ -820,7 +839,6 @@ namespace Quanta::As_Std::String
         r = engine->RegisterObjectMethod("String", "int findLastNotOf(const String &in, int start = -1) const", asFUNCTION(StringFindLastNotOf), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterObjectMethod("String", "void insert(uint pos, const String &in other)", asFUNCTION(StringInsert), asCALL_CDECL_OBJLAST); assert(r >= 0);
         r = engine->RegisterObjectMethod("String", "void erase(uint pos, int count = -1)", asFUNCTION(StringErase), asCALL_CDECL_OBJLAST); assert(r >= 0);
-
 
         r = engine->RegisterGlobalFunction("String formatInt(int64 val, const String &in options = \"\", uint width = 0)", asFUNCTION(formatInt), asCALL_CDECL); assert(r >= 0);
         r = engine->RegisterGlobalFunction("String formatUInt(uint64 val, const String &in options = \"\", uint width = 0)", asFUNCTION(formatUInt), asCALL_CDECL); assert(r >= 0);

@@ -7,8 +7,10 @@
 
 namespace Quanta::As_Std
 {
-    void Print(const std::string& string);
-    void PutChar(Char character);
+    void print(const std::string& string);
+    void putchar(char character);
+    void _throw(const std::string& message);
+    std::string get_exception();
 
     void RegisterFunctions(asIScriptEngine* engine);
 }

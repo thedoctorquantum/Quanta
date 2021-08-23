@@ -104,7 +104,7 @@ namespace Quanta
 
         script = std::make_unique<Script>(scriptRuntime, source);
 
-        Int32 res = script->Main();
+        script->Main();
     }
     
     Editor::~Editor()

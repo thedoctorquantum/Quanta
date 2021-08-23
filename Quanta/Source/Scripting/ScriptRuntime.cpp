@@ -29,6 +29,20 @@ namespace Quanta
         std::printf("[SCRIPT_COMPILER] %s (%d, %d) : [%s] : [%s]\n", message->section, message->row, message->col, type, message->message);
     };
 
+    static void ExceptionCallback(asIScriptContext* context, void* userParam)
+    {
+        try 
+        {
+            throw;
+        }
+        catch(const std::exception& exception)
+        {
+            std::printf("[SCRIPT] [EXCEPTION_THROWN] (Script terminated): %s\n", exception.what());
+
+            context->SetException(exception.what());
+        }
+    }
+    
     ScriptRuntime::ScriptRuntime()
     {
         engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
@@ -46,6 +60,8 @@ namespace Quanta
         {
             engine->SetMessageCallback(asFUNCTION(MessageCallback), nullptr, asCALL_CDECL);
         }
+
+        engine->SetTranslateAppExceptionCallback(asFUNCTION(ExceptionCallback), nullptr, asCALL_CDECL);
 
         As_Std::Configure(engine);
     }

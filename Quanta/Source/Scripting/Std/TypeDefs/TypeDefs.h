@@ -6,21 +6,20 @@
 
 namespace Quanta::As_Std
 {
-    using ::Quanta::Int8;
-    using ::Quanta::Int16;
-    using ::Quanta::Int32;
-    using ::Quanta::Int64;
+    using i8 = Int8;
+    using i16 = Int16;
+    using i32 = Int32;
+    using i64 = Int64;
+    using isize = ssize_t;
 
-    using ::Quanta::UInt8;
-    using ::Quanta::UInt16;
-    using ::Quanta::UInt32;
-    using ::Quanta::UInt64;
+    using u8 = UInt8;
+    using u16 = UInt16;
+    using u32 = UInt32;
+    using u64 = UInt64;
+    using usize = Size;
 
-    using ::Quanta::Char;
-    using ::Quanta::WChar;
-
-    using ::Quanta::Float32;
-    using ::Quanta::Float64;
-
+    using f32 = Float32;
+    using f64 = Float64;
+        
     void RegisterTypeDefs(asIScriptEngine* engine);
 }
