@@ -2,18 +2,10 @@
 
 #include <angelscript.h>
 
-namespace Quanta
+namespace Quanta::ScriptRuntime
 {
-    class Script;
-
-    class ScriptRuntime final 
-    {
-        friend class Script; 
-    public:
-        ScriptRuntime();
-        ~ScriptRuntime();
-    private:
-        asIScriptEngine* engine = nullptr;
-        asIScriptContext* context = nullptr;
-    };
+    void Create();
+    void Destroy();
+    
+    asIScriptEngine* GetEngine();
 }

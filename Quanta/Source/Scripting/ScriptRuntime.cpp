@@ -1,8 +1,9 @@
 #include <Quanta/Scripting/ScriptRuntime.h>
+#include <angelscript.h>
 #include <cstdio>
 
 #include "../Debugging/Validation.h"
-#include "Std/Std.h"
+#include "As/Std/Std.h"
 
 namespace Quanta
 {
@@ -43,32 +44,35 @@ namespace Quanta
         }
     }
     
-    ScriptRuntime::ScriptRuntime()
+    static asIScriptEngine* engine = nullptr;
+
+    void ScriptRuntime::Create()
     {
-        engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
+        engine = asCreateScriptEngine();
 
         DEBUG_ASSERT(engine != nullptr);
 
         engine->SetEngineProperty(asEP_REQUIRE_ENUM_SCOPE, true);
         engine->SetEngineProperty(asEP_USE_CHARACTER_LITERALS, true);
-
-        context = engine->CreateContext();
-
-        DEBUG_ASSERT(context != nullptr);
+        engine->SetEngineProperty(asEP_SCRIPT_SCANNER, 0);
 
         if constexpr (DEBUG)
         {
             engine->SetMessageCallback(asFUNCTION(MessageCallback), nullptr, asCALL_CDECL);
         }
-
+        
         engine->SetTranslateAppExceptionCallback(asFUNCTION(ExceptionCallback), nullptr, asCALL_CDECL);
-
-        As_Std::Configure(engine);
+        
+        As::Std::Register(engine);
     }
     
-    ScriptRuntime::~ScriptRuntime()
+    void ScriptRuntime::Destroy()
     {
-        context->Release();
         engine->Release();
+    }
+    
+    asIScriptEngine* ScriptRuntime::GetEngine() 
+    {
+        return engine;
     }
 }

@@ -18,8 +18,7 @@ namespace Quanta
         Renderer3D::View view;
 
         Model model;
-
-        std::shared_ptr<ScriptRuntime> scriptRuntime = nullptr;
+        
         std::unique_ptr<Script> script = nullptr;
     };
 }

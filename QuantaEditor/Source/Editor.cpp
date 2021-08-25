@@ -84,7 +84,7 @@ namespace Quanta
         view.far = 10000.0f;
         view.matrix = glm::mat4(1.0f);
 
-        scriptRuntime = std::make_shared<ScriptRuntime>();
+        ScriptRuntime::Create();
         
         std::string source;
 
@@ -101,14 +101,15 @@ namespace Quanta
         std::size_t result = fread(&source[0], len, 1, file);
 
         fclose(file);
-
-        script = std::make_unique<Script>(scriptRuntime, source);
+        
+        script = std::make_unique<Script>(source);
 
         script->Main();
     }
     
     Editor::~Editor()
     {
+        ScriptRuntime::Destroy();
         Renderer3D::Destroy();
         ImGuiRenderer::Destroy();
     }

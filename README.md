@@ -10,7 +10,7 @@ A C++, cross platform desktop game engine with a focus on data oriented and data
 * A data oriented ECS (Entity Component System) scene archetecture.
 * Data driven configuration via Json and Xml
 * A data driven UI system controlled via a markup language
-* Extensive scripting via Python
+* Extensive scripting via AngelScript
 
 ---
 
