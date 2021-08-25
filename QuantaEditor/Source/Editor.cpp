@@ -1,5 +1,6 @@
 #include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
+#include <Quanta/IO/FileStream.h>
 #include <iostream>
 #include <imgui.h>
 #include <glm/glm.hpp>
@@ -86,22 +87,10 @@ namespace Quanta
 
         ScriptRuntime::Create();
         
-        std::string source;
+        FileStream stream("Resources/Scripts/test.as", FileStream::Mode::Read);
 
-        FILE* file = fopen("Resources/Scripts/test.as", "r");
+        std::string source = stream.ReadAllText();
 
-        assert(file != nullptr);
-
-        fseek(file, 0, SEEK_END);
-	    std::size_t len = ftell(file);
-	    fseek(file, 0, SEEK_SET);
-
-        source.resize(len);
-
-        std::size_t result = fread(&source[0], len, 1, file);
-
-        fclose(file);
-        
         script = std::make_unique<Script>(source);
 
         script->Main();
