@@ -4,11 +4,12 @@
 
 namespace Quanta
 {
-    static const char* modes[3] = { "r", "w", "a" };
-
+    static const char* modes[] = { "r", "w", "rw", "a" };
+    
     FileStream::FileStream(const std::string& path, Mode mode)
     {
         this->path = path;
+        this->mode = mode;
 
         handle = std::fopen(path.c_str(), modes[static_cast<std::size_t>(mode)]);
 
@@ -42,14 +43,14 @@ namespace Quanta
 
     void FileStream::WriteAllText(const std::string& text)
     {
-        DEBUG_ASSERT(mode == Mode::Write);
+        DEBUG_ASSERT(mode == Mode::Write || mode == Mode::ReadWrite);
 
         std::fwrite(text.data(), text.size(), text.size(), handle);
     }
 
     void FileStream::WriteAllBytes(const std::vector<UInt8>& bytes)
     {
-        DEBUG_ASSERT(mode == Mode::Write);
+        DEBUG_ASSERT(mode == Mode::Write || mode == Mode::ReadWrite);
 
         std::fwrite(bytes.data(), bytes.size(), bytes.size(), handle);
     }

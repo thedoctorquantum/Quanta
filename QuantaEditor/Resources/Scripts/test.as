@@ -6,6 +6,6 @@ int32 Main()
     str += ", world!";
 
     Std::Print(str);
-
+    
     return 0;
 }

@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <cstdio>
 
 #include "Editor.h"
 #include "Gizmo/ImGuizmo.h"
@@ -86,7 +85,7 @@ namespace Quanta
         view.matrix = glm::mat4(1.0f);
 
         ScriptRuntime::Create();
-        
+
         FileStream stream("Resources/Scripts/test.as", FileStream::Mode::Read);
 
         std::string source = stream.ReadAllText();
@@ -95,7 +94,7 @@ namespace Quanta
 
         script->Main();
     }
-    
+
     Editor::~Editor()
     {
         ScriptRuntime::Destroy();

@@ -15,6 +15,7 @@ namespace Quanta
         {
             Read,
             Write,
+            ReadWrite,
             Append
         };
 
