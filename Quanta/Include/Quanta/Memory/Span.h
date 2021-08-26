@@ -10,13 +10,13 @@ namespace Quanta
     public:
         Span(T* pointer) : Span(pointer, 1) { };
 
-        Span(T* pointer, Size size)
+        Span(T* pointer, USize size)
         {
             this->pointer = pointer;
             this->size = size;
         }
 
-        T& operator[](Size index) const
+        T& operator[](USize index) const
         {
             return pointer[index];
         }
@@ -36,12 +36,12 @@ namespace Quanta
             return pointer;
         }
 
-        Size GetLength() const
+        USize GetLength() const
         {
             return length;
         }
     private:
         T* pointer = nullptr;
-        Size length = 0;
+        USize length = 0;
     };
 }

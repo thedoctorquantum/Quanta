@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class BufferUsage : UInt8
+    enum class BufferUsage : U8
     {
         Static,
         Dynamic

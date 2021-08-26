@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class GeometryLayout : UInt8
+    enum class GeometryLayout : U8
     {
         Triangle,
         TriangleStrip,

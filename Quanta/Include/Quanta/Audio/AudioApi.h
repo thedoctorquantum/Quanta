@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class AudioApi : UInt8
+    enum class AudioApi : U8
     {
         OpenAL
     };

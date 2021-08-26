@@ -1,10 +1,6 @@
 #include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
-#include <Quanta/Graphics/Buffer/GraphicsBuffer.h>
-#include <Quanta/Graphics/Buffer/VertexArray.h>
-#include <Quanta/Graphics/Pipeline/RasterPipeline.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 
 #include "../../Debugging/Validation.h"

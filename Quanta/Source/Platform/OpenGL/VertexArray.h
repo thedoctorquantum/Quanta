@@ -22,13 +22,13 @@ namespace Quanta::OpenGL
         
         IndexType GetIndexType() const override;
                 
-        UInt32 GetHandle() const;
+        U32 GetHandle() const;
     private:
         std::shared_ptr<Quanta::GraphicsBuffer> vertexBuffer = nullptr;
         std::shared_ptr<Quanta::GraphicsBuffer> indexBuffer = nullptr;
         
         IndexType indexType = IndexType::UInt32;
         
-        UInt32 handle = 0;
+        U32 handle = 0;
     };
 }

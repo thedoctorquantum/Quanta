@@ -25,7 +25,7 @@ namespace Quanta::OpenGL
         void InternalSetRasterPipeline(const Quanta::RasterPipeline* value) override;
         void InternalSetVertexArray(const Quanta::VertexArray* value) override;
         
-        void InternalBindSampler(const Quanta::Sampler* sampler, Size index) override;
+        void InternalBindSampler(const Quanta::Sampler* sampler, USize index) override;
         
         void InternalDispatchDraw(const DrawCommand& command) override;
     };

@@ -10,8 +10,8 @@ namespace Quanta
     class Image32 final
     {
     public:
-        Image32(Size width, Size height);
-        Image32(Color32* data, Size width, Size height);
+        Image32(USize width, USize height);
+        Image32(Color32* data, USize width, USize height);
 
         ~Image32();
         
@@ -25,21 +25,21 @@ namespace Quanta
 
         Image32& operator=(Image32&& other) noexcept;
 
-        Color32& operator[](Size index);
-        const Color32& operator[](Size index) const;
+        Color32& operator[](USize index);
+        const Color32& operator[](USize index) const;
 
-        Color32& operator()(Size x, Size y);
-        const Color32& operator()(Size x, Size y) const;
+        Color32& operator()(USize x, USize y);
+        const Color32& operator()(USize x, USize y) const;
         
         const Color32* GetData() const;
         Color32* GetData();
         
-        Size GetWidth() const;
-        Size GetHeight() const;
+        USize GetWidth() const;
+        USize GetHeight() const;
     private:
         Color32* data = nullptr;
 
-        Size width = 0;
-        Size height = 0;
+        USize width = 0;
+        USize height = 0;
     };
 }

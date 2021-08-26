@@ -44,7 +44,7 @@ namespace Quanta
         DEBUG_ASSERT(handle != 0);
 
         const char* sourcePointer = source.c_str();
-        Size length = source.length();
+        USize length = source.length();
         
         glShaderSource(handle, 1, &sourcePointer, reinterpret_cast<GLint*>(&length));
         
@@ -74,7 +74,7 @@ namespace Quanta
         glDeleteShader(handle);
     }
     
-    UInt32 OpenGL::ShaderModule::GetHandle() const
+    U32 OpenGL::ShaderModule::GetHandle() const
     {
         return handle;
     }

@@ -11,7 +11,7 @@ namespace Quanta
     class FileStream final 
     {
     public:
-        enum class Mode : UInt8
+        enum class Mode : U8
         {
             Read,
             Write,
@@ -23,10 +23,10 @@ namespace Quanta
         ~FileStream();
 
         std::string ReadAllText() const;
-        std::vector<UInt8> ReadAllBytes() const;      
+        std::vector<U8> ReadAllBytes() const;      
 
         void WriteAllText(const std::string& text);        
-        void WriteAllBytes(const std::vector<UInt8>& bytes);   
+        void WriteAllBytes(const std::vector<U8>& bytes);   
 
         std::size_t GetSize() const;
 

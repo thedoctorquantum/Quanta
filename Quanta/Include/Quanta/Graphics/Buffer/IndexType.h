@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class IndexType : UInt8
+    enum class IndexType : U8
     {
         UInt8,
         UInt16,

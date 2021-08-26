@@ -4,12 +4,12 @@
 
 namespace Quanta
 {
-    Color32::Color32(UInt32 value)
+    Color32::Color32(U32 value)
     {
         PackedValue = value;
     }
 
-    Color32::Color32(UInt8 red, UInt8 green, UInt8 blue, UInt8 alpha)
+    Color32::Color32(U8 red, U8 green, U8 blue, U8 alpha)
     {
         Red = red;
         Green = green;
@@ -17,14 +17,14 @@ namespace Quanta
         Alpha = alpha;
     }
 
-    UInt8& Color32::operator[](Size index)
+    U8& Color32::operator[](USize index)
     {
         DEBUG_ASSERT(index < 3);
         
         return RedGreenBlueAlpha[index];
     }
     
-    const UInt8& Color32::operator[](Size index) const
+    const U8& Color32::operator[](USize index) const
     {
         DEBUG_ASSERT(index < 3);
 

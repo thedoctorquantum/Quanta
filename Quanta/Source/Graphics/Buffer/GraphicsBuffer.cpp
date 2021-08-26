@@ -6,7 +6,7 @@
 
 namespace Quanta
 {
-    std::shared_ptr<GraphicsBuffer> GraphicsBuffer::Create(BufferUsage usage, Size size)
+    std::shared_ptr<GraphicsBuffer> GraphicsBuffer::Create(BufferUsage usage, USize size)
     {
         GraphicsApi api = GraphicsDevice::GetApi();
 

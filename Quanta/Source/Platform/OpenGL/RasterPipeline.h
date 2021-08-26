@@ -14,13 +14,13 @@ namespace Quanta::OpenGL
 
         RasterPipeline& operator=(const RasterPipeline&) = delete; 
 
-        const std::shared_ptr<Quanta::ShaderModule>& GetShaderModule(Size index) const override;
-        const std::shared_ptr<Quanta::GraphicsBuffer>& GetUniformBuffer(Size index) const override;
-        const std::shared_ptr<Quanta::GraphicsBuffer>& GetStorageBuffer(Size index) const override;
+        const std::shared_ptr<Quanta::ShaderModule>& GetShaderModule(USize index) const override;
+        const std::shared_ptr<Quanta::GraphicsBuffer>& GetUniformBuffer(USize index) const override;
+        const std::shared_ptr<Quanta::GraphicsBuffer>& GetStorageBuffer(USize index) const override;
         
-        Size GetShaderModuleCount() const override;
-        Size GetUniformBufferCount() const override;
-        Size GetStorageBufferCount() const override;
+        USize GetShaderModuleCount() const override;
+        USize GetUniformBufferCount() const override;
+        USize GetStorageBufferCount() const override;
 
         const glm::uvec4& GetViewport() const override;
         void SetViewport(const glm::uvec4&) override;
@@ -55,9 +55,9 @@ namespace Quanta::OpenGL
         GeometryWinding GetGeometryWinding() const override;
         void SetGeometryWinding(GeometryWinding) override;
 
-        UInt32 GetHandle() const;
+        U32 GetHandle() const;
     private:
-        UInt32 handle = 0;
+        U32 handle = 0;
         
         std::vector<std::shared_ptr<Quanta::ShaderModule>> shaderModules;
         std::vector<std::shared_ptr<Quanta::GraphicsBuffer>> uniformBuffers;

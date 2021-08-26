@@ -6,7 +6,7 @@
 
 namespace Quanta
 {
-    std::shared_ptr<Texture> Texture::Create(TextureType type, TexelFormat format, Size width, Size height, Size depth)
+    std::shared_ptr<Texture> Texture::Create(TextureType type, TexelFormat format, USize width, USize height, USize depth)
     {
         GraphicsApi api = GraphicsDevice::GetApi();
 

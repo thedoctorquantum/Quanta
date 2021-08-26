@@ -31,13 +31,13 @@ namespace Quanta
 
         virtual ~RasterPipeline() = default;
 
-        virtual const std::shared_ptr<ShaderModule>& GetShaderModule(Size index) const = 0;
-        virtual const std::shared_ptr<GraphicsBuffer>& GetUniformBuffer(Size index) const = 0;
-        virtual const std::shared_ptr<GraphicsBuffer>& GetStorageBuffer(Size index) const = 0;
+        virtual const std::shared_ptr<ShaderModule>& GetShaderModule(USize index) const = 0;
+        virtual const std::shared_ptr<GraphicsBuffer>& GetUniformBuffer(USize index) const = 0;
+        virtual const std::shared_ptr<GraphicsBuffer>& GetStorageBuffer(USize index) const = 0;
         
-        virtual Size GetShaderModuleCount() const = 0;
-        virtual Size GetUniformBufferCount() const = 0;
-        virtual Size GetStorageBufferCount() const = 0;
+        virtual USize GetShaderModuleCount() const = 0;
+        virtual USize GetUniformBufferCount() const = 0;
+        virtual USize GetStorageBufferCount() const = 0;
 
         virtual const glm::uvec4& GetViewport() const = 0;
         virtual void SetViewport(const glm::uvec4&) = 0;

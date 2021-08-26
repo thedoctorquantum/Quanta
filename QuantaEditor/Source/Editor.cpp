@@ -24,8 +24,8 @@ namespace Quanta
         
         io.FontDefault = io.Fonts->AddFontFromFileTTF("Resources/Fonts/Consolas-Font/CONSOLA.TTF", 15.0f);
 
-        ImGuiStyle& style = ImGui::GetStyle();
-        
+        ImGuiStyle& style = ImGui::GetStyle();        
+
         style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
         style.Colors[ImGuiCol_WindowBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
@@ -77,7 +77,7 @@ namespace Quanta
         style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
         style.GrabRounding = style.FrameRounding = 2.3f;
-
+        
         model = Model::FromFile("Resources/Models/test_scene_01.fbx");
 
         view.fieldOfView = 70.0f;

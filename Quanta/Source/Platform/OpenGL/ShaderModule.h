@@ -14,8 +14,8 @@ namespace Quanta::OpenGL
 
         ShaderModule& operator=(const ShaderModule&) = delete;
         
-        UInt32 GetHandle() const;
+        U32 GetHandle() const;
     private:
-        UInt32 handle;
+        U32 handle;
     };
 }

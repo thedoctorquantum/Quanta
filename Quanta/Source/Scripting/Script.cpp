@@ -25,7 +25,7 @@ namespace Quanta
         module->Discard();
     }
     
-    Int32 Script::Main()
+    I32 Script::Main()
     {
         asIScriptFunction* main = module->GetFunctionByDecl("int32 Main()");
 
@@ -39,6 +39,6 @@ namespace Quanta
 
         context->Unprepare();
 
-        return static_cast<Int32>(exit);
+        return static_cast<I32>(exit);
     } 
 }

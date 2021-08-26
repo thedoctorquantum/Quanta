@@ -6,7 +6,7 @@
 
 namespace Quanta::OpenGL
 {
-    Texture::Texture(TextureType type, TexelFormat format, Size width, Size height, Size depth)
+    Texture::Texture(TextureType type, TexelFormat format, USize width, USize height, USize depth)
     {
         this->width = width;
         this->height = height;
@@ -102,7 +102,7 @@ namespace Quanta::OpenGL
         } 
     }
     
-    void Texture::SetData(const void* data, Size xOffset, Size yOffset, Size zOffset)
+    void Texture::SetData(const void* data, USize xOffset, USize yOffset, USize zOffset)
     {
         DEBUG_ASSERT(data != nullptr);
 
@@ -137,22 +137,22 @@ namespace Quanta::OpenGL
         return format;
     }
 
-    Size Texture::GetWidth() const
+    USize Texture::GetWidth() const
     {
         return width;
     }
 
-    Size Texture::GetHeight() const
+    USize Texture::GetHeight() const
     {
         return height;
     }
 
-    Size Texture::GetDepth() const
+    USize Texture::GetDepth() const
     {
         return depth;
     }
     
-    UInt32 Texture::GetHandle() const
+    U32 Texture::GetHandle() const
     {
         return handle;
     }

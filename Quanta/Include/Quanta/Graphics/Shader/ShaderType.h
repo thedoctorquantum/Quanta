@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class ShaderType : UInt8
+    enum class ShaderType : U8
     {
         Vertex,
         Pixel,

@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class BufferPrimitive : UInt8
+    enum class BufferPrimitive : U8
     {
         Float,
         Double, 

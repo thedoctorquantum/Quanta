@@ -5,8 +5,8 @@
 
 namespace Quanta::As::Std
 {
-    using F32 = Float32;
-    using F64 = Float64;
+    using F32 = F32;
+    using F64 = F64;
     
     void RegisterFloats(asIScriptEngine* engine);
 }

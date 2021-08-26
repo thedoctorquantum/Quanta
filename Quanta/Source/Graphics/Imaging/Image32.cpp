@@ -5,7 +5,7 @@
 
 namespace Quanta
 {
-    Image32::Image32(Size width, Size height)
+    Image32::Image32(USize width, USize height)
     {
         DEBUG_ASSERT(width != 0);
         DEBUG_ASSERT(height != 0);
@@ -16,7 +16,7 @@ namespace Quanta
         this->height = height;
     }
 
-    Image32::Image32(Color32* data, Size width, Size height)
+    Image32::Image32(Color32* data, USize width, USize height)
     {
         DEBUG_ASSERT(data != nullptr);   
         DEBUG_ASSERT(width != 0);
@@ -75,21 +75,21 @@ namespace Quanta
         return *this;
     }
 
-    Color32& Image32::operator[](Size index)
+    Color32& Image32::operator[](USize index)
     {
         DEBUG_ASSERT(index < width * height);
 
         return data[index];
     }
     
-    const Color32& Image32::operator[](Size index) const
+    const Color32& Image32::operator[](USize index) const
     {
         DEBUG_ASSERT(index < width * height);
 
         return data[index];
     }
 
-    Color32& Image32::operator()(Size x, Size y)
+    Color32& Image32::operator()(USize x, USize y)
     {
         DEBUG_ASSERT(x < width);
         DEBUG_ASSERT(y < height);
@@ -97,7 +97,7 @@ namespace Quanta
         return data[x + width * y];
     }
     
-    const Color32& Image32::operator()(Size x, Size y) const
+    const Color32& Image32::operator()(USize x, USize y) const
     {
         return this->operator()(x, y);
     }
@@ -112,12 +112,12 @@ namespace Quanta
         return data;
     }
     
-    Size Image32::GetWidth() const
+    USize Image32::GetWidth() const
     {
         return width;
     }
 
-    Size Image32::GetHeight() const
+    USize Image32::GetHeight() const
     {
         return height;
     }

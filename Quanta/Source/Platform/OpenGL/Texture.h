@@ -8,30 +8,30 @@ namespace Quanta::OpenGL
     class Texture final : public Quanta::Texture
     {
     public:
-        Texture(TextureType type, TexelFormat format, Size width, Size height, Size depth);
+        Texture(TextureType type, TexelFormat format, USize width, USize height, USize depth);
         ~Texture();
 
         void SetData(const void* data) override;
 
-        void SetData(const void* data, Size xOffset, Size yOffset, Size zOffset) override;
+        void SetData(const void* data, USize xOffset, USize yOffset, USize zOffset) override;
 
         TextureType GetType() const override;
         TexelFormat GetFormat() const override;
 
-        Size GetWidth() const override;
-        Size GetHeight() const override;
-        Size GetDepth() const override;
+        USize GetWidth() const override;
+        USize GetHeight() const override;
+        USize GetDepth() const override;
 
-        UInt32 GetHandle() const;
+        U32 GetHandle() const;
     private:
         TextureType type = TextureType::Texture1D;
         TexelFormat format = TexelFormat::Rgba8I;
 
-        Size width = 0;
-        Size height = 0;
-        Size depth = 0;
+        USize width = 0;
+        USize height = 0;
+        USize depth = 0;
 
-        UInt32 handle = 0;
+        U32 handle = 0;
 
         GLenum glPixelFormat = 0;
         GLenum glInternalFormat = 0;

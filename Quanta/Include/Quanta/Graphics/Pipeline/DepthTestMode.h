@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class DepthTestMode : UInt8
+    enum class DepthTestMode : U8
     {
         None,
         Always,

@@ -13,7 +13,7 @@ namespace Quanta
         Script(const std::string& source);
         ~Script();
 
-        Int32 Main(); 
+        I32 Main(); 
     private:
         asIScriptModule* module = nullptr;  
         asIScriptContext* context = nullptr;

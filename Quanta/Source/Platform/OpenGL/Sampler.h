@@ -27,7 +27,7 @@ namespace Quanta::OpenGL
         WrapMode GetWrapModeZ() const override;
         void SetWrapModeZ(WrapMode) override;
 
-        UInt32 GetHandle() const;
+        U32 GetHandle() const;
     private:
         std::shared_ptr<Quanta::Texture> texture = nullptr;
         
@@ -38,6 +38,6 @@ namespace Quanta::OpenGL
         WrapMode wrapModeY = WrapMode::Repeat;
         WrapMode wrapModeZ = WrapMode::Repeat;
 
-        UInt32 handle = 0;
+        U32 handle = 0;
     };
 }

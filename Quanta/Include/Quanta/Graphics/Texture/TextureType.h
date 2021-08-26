@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class TextureType : UInt8
+    enum class TextureType : U8
     {
         Texture1D,
         Texture2D,

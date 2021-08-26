@@ -106,7 +106,7 @@ namespace Quanta
         glSamplerParameteri(handle, GL_TEXTURE_WRAP_R, WrapModeToGLenum(value));
     }
     
-    UInt32 OpenGL::Sampler::GetHandle() const
+    U32 OpenGL::Sampler::GetHandle() const
     {
         return handle;
     }

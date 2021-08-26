@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class BlendMode : UInt8
+    enum class BlendMode : U8
     {
         None,
         Add,

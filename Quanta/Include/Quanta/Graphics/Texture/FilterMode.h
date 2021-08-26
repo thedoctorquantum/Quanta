@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class FilterMode : UInt8
+    enum class FilterMode : U8
     {
         Nearest,
         Linear,

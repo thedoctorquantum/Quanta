@@ -7,7 +7,7 @@ namespace Quanta::OpenGL
     class GraphicsBuffer final : public Quanta::GraphicsBuffer
     {
     public:
-        GraphicsBuffer(BufferUsage usage, Size size);
+        GraphicsBuffer(BufferUsage usage, USize size);
         ~GraphicsBuffer();
 
         GraphicsBuffer(const GraphicsBuffer&) = delete; 
@@ -17,19 +17,19 @@ namespace Quanta::OpenGL
         void* MapData() override;
         void UnmapData() override;
         
-        void SetData(const void* data, Size size) override;
-        void SetData(const void* data, Size size, Size offset) override;
+        void SetData(const void* data, USize size) override;
+        void SetData(const void* data, USize size, USize offset) override;
         
-        void Resize(Size size);
+        void Resize(USize size);
 
         BufferUsage GetUsage() const override;
-        Size GetSize() const override;
+        USize GetSize() const override;
 
-        UInt32 GetHandle() const;
+        U32 GetHandle() const;
     private:
         BufferUsage usage = BufferUsage::Static;
-        Size size = 0;
+        USize size = 0;
         
-        UInt32 handle = 0;
+        U32 handle = 0;
     };
 }

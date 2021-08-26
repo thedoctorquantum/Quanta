@@ -78,21 +78,21 @@ namespace Quanta::OpenGL
         glDeleteProgram(handle);
     }
 
-    const std::shared_ptr<Quanta::ShaderModule>& RasterPipeline::GetShaderModule(Size index) const
+    const std::shared_ptr<Quanta::ShaderModule>& RasterPipeline::GetShaderModule(USize index) const
     {
         DEBUG_ASSERT(index < shaderModules.size());
 
         return shaderModules[index];
     }
     
-    const std::shared_ptr<Quanta::GraphicsBuffer>& RasterPipeline::GetUniformBuffer(Size index) const
+    const std::shared_ptr<Quanta::GraphicsBuffer>& RasterPipeline::GetUniformBuffer(USize index) const
     {
         DEBUG_ASSERT(index < uniformBuffers.size());
 
         return uniformBuffers[index];
     }
     
-    const std::shared_ptr<Quanta::GraphicsBuffer>& RasterPipeline::GetStorageBuffer(Size index) const
+    const std::shared_ptr<Quanta::GraphicsBuffer>& RasterPipeline::GetStorageBuffer(USize index) const
     {
         DEBUG_ASSERT(index < storageBuffers.size());
 
@@ -123,17 +123,17 @@ namespace Quanta::OpenGL
         glScissor(value.x, value.y, value.z, value.w);
     } 
 
-    Size RasterPipeline::GetShaderModuleCount() const
+    USize RasterPipeline::GetShaderModuleCount() const
     {
         return shaderModules.size();
     }
     
-    Size RasterPipeline::GetUniformBufferCount() const
+    USize RasterPipeline::GetUniformBufferCount() const
     {
         return uniformBuffers.size();
     }
     
-    Size RasterPipeline::GetStorageBufferCount() const
+    USize RasterPipeline::GetStorageBufferCount() const
     {
         return storageBuffers.size();
     }
@@ -228,7 +228,7 @@ namespace Quanta::OpenGL
         geometryWinding = value;
     }
     
-    UInt32 RasterPipeline::GetHandle() const
+    U32 RasterPipeline::GetHandle() const
     {
         return handle;
     }

@@ -42,9 +42,9 @@ namespace Quanta::OpenGL
         
         glVertexArrayVertexBuffer(handle, 0, glBuffer->GetHandle(), 0, layout.GetStride());
 
-        Size offset = 0;
+        USize offset = 0;
 
-        for(Size i = 0; i < layout.GetCount(); i++)
+        for(USize i = 0; i < layout.GetCount(); i++)
         {
             const VertexElement& element = layout[i];
 
@@ -126,7 +126,7 @@ namespace Quanta::OpenGL
         return indexType;
     }
     
-    UInt32 VertexArray::GetHandle() const
+    U32 VertexArray::GetHandle() const
     {
         return handle;
     }

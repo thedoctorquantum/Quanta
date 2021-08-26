@@ -9,14 +9,14 @@ namespace Quanta
     struct VertexLayout final
     {
     public:
-        const VertexElement& operator[](Size index) const;
+        const VertexElement& operator[](USize index) const;
 
         void Add(const VertexElement& element);
 
-        Size GetCount() const;
-        Size GetStride() const;
+        USize GetCount() const;
+        USize GetStride() const;
     private:
         std::vector<VertexElement> elements;
-        Size stride = 0;
+        USize stride = 0;
     };
 }

@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    const VertexElement& VertexLayout::operator[](Size index) const
+    const VertexElement& VertexLayout::operator[](USize index) const
     {
         DEBUG_ASSERT(index < elements.size());
         
@@ -21,12 +21,12 @@ namespace Quanta
         stride += element.count * element.size;
     }
 
-    Size VertexLayout::GetCount() const
+    USize VertexLayout::GetCount() const
     {
         return elements.size();
     }
 
-    Size VertexLayout::GetStride() const
+    USize VertexLayout::GetStride() const
     {
         return stride;
     }

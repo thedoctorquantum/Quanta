@@ -8,10 +8,10 @@ namespace Quanta
     {
     public:
         BufferPrimitive primitve = BufferPrimitive::Float;
-        UInt32 count = 0;
-        Size size = 0;
+        U32 count = 0;
+        USize size = 0;
         bool normalized = false;
         
-        VertexElement(BufferPrimitive primitive, UInt32 count, Size size, bool normalized);
+        VertexElement(BufferPrimitive primitive, U32 count, USize size, bool normalized);
     };
 }

@@ -365,17 +365,17 @@ namespace Quanta::OpenGL
         {
         case IndexType::UInt8:
             drawElementsType = GL_UNSIGNED_BYTE;
-            drawElementSize = sizeof(UInt8);
+            drawElementSize = sizeof(U8);
 
             break;
         case IndexType::UInt16:
             drawElementsType = GL_UNSIGNED_SHORT;
-            drawElementSize = sizeof(UInt16);
+            drawElementSize = sizeof(U16);
 
             break;
         case IndexType::UInt32:
             drawElementsType = GL_UNSIGNED_INT;
-            drawElementSize = sizeof(UInt32);
+            drawElementSize = sizeof(U32);
 
             break;
         }
@@ -383,7 +383,7 @@ namespace Quanta::OpenGL
         glBindVertexArray(glVertexArray->GetHandle());
     }
     
-    void GraphicsDevice::InternalBindSampler(const Quanta::Sampler* sampler, Size index)
+    void GraphicsDevice::InternalBindSampler(const Quanta::Sampler* sampler, USize index)
     {
         const Sampler* internalSampler = nullptr;
         const Texture* internalTexture = nullptr;
