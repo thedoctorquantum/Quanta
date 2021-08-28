@@ -79,7 +79,7 @@ namespace Quanta
         style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
         style.GrabRounding = style.FrameRounding = 2.3f;
-        
+
         model = Model::FromFile("Resources/Models/test_scene_01.fbx");
 
         Log::EnableStdCout(true);

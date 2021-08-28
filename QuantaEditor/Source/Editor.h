@@ -4,6 +4,7 @@
 #include <Quanta/Renderer/Renderer3D.h>
 #include <Quanta/Scripting/ScriptRuntime.h>
 #include <Quanta/Scripting/Script.h>
+#include <Quanta/Scene/Entity.h>
 
 #include "Widgets/TextEditor/TextEditor.h"
 #include "Widgets/LogWidget.h"
@@ -29,5 +30,7 @@ namespace Quanta
 
         LogWidget log;
         bool logOpen = true;
+
+        entt::registry scene;
     };
 }

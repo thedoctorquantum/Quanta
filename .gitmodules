@@ -23,3 +23,6 @@
 [submodule "Quanta/External/angelscript-mirror"]
 	path = Quanta/External/angelscript-mirror
 	url = https://github.com/codecat/angelscript-mirror.git
+[submodule "Quanta/External/entt"]
+	path = Quanta/External/entt
+	url = https://github.com/skypjack/entt.git

@@ -1,5 +1,6 @@
 add_subdirectory("angelscript-mirror/sdk/angelscript/projects/cmake")
 add_subdirectory("assimp")
+add_subdirectory("entt")
 add_subdirectory("glad")
 add_subdirectory("glfw")
 add_subdirectory("libsndfile")
