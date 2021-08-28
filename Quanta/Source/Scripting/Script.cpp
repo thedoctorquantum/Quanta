@@ -1,20 +1,27 @@
 #include <Quanta/Scripting/Script.h>
 #include <Quanta/Scripting/ScriptRuntime.h>
+#include <Quanta/IO/FileStream.h>
+#include <Quanta/Text/CPreProcessor.h>
+#include <fstream>
+#include <ostream>
+#include <sstream>
 
 #include "../Debugging/Validation.h"
 
 namespace Quanta
 {
-    Script::Script(const std::string& source)
+    Script::Script(const std::string& filepath)
     {
-        DEBUG_ASSERT(source.size() != 0);
-
         module = ScriptRuntime::GetEngine()->GetModule(nullptr, asGM_ALWAYS_CREATE);
         
-        module->AddScriptSection("source", source.c_str(), source.size());
+        CPreProcessor processor(filepath);
+
+        std::string output = processor.Process();
+
+        module->AddScriptSection("Source", output.c_str(), output.size());
 
         module->Build();
-
+        
         context = ScriptRuntime::GetEngine()->CreateContext();
 
         DEBUG_ASSERT(context != nullptr);
@@ -29,7 +36,10 @@ namespace Quanta
     {
         asIScriptFunction* main = module->GetFunctionByDecl("int32 Main()");
 
-        DEBUG_ASSERT(main != nullptr);
+        if (main == nullptr)
+        {
+            return -1;
+        }
 
         context->Prepare(main);
 

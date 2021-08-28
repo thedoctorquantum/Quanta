@@ -425,6 +425,16 @@ namespace Quanta::Glfw
     {
         glfwSetWindowSize(handle, GetWidth(), value);
     }
+    
+    const char* Window::GetClipboardText() const
+    {
+        return glfwGetClipboardString(handle);
+    }
+    
+    void Window::SetClipboardText(const char* value) 
+    {
+        glfwSetClipboardString(handle, value);
+    }
 
     const std::string& Window::GetTitle() const
     {

@@ -5,6 +5,9 @@
 #include <Quanta/Scripting/ScriptRuntime.h>
 #include <Quanta/Scripting/Script.h>
 
+#include "Widgets/TextEditor/TextEditor.h"
+#include "Widgets/LogWidget.h"
+
 namespace Quanta
 {
     class Editor final : public Application
@@ -20,5 +23,11 @@ namespace Quanta
         Model model;
         
         std::unique_ptr<Script> script = nullptr;
+
+        TextEditor textEditor;
+        bool textEditorOpen = true;
+
+        LogWidget log;
+        bool logOpen = true;
     };
 }

@@ -1,11 +1,32 @@
+#pragma once
 
-int32 Main() 
+#include "lib.as"
+
+#define HELLO "HELLO WORLD I LOVE YOU"
+
+#define nameof(x) #x
+
+#ifdef HELLO
+#warning "ummm.. your code says hello"
+#endif
+
+funcdef int AddCallback(int, int);
+
+int Main() 
 {
-    Std::String str = "Hello";
+    auto str = "" + nameof(Main);
+    
+    str += ", world! ";
 
-    str += ", world!";
+    Std::LogInfo(str);
 
-    Std::Print(str);
+    SayHello();
+
+    AddCallback@ add = function (int a, int b) { return a + b; };
+
+    str = Std::ToString(add(5, 10));
+
+    Std::LogInfo(str);
     
     return 0;
 }

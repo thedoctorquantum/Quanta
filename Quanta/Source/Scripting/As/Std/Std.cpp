@@ -1,3 +1,5 @@
+#include <Quanta/Logging/Log.h>
+
 #include "Std.h"
 #include "primitive/primitive.h"
 #include "String.h"
@@ -20,6 +22,21 @@ namespace Quanta::As::Std
         return exceptionMessage;
     }
 
+    static void LogInfo(const String& message)
+    {
+        Log::Write(Log::Level::Information, message);
+    }
+
+    static void LogWarn(const String& message)
+    {
+        Log::Write(Log::Level::Warning, message);
+    }
+
+    static void LogError(const String& message)
+    {
+        Log::Write(Log::Level::Error, message);
+    }
+
     void Register(asIScriptEngine* engine)
     {
         DEBUG_ASSERT(engine != nullptr);
@@ -32,6 +49,10 @@ namespace Quanta::As::Std
 
         engine->RegisterGlobalFunction("void Throw(const String& in)", asFUNCTIONPR(Throw, (const String&), void), asCALL_CDECL);
         engine->RegisterGlobalFunction("String Catch()", asFUNCTIONPR(Catch, (void), String), asCALL_CDECL);
+        
+        engine->RegisterGlobalFunction("void LogInfo(const String& in)", asFUNCTION(LogInfo), asCALL_CDECL);
+        engine->RegisterGlobalFunction("void LogWarn(const String& in)", asFUNCTION(LogWarn), asCALL_CDECL);
+        engine->RegisterGlobalFunction("void LogError(const String& in)", asFUNCTION(LogError), asCALL_CDECL);
 
         engine->SetDefaultNamespace("");        
     }

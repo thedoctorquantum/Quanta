@@ -10,7 +10,7 @@ namespace Quanta
     class Script final
     {
     public:
-        Script(const std::string& source);
+        Script(const std::string& filepath);
         ~Script();
 
         I32 Main(); 

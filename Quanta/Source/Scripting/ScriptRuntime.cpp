@@ -1,6 +1,7 @@
 #include <Quanta/Scripting/ScriptRuntime.h>
+#include <Quanta/Logging/Log.h>
 #include <angelscript.h>
-#include <cstdio>
+#include <sstream>
 
 #include "../Debugging/Validation.h"
 #include "As/Std/Std.h"
@@ -9,25 +10,37 @@ namespace Quanta
 {
     static void MessageCallback(const asSMessageInfo* message, void* param)
     {
-        const char* type = "";
+        Log::Level level = Log::Level::Information;
 
         switch(message->type)
         {
             case asMSGTYPE_ERROR:
-                type = "ERROR";
+                level = Log::Level::Error;
 
                 break;
             case asMSGTYPE_WARNING:
-                type = "WARNING";
+                level = Log::Level::Warning;
 
                 break;
             case asMSGTYPE_INFORMATION:
-                type = "INFO";
+                level = Log::Level::Information;
 
                 break;  
         }
+        
+        std::ostringstream outputMessage;
 
-        std::printf("[SCRIPT_COMPILER] %s (%d, %d) : [%s] : [%s]\n", message->section, message->row, message->col, type, message->message);
+        outputMessage << "[Script Compiler] ";
+        outputMessage << message->section;
+        outputMessage << " (";
+        outputMessage << message->row;
+        outputMessage << ", ";
+        outputMessage << message->col;
+        outputMessage << ") : [";
+        outputMessage << message->message;
+        outputMessage << ']';
+
+        Log::Write(level, outputMessage.str());
     };
 
     static void ExceptionCallback(asIScriptContext* context, void* userParam)
@@ -38,9 +51,18 @@ namespace Quanta
         }
         catch(const std::exception& exception)
         {
-            std::printf("[SCRIPT] [EXCEPTION_THROWN] (Script terminated): %s\n", exception.what());
-
             context->SetException(exception.what());
+
+            std::ostringstream message;
+
+            message << "[Script] Exception thrown (Script terminated) (";
+            message << context->GetExceptionLineNumber();
+            message << ") (";
+            message << context->GetExceptionFunction()->GetName();
+            message << "): ";
+            message << context->GetExceptionString();
+
+            Log::Write(Log::Level::Error, message.str());
         }
     }
     

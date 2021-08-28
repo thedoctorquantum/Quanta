@@ -1,14 +1,16 @@
 #include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
-#include <Quanta/IO/FileStream.h>
+#include <Quanta/Logging/Log.h>
 #include <iostream>
 #include <imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <fstream>
 
 #include "Editor.h"
 #include "Gizmo/ImGuizmo.h"
+#include "Widgets/TextEditor/AsLanguageDefinition.h"
 
 namespace Quanta
 {
@@ -80,19 +82,36 @@ namespace Quanta
         
         model = Model::FromFile("Resources/Models/test_scene_01.fbx");
 
+        Log::EnableStdCout(true);
+
+        Log::SetLevelMask(Log::LevelMask::Warning + Log::LevelMask::Error + Log::LevelMask::Information);
+        
+        Log::Write(Log::Level::Information, "Hello, log!");
+        Log::Write(Log::Level::Trace, "Trace");
+        Log::Write(Log::Level::Warning, "Warning example");
+        Log::Write(Log::Level::Error, "Error example");
+
+        Log::WriteFormat(Log::Level::Warning, "Hello, world! look at this ptr: %p", &model);
+
         view.fieldOfView = 70.0f;
         view.far = 10000.0f;
         view.matrix = glm::mat4(1.0f);
 
         ScriptRuntime::Create();
 
-        FileStream stream("Resources/Scripts/test.as", FileStream::Mode::Read);
-
-        std::string source = stream.ReadAllText();
-
-        script = std::make_unique<Script>(source);
+        std::ifstream source("Resources/Scripts/test.as");
+        
+        script = std::make_unique<Script>("Resources/Scripts/test.as");
 
         script->Main();
+
+        textEditor.SetLanguageDefinition(AngelScriptDefinition());
+
+        std::ostringstream strStream;
+
+        strStream << source.rdbuf();
+
+        textEditor.SetText(strStream.str());
     }
 
     Editor::~Editor()
@@ -112,9 +131,9 @@ namespace Quanta
 
         Renderer3D::BeginPass(view);
         {
-            Renderer3D::SetDirectionalLight(light);
+            //Renderer3D::SetDirectionalLight(light);
 
-            Renderer3D::DrawModel(model, transform);
+            //Renderer3D::DrawModel(model, transform);
         }
         Renderer3D::EndPass();
 
@@ -122,13 +141,13 @@ namespace Quanta
         {
             ImGuizmo::BeginFrame();
 
-            //ImGui::DockSpaceOverViewport();
+            ImGui::DockSpaceOverViewport();
 
-            if(ImGui::BeginMainMenuBar());
+            if (ImGui::BeginMainMenuBar());
             {
-                if(ImGui::BeginMenu("File"))
+                if (ImGui::BeginMenu("File"))
                 {
-                    if(ImGui::Button("Exit"))
+                    if (ImGui::MenuItem("Exit", "Alt+F4"))
                     {
                         window->Close();
                     }
@@ -136,16 +155,79 @@ namespace Quanta
                     ImGui::EndMenu();   
                 }
 
+                if (ImGui::BeginMenu("Window"))
+                {   
+                    if (ImGui::MenuItem("Text Editor"))
+                    {
+                        textEditorOpen = !textEditorOpen;
+                    }
+
+                    if (ImGui::MenuItem("Log"))
+                    {
+                        logOpen = !logOpen;
+                    }
+
+                    ImGui::EndMenu();
+                }
+
                 ImGui::EndMainMenuBar();
             }
 
-            ImGui::ShowMetricsWindow();  
-            ImGui::ShowDemoWindow();   
+            log.Render("Log", &logOpen);
+
+            if (textEditorOpen)
+            {
+                if (ImGui::Begin("Text Editor", &textEditorOpen))
+                {
+                    static auto runScript = [](const TextEditor& editor)
+                    {
+                        std::ofstream file("Resources/Scripts/test.as");
+                        
+                        std::string source = editor.GetText();
+
+                        file.write(source.c_str(), source.size());
+                        
+                        file.close();
+
+                        Script script("Resources/Scripts/test.as");
+
+                        script.Main();
+                    };
+
+                    if (ImGui::IsItemFocused() && ImGui::GetIO().KeysDown[static_cast<USize>(Key::F5)])
+                    {
+                        runScript(textEditor);
+                    }
+
+                    if (ImGui::BeginMenu("File"))
+                    {
+                        if (ImGui::Button("Save"))
+                        {
+                            std::ofstream file("Resources/Scripts/test.as");
+
+                            std::string text = textEditor.GetText();
+
+                            file.write(text.c_str(), text.size());
+                        }
+
+                        if (ImGui::Button("Run"))
+                        {
+                            runScript(textEditor);
+                        }
+
+                        ImGui::EndMenu();
+                    }
+
+                    textEditor.Render("Text");
+                }
+
+                ImGui::End();
+            }
 
             ImGuizmo::SetRect(0, 0, static_cast<float>(window->GetWidth()), static_cast<float>(window->GetHeight()));
             ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
             ImGuizmo::AllowAxisFlip(false);
- 
+
             ImGuizmo::ViewManipulate(glm::value_ptr(view.matrix), 100, ImVec2 { 0, 0 }, ImVec2 { 128, 128 }, 0x00FFFFFF);
 
             glm::mat4 proj = Renderer3D::GetProjectionMatrix();

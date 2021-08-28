@@ -51,6 +51,9 @@ namespace Quanta::Glfw
         uint32_t GetHeight() const override;
         void SetHeight(uint32_t) override;
 
+        const char* GetClipboardText() const override;
+        void SetClipboardText(const char*) override;
+
         const std::string& GetTitle() const override;
         void SetTitle(const std::string&) override;
 

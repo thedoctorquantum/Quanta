@@ -56,6 +56,9 @@ namespace Quanta
         virtual uint32_t GetHeight() const = 0;
         virtual void SetHeight(uint32_t) = 0;
 
+        virtual const char* GetClipboardText() const = 0;
+        virtual void SetClipboardText(const char*) = 0;
+
         virtual double GetTime() const = 0;
 
         virtual const std::string& GetTitle() const = 0;

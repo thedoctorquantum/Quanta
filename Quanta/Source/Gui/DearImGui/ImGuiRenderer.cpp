@@ -45,40 +45,81 @@ namespace Quanta
         state->io->Fonts->SetTexID(state->fontSampler.get());
     }
 
-    void OnKeyDown(Key key)
+    static void OnKeyDown(Key key)
     {
-       state->io->KeysDown[static_cast<size_t>(key)] = true;
+        state->io->KeysDown[static_cast<std::size_t>(key)] = true;
+
+        state->io->KeyCtrl = 
+            state->io->KeysDown[static_cast<std::size_t>(Key::LeftControl)] &&
+            state->io->KeysDown[static_cast<std::size_t>(Key::RightControl)];
+        
+        state->io->KeyShift = 
+            state->io->KeysDown[static_cast<std::size_t>(Key::LeftShift)] &&
+            state->io->KeysDown[static_cast<std::size_t>(Key::RightShift)];
+
+        state->io->KeyAlt = 
+            state->io->KeysDown[static_cast<std::size_t>(Key::LeftAlt)] &&
+            state->io->KeysDown[static_cast<std::size_t>(Key::RightAlt)];
+        
+        switch (key)
+        {
+            case Key::LeftControl: 
+            case Key::RightControl: 
+                state->io->KeyMods |= ImGuiKeyModFlags_Ctrl;
+
+                break;
+            case Key::LeftShift: 
+            case Key::RightShift:
+                state->io->KeyMods |= ImGuiKeyModFlags_Shift;
+
+                break;
+            case Key::LeftAlt:
+            case Key::RightAlt:
+                state->io->KeyMods |= ImGuiKeyModFlags_Alt;
+
+                break;
+        }
     }
 
-    void OnKeyUp(Key key)
+    static void OnKeyUp(Key key)
     {
         state->io->KeysDown[static_cast<size_t>(key)] = false;
     }
 
-    void OnMouseDown(MouseButton button)
+    static void OnMouseDown(MouseButton button)
     {
         state->io->MouseDown[static_cast<size_t>(button)] = true;
     }
 
-    void OnMouseUp(MouseButton button)
+    static void OnMouseUp(MouseButton button)
     {
         state->io->MouseDown[static_cast<size_t>(button)] = false;
     }
     
-    void OnMouseMove(glm::vec2 position)
+    static void OnMouseMove(glm::vec2 position)
     {
         state->io->MousePos = { position.x, position.y };
     }
 
-    void OnMouseScroll(glm::vec2 scroll)
+    static void OnMouseScroll(glm::vec2 scroll)
     {
         state->io->MouseWheel = scroll.y;
         state->io->MouseWheelH = scroll.x;
     }
 
-    void OnCharacterDown(char character)
+    static void OnCharacterDown(char character)
     {
         state->io->AddInputCharacter(character);
+    }
+
+    static void SetClipboardText(void* user_data, const char* text)
+    {
+        state->window->SetClipboardText(text);
+    }
+
+    static const char* GetClipboardText(void* user_data)
+    {
+        return state->window->GetClipboardText();
     }
     
     void ImGuiRenderer::Create(const std::shared_ptr<Window>& window)
@@ -101,6 +142,9 @@ namespace Quanta
 
         state->io->BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
         state->io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+        state->io->SetClipboardTextFn = SetClipboardText;
+        state->io->GetClipboardTextFn = GetClipboardText;
 
         window->AddKeyDownCallback(OnKeyDown);
         window->AddKeyUpCallback(OnKeyUp);

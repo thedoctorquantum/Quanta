@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    static const char* modes[] = { "r", "w", "rw", "a" };
+    static const char* modes[] = { "rb", "wb", "rw", "a" };
 
     FileStream::FileStream(const std::string& path, Mode mode)
     {
@@ -45,14 +45,14 @@ namespace Quanta
     {
         DEBUG_ASSERT(mode == Mode::Write || mode == Mode::ReadWrite);
 
-        std::fwrite(text.data(), text.size(), text.size(), handle);
+        std::fwrite(text.data(), text.size(), 1, handle);
     }
 
     void FileStream::WriteAllBytes(const std::vector<U8>& bytes)
     {
         DEBUG_ASSERT(mode == Mode::Write || mode == Mode::ReadWrite);
 
-        std::fwrite(bytes.data(), bytes.size(), bytes.size(), handle);
+        std::fwrite(bytes.data(), bytes.size(), 1, handle);
     }
 
     std::size_t FileStream::GetSize() const
