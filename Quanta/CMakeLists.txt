@@ -9,6 +9,7 @@ target_include_directories("${CMAKE_PROJECT_NAME}"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/angelscript-mirror/sdk/angelscript/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/glm"
     "${CMAKE_CURRENT_SOURCE_DIR}/External/imgui"
+    "${CMAKE_CURRENT_SOURCE_DIR}/External/entt"
 )
 
 add_subdirectory("External")

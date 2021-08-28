@@ -84,11 +84,11 @@ namespace Quanta
 
         Log::EnableStdCout(true);
 
-        Log::SetLevelMask(Log::LevelMask::Warning + Log::LevelMask::Error + Log::LevelMask::Information);
+        Log::SetLevelMask(Log::LevelMask::All);
         
         Log::Write(Log::Level::Information, "Hello, log!");
         Log::Write(Log::Level::Trace, "Trace");
-        Log::Write(Log::Level::Warning, "Warning example");
+        Log::Write(Log::Level::Warning, "Warning example"); 
         Log::Write(Log::Level::Error, "Error example");
 
         Log::WriteFormat(Log::Level::Warning, "Hello, world! look at this ptr: %p", &model);
