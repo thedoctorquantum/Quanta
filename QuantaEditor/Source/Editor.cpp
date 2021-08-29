@@ -96,7 +96,7 @@ namespace Quanta
         view.fieldOfView = 70.0f;
         view.far = 10000.0f;
         view.matrix = glm::mat4(1.0f);
-
+        
         ScriptRuntime::Create();
 
         std::ifstream source("Resources/Scripts/test.as");

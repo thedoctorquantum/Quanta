@@ -15,36 +15,36 @@ namespace Quanta::Log
         Error = static_cast<U8>(Level::Error)
     };
     
-    constexpr LevelMask operator+(LevelMask left, LevelMask right)
+    constexpr LevelMask operator+(const LevelMask left, const LevelMask right)
     {
         return static_cast<LevelMask>(static_cast<U8>(left) | static_cast<U8>(right));
     }
 
-    constexpr LevelMask operator+=(LevelMask& left, LevelMask right)
+    constexpr LevelMask operator+=(LevelMask& left, const LevelMask right)
     {
         reinterpret_cast<U8&>(left) |= static_cast<U8>(right);
 
         return left;
     }
     
-    constexpr LevelMask operator-(LevelMask left, LevelMask right)
+    constexpr LevelMask operator-(const LevelMask left, const LevelMask right)
     {
         return static_cast<LevelMask>(static_cast<U8>(left) & ~static_cast<U8>(right));
     }
 
-    constexpr LevelMask operator-=(LevelMask& left, LevelMask right)
+    constexpr LevelMask operator-=(LevelMask& left, const LevelMask right)
     {
         left = left - right;
 
         return left;
     }
     
-    constexpr bool operator&(LevelMask mask, LevelMask query)
+    constexpr bool operator&(const LevelMask mask, const LevelMask query)
     {
         return static_cast<U8>(mask) & static_cast<U8>(query);
     }
     
-    constexpr bool operator&(LevelMask mask, Level query)
+    constexpr bool operator&(const LevelMask mask, const Level query)
     {
         return static_cast<U8>(mask) & static_cast<U8>(query);
     }
