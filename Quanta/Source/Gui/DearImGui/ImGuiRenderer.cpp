@@ -25,7 +25,7 @@ namespace Quanta
     
     static void BuildFontAtlas()
     {
-        if(state->io->Fonts->IsBuilt()) return;
+        if (state->io->Fonts->IsBuilt()) return;
 
         unsigned char* pixels = nullptr;
         int width = 0;
@@ -44,8 +44,8 @@ namespace Quanta
 
         state->io->Fonts->SetTexID(state->fontSampler.get());
     }
-
-    static void OnKeyDown(Key key)
+    
+    static void OnKeyDown(const Key key)
     {
         state->io->KeysDown[static_cast<std::size_t>(key)] = true;
 
@@ -81,43 +81,43 @@ namespace Quanta
         }
     }
 
-    static void OnKeyUp(Key key)
+    static void OnKeyUp(const Key key)
     {
         state->io->KeysDown[static_cast<size_t>(key)] = false;
     }
 
-    static void OnMouseDown(MouseButton button)
+    static void OnMouseDown(const MouseButton button)
     {
         state->io->MouseDown[static_cast<size_t>(button)] = true;
     }
 
-    static void OnMouseUp(MouseButton button)
+    static void OnMouseUp(const MouseButton button)
     {
         state->io->MouseDown[static_cast<size_t>(button)] = false;
     }
     
-    static void OnMouseMove(glm::vec2 position)
+    static void OnMouseMove(const glm::vec2 position)
     {
         state->io->MousePos = { position.x, position.y };
     }
 
-    static void OnMouseScroll(glm::vec2 scroll)
+    static void OnMouseScroll(const glm::vec2 scroll)
     {
         state->io->MouseWheel = scroll.y;
         state->io->MouseWheelH = scroll.x;
     }
 
-    static void OnCharacterDown(char character)
+    static void OnCharacterDown(const char character)
     {
         state->io->AddInputCharacter(character);
     }
 
-    static void SetClipboardText(void* user_data, const char* text)
+    static void SetClipboardText(void* const user_data, const char* const text)
     {
         state->window->SetClipboardText(text);
     }
-
-    static const char* GetClipboardText(void* user_data)
+    
+    static const char* GetClipboardText(void* const user_data)
     {
         return state->window->GetClipboardText();
     }
@@ -154,7 +154,7 @@ namespace Quanta
         window->AddMouseScrollCallback(OnMouseScroll);
         window->AddCharacterDownCallback(OnCharacterDown);
         
-        std::string vertexSource =
+        constexpr const char* vertexSource =
             R"(
             #version 450 core
             
@@ -181,7 +181,7 @@ namespace Quanta
                 gl_Position = u_Matrices.matrix * vec4(a_Position, 0.0, 1.0);
             })";
             
-        std::string fragmentSource =
+        constexpr const char* fragmentSource =
             R"(
             #version 450 core
 
@@ -269,7 +269,7 @@ namespace Quanta
         delete state;
     }
 
-    void ImGuiRenderer::Begin(float elapsed)
+    void ImGuiRenderer::Begin(const float elapsed)
     {
         BuildFontAtlas();
         
@@ -286,23 +286,23 @@ namespace Quanta
     {
         ImGui::Render();
 
-        ImDrawData* drawData = ImGui::GetDrawData();
+        ImDrawData* const drawData = ImGui::GetDrawData();
 
         DEBUG_ASSERT(drawData != nullptr);
 
-        if(drawData->CmdListsCount <= 0) return;
+        if (drawData->CmdListsCount <= 0) return;
 
         drawData->ScaleClipRects(state->io->DisplayFramebufferScale);
 
-        glm::mat4 matrix = glm::ortho(0.0f, state->io->DisplaySize.x, state->io->DisplaySize.y, 0.0f, -1.0f, 1.0f);
+        const glm::mat4 matrix = glm::ortho(0.0f, state->io->DisplaySize.x, state->io->DisplaySize.y, 0.0f, -1.0f, 1.0f);
 
         state->uniformBuffer->SetData(&matrix, sizeof(glm::mat4));
 
         GraphicsDevice::SetRasterPipeline(state->pipeline.get());
         GraphicsDevice::SetVertexArray(state->vertexArray.get());
 
-        size_t totalVertexBuffersize = drawData->TotalVtxCount * sizeof(ImDrawVert);
-        size_t totalIndexBufferSize = drawData->TotalIdxCount * sizeof(uint16_t);
+        const size_t totalVertexBuffersize = drawData->TotalVtxCount * sizeof(ImDrawVert);
+        const size_t totalIndexBufferSize = drawData->TotalIdxCount * sizeof(uint16_t);
 
         if(totalVertexBuffersize > state->vertexBuffer->GetSize())
         {
@@ -321,23 +321,23 @@ namespace Quanta
 
         DrawCommand drawCommand;
 
-        for(size_t i = 0; i < drawData->CmdListsCount; i++)
+        for (size_t i = 0; i < drawData->CmdListsCount; i++)
         {
-            ImDrawList* drawList = drawData->CmdLists[i];
+            const ImDrawList* const drawList = drawData->CmdLists[i];
 
-            ImVector<ImDrawCmd>& commands = drawList->CmdBuffer;
+            const ImVector<ImDrawCmd>& commands = drawList->CmdBuffer;
 
-            size_t vertexBufferSize = drawList->VtxBuffer.Size * sizeof(ImDrawVert);
-            size_t indexBufferSize = drawList->IdxBuffer.Size * sizeof(ImWchar);
+            const size_t vertexBufferSize = drawList->VtxBuffer.Size * sizeof(ImDrawVert);
+            const size_t indexBufferSize = drawList->IdxBuffer.Size * sizeof(ImWchar);
 
             state->vertexBuffer->SetData(drawList->VtxBuffer.Data, vertexBufferSize, vertexOffset);
             state->indexBuffer->SetData(drawList->IdxBuffer.Data, indexBufferSize, indexOffset);
             
-            for(size_t j = 0; j < commands.Size; j++)
+            for (size_t j = 0; j < commands.Size; j++)
             {
-                ImDrawCmd& command = commands[j];
+                const ImDrawCmd& command = commands[j];
 
-                Sampler* sampler = static_cast<Sampler*>(command.TextureId);
+                Sampler* const sampler = static_cast<Sampler*>(command.TextureId);
 
                 DEBUG_ASSERT(sampler != nullptr);
 

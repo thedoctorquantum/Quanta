@@ -6,13 +6,13 @@
 
 namespace Quanta
 {
-    std::shared_ptr<ShaderModule> ShaderModule::Create(ShaderType type, const std::string& source)
+    std::shared_ptr<ShaderModule> ShaderModule::Create(const ShaderType type, const std::string& source)
     {
-        GraphicsApi api = GraphicsDevice::GetApi();
+        const GraphicsApi api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
-
-        switch(api)
+        
+        switch (api)
         {
         case GraphicsApi::OpenGL:
             return std::make_shared<OpenGL::ShaderModule>(type, source);
@@ -20,6 +20,4 @@ namespace Quanta
 
         return nullptr;
     }
-
-    ShaderModule::~ShaderModule() = default;
 }

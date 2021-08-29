@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    std::shared_ptr<Window> Window::Create(GraphicsApi graphicsApi)
+    std::shared_ptr<Window> Window::Create(const GraphicsApi graphicsApi)
     {
         return std::make_shared<Glfw::Window>(graphicsApi);
     }

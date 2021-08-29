@@ -684,7 +684,7 @@ namespace Quanta::Renderer3D
         state->uniformDirectionalLight->SetData(&light, sizeof(light));
     }
     
-    void SetPointLights(const PointLight* lights, size_t count)
+    void SetPointLights(const PointLight* lights, const size_t count)
     {
         DEBUG_ASSERT(lights != nullptr);
         DEBUG_ASSERT(state != nullptr);

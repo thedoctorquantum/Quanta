@@ -16,8 +16,8 @@ namespace Quanta
         GraphicsApi api = window.GetGraphicsApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
-
-        switch(api)
+        
+        switch (api)
         {
         case GraphicsApi::OpenGL:
             state.device = new OpenGL::GraphicsDevice(window);
@@ -33,7 +33,7 @@ namespace Quanta
         delete state.device;
     }
 
-    void GraphicsDevice::ClearBackBuffer(const glm::vec4& color, float depth, int stencil)
+    void GraphicsDevice::ClearBackBuffer(const glm::vec4& color, const float depth, const int stencil)
     {
         DEBUG_ASSERT(state.device != nullptr);
 
@@ -54,7 +54,7 @@ namespace Quanta
         state.device->InternalSetVertexArray(value);
     }
         
-    void GraphicsDevice::BindSampler(const Sampler* sampler, size_t index)
+    void GraphicsDevice::BindSampler(const Sampler* sampler, const size_t index)
     {
         DEBUG_ASSERT(state.device != nullptr);
 

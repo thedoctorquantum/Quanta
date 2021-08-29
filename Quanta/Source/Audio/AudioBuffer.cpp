@@ -9,7 +9,7 @@ namespace Quanta
 {
     std::shared_ptr<AudioBuffer> AudioBuffer::Create() 
     {
-        AudioApi api = AudioDevice::GetApi();
+        const AudioApi api = AudioDevice::GetApi();
 
         DEBUG_ASSERT(api == AudioApi::OpenAL);
 
@@ -26,7 +26,7 @@ namespace Quanta
     {
         SF_INFO sfinfo;
 
-        SNDFILE* sndfile = sf_open(filepath.c_str(), SFM_READ, &sfinfo);
+        SNDFILE* const sndfile = sf_open(filepath.c_str(), SFM_READ, &sfinfo);
 
         DEBUG_ASSERT(sndfile != nullptr);
 
@@ -58,24 +58,20 @@ namespace Quanta
             break;
         }
 
-        int16_t* buffer = new int16_t[sfinfo.frames * sfinfo.channels];
+        const std::unique_ptr<int16_t[]> buffer = std::make_unique<int16_t[]>(sfinfo.frames * sfinfo.channels);
 
-        sf_count_t frameCount = sf_readf_short(sndfile, buffer, sfinfo.frames);
+        const sf_count_t frameCount = sf_readf_short(sndfile, buffer.get(), sfinfo.frames);
 
         DEBUG_ASSERT(frameCount != 0);
 
-        size_t bufferSize = frameCount * sfinfo.channels * sizeof(short);
+        const size_t bufferSize = frameCount * sfinfo.channels * sizeof(short);
 
-        std::shared_ptr<AudioBuffer> audioBuffer = Create();
+        const std::shared_ptr<AudioBuffer> audioBuffer = Create();
 
-        audioBuffer->SetData(buffer, bufferSize, sfinfo.samplerate, format);
-
-        delete[] buffer;
+        audioBuffer->SetData(buffer.get(), bufferSize, sfinfo.samplerate, format);
 
         sf_close(sndfile);
 
         return audioBuffer;
     }
-    
-    AudioBuffer::~AudioBuffer() = default;
 }

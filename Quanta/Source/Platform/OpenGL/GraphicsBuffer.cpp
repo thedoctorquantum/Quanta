@@ -5,7 +5,7 @@
 
 namespace Quanta
 {
-    OpenGL::GraphicsBuffer::GraphicsBuffer(BufferUsage usage, USize size)
+    OpenGL::GraphicsBuffer::GraphicsBuffer(const BufferUsage usage, const USize size)
     {       
         DEBUG_ASSERT(
             usage == BufferUsage::Static ||
@@ -47,17 +47,17 @@ namespace Quanta
         glUnmapNamedBuffer(handle);
     }
     
-    void OpenGL::GraphicsBuffer::SetData(const void* data, USize size)
+    void OpenGL::GraphicsBuffer::SetData(const void* const data, const USize size)
     {
         glNamedBufferSubData(handle, 0, size, data);
     }
 
-    void OpenGL::GraphicsBuffer::SetData(const void* data, USize size, USize offset)
+    void OpenGL::GraphicsBuffer::SetData(const void* data, const USize size, const USize offset)
     {
         glNamedBufferSubData(handle, offset, size, data);
     }
 
-    void OpenGL::GraphicsBuffer::Resize(USize size)
+    void OpenGL::GraphicsBuffer::Resize(const USize size)
     {
         DEBUG_ASSERT(usage != BufferUsage::Static);
 

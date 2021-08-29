@@ -3,7 +3,7 @@
 
 namespace Quanta
 {
-    GLenum FilterModeToGLenum(FilterMode mode)
+    GLenum FilterModeToGLenum(const FilterMode mode)
     {
         DEBUG_ASSERT(
             mode == FilterMode::Linear ||
@@ -27,7 +27,7 @@ namespace Quanta
         return 0;
     }
     
-    GLenum WrapModeToGLenum(WrapMode mode)
+    GLenum WrapModeToGLenum(const WrapMode mode)
     {
         DEBUG_ASSERT(
             mode == WrapMode::Repeat ||
@@ -47,7 +47,7 @@ namespace Quanta
         return 0;
     }
 
-    GLenum TexelFormatToPixelFormat(TexelFormat format)
+    GLenum TexelFormatToPixelFormat(const TexelFormat format)
     {
         switch(format)
         {
@@ -59,7 +59,7 @@ namespace Quanta
         return 0;
     }
 
-    GLenum TexelFormatToInternalFormat(TexelFormat format)
+    GLenum TexelFormatToInternalFormat(const TexelFormat format)
     {
         switch(format)
         {
@@ -71,7 +71,7 @@ namespace Quanta
         return 0;
     }
     
-    GLenum TexelFormatToPixelType(TexelFormat format)
+    GLenum TexelFormatToPixelType(const TexelFormat format)
     {
         switch(format)
         {

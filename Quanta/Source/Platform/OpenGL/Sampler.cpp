@@ -41,7 +41,7 @@ namespace Quanta
         return magnifiaction;
     }
 
-    void OpenGL::Sampler::SetMagnification(FilterMode value)
+    void OpenGL::Sampler::SetMagnification(const FilterMode value)
     {
         if(magnifiaction == value) return;
 
@@ -55,7 +55,7 @@ namespace Quanta
         return minification;
     }
 
-    void OpenGL::Sampler::SetMinification(FilterMode value)
+    void OpenGL::Sampler::SetMinification(const FilterMode value)
     {
         if(minification == value) return;
 
@@ -69,7 +69,7 @@ namespace Quanta
         return wrapModeX;
     }
 
-    void OpenGL::Sampler::SetWrapModeX(WrapMode value)
+    void OpenGL::Sampler::SetWrapModeX(const WrapMode value)
     {
         if(wrapModeX == value) return;
 
@@ -83,7 +83,7 @@ namespace Quanta
         return wrapModeY;
     }
 
-    void OpenGL::Sampler::SetWrapModeY(WrapMode value)
+    void OpenGL::Sampler::SetWrapModeY(const WrapMode value)
     {
         if(wrapModeY == value) return;
 
@@ -96,8 +96,8 @@ namespace Quanta
     {
         return wrapModeZ;
     }
-
-    void OpenGL::Sampler::SetWrapModeZ(WrapMode value)
+    
+    void OpenGL::Sampler::SetWrapModeZ(const WrapMode value)
     {
         if(wrapModeZ == value) return;
 

@@ -6,7 +6,7 @@
 
 namespace Quanta::OpenGL
 {
-    Texture::Texture(TextureType type, TexelFormat format, USize width, USize height, USize depth)
+    Texture::Texture(const TextureType type, const TexelFormat format, const USize width, const USize height, const USize depth)
     {
         this->width = width;
         this->height = height;
@@ -77,7 +77,7 @@ namespace Quanta::OpenGL
         glDeleteTextures(1, &handle);
     }
     
-    void Texture::SetData(const void* data)
+    void Texture::SetData(const void* const data)
     {
         DEBUG_ASSERT(data != nullptr);
 
@@ -102,7 +102,7 @@ namespace Quanta::OpenGL
         } 
     }
     
-    void Texture::SetData(const void* data, USize xOffset, USize yOffset, USize zOffset)
+    void Texture::SetData(const void* const data, const USize xOffset, const USize yOffset, const USize zOffset)
     {
         DEBUG_ASSERT(data != nullptr);
 

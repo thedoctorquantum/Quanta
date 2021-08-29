@@ -28,12 +28,12 @@ namespace Quanta
         return height;
     }
 
-    void OpenGL::FrameBuffer::ClearTexture(size_t index, const glm::vec4& color)
+    void OpenGL::FrameBuffer::ClearTexture(const size_t index, const glm::vec4& color)
     {
         
     }
-
-    std::shared_ptr<Texture> OpenGL::FrameBuffer::GetTexture(size_t index) const
+    
+    std::shared_ptr<Texture> OpenGL::FrameBuffer::GetTexture(const size_t index) const
     {
         return nullptr;
     }

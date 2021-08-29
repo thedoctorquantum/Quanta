@@ -48,14 +48,14 @@ namespace Quanta::OpenGL
         {
             const VertexElement& element = layout[i];
 
-            GLenum type = 0;
-
             DEBUG_ASSERT(
                 element.primitve == BufferPrimitive::UInt8 ||
                 element.primitve == BufferPrimitive::Int8 ||
                 element.primitve == BufferPrimitive::Float ||
                 element.primitve == BufferPrimitive::Double
             );
+
+            GLenum type = 0;
 
             switch(element.primitve)
             {
@@ -87,13 +87,12 @@ namespace Quanta::OpenGL
         }
     }
     
-    void VertexArray::SetIndexBuffer(const std::shared_ptr<Quanta::GraphicsBuffer>& buffer, IndexType type)
+    void VertexArray::SetIndexBuffer(const std::shared_ptr<Quanta::GraphicsBuffer>& buffer, const IndexType type)
     {
-        indexType = type;
-
         DEBUG_ASSERT(buffer != nullptr);
 
         indexBuffer = buffer;
+        indexType = type;
 
         const GraphicsBuffer* glBuffer = nullptr;
 

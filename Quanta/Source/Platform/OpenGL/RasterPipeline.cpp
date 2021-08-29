@@ -18,7 +18,7 @@ namespace Quanta::OpenGL
 
         DEBUG_ASSERT(handle != 0);
 
-        for(const std::shared_ptr<Quanta::ShaderModule>& shader : shaderModules)
+        for (const std::shared_ptr<Quanta::ShaderModule>& shader : shaderModules)
         {
             const ShaderModule* glShader = nullptr;
 
@@ -54,7 +54,7 @@ namespace Quanta::OpenGL
             }
         }
         
-        for(const std::shared_ptr<Quanta::ShaderModule>& shader : shaderModules)
+        for (const std::shared_ptr<Quanta::ShaderModule>& shader : shaderModules)
         {
             const ShaderModule* glShader = nullptr;
 
@@ -78,21 +78,21 @@ namespace Quanta::OpenGL
         glDeleteProgram(handle);
     }
 
-    const std::shared_ptr<Quanta::ShaderModule>& RasterPipeline::GetShaderModule(USize index) const
+    const std::shared_ptr<Quanta::ShaderModule>& RasterPipeline::GetShaderModule(const USize index) const
     {
         DEBUG_ASSERT(index < shaderModules.size());
 
         return shaderModules[index];
     }
     
-    const std::shared_ptr<Quanta::GraphicsBuffer>& RasterPipeline::GetUniformBuffer(USize index) const
+    const std::shared_ptr<Quanta::GraphicsBuffer>& RasterPipeline::GetUniformBuffer(const USize index) const
     {
         DEBUG_ASSERT(index < uniformBuffers.size());
 
         return uniformBuffers[index];
     }
     
-    const std::shared_ptr<Quanta::GraphicsBuffer>& RasterPipeline::GetStorageBuffer(USize index) const
+    const std::shared_ptr<Quanta::GraphicsBuffer>& RasterPipeline::GetStorageBuffer(const USize index) const
     {
         DEBUG_ASSERT(index < storageBuffers.size());
 
@@ -143,7 +143,7 @@ namespace Quanta::OpenGL
         return polygonFillMode;
     }
 
-    void RasterPipeline::SetPolygonFillMode(PolygonFillMode value)
+    void RasterPipeline::SetPolygonFillMode(const PolygonFillMode value)
     {
         polygonFillMode = value;
     }
@@ -153,7 +153,7 @@ namespace Quanta::OpenGL
         return depthTestMode;
     }
 
-    void RasterPipeline::SetDepthTestMode(DepthTestMode value)
+    void RasterPipeline::SetDepthTestMode(const DepthTestMode value)
     {
         depthTestMode = value;
     }
@@ -163,7 +163,7 @@ namespace Quanta::OpenGL
         return enableDepthWriting;
     }
 
-    void RasterPipeline::SetEnableDepthWriting(bool value)
+    void RasterPipeline::SetEnableDepthWriting(const bool value)
     {
         enableDepthWriting = value;
     }
@@ -173,7 +173,7 @@ namespace Quanta::OpenGL
         return enableScissorTesting;
     }
 
-    void RasterPipeline::SetEnableScissorTesting(bool value)
+    void RasterPipeline::SetEnableScissorTesting(const bool value)
     {
         enableScissorTesting = value;
     }
@@ -183,7 +183,7 @@ namespace Quanta::OpenGL
         return blendMode;
     }
 
-    void RasterPipeline::SetBlendMode(BlendMode value)
+    void RasterPipeline::SetBlendMode(const BlendMode value)
     {
         blendMode = value;
     }
@@ -193,7 +193,7 @@ namespace Quanta::OpenGL
         return blendFactor;
     }
     
-    void RasterPipeline::SetBlendFactor(BlendFactor value)
+    void RasterPipeline::SetBlendFactor(const BlendFactor value)
     {
         blendFactor = value;
     }
@@ -203,7 +203,7 @@ namespace Quanta::OpenGL
         return faceCullMode;
     }
 
-    void RasterPipeline::SetFaceCullMode(FaceCullMode value)
+    void RasterPipeline::SetFaceCullMode(const FaceCullMode value)
     {
         faceCullMode = value;
     }
@@ -213,7 +213,7 @@ namespace Quanta::OpenGL
         return geometryLayout;
     }
 
-    void RasterPipeline::SetGeometryLayout(GeometryLayout value)
+    void RasterPipeline::SetGeometryLayout(const GeometryLayout value)
     {
         geometryLayout = value;
     }
@@ -223,7 +223,7 @@ namespace Quanta::OpenGL
         return geometryWinding;
     }
 
-    void RasterPipeline::SetGeometryWinding(GeometryWinding value)
+    void RasterPipeline::SetGeometryWinding(const GeometryWinding value)
     {
         geometryWinding = value;
     }

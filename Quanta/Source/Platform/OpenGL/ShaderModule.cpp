@@ -1,3 +1,4 @@
+#include <Quanta/Logging/Log.h>
 #include <glad/glad.h>
 
 #include "ShaderModule.h"
@@ -5,7 +6,7 @@
 
 namespace Quanta
 {
-    OpenGL::ShaderModule::ShaderModule(ShaderType type, const std::string& source)
+    OpenGL::ShaderModule::ShaderModule(const ShaderType type, const std::string& source)
     {
         DEBUG_ASSERT(source.length() != 0);
         DEBUG_ASSERT(source.c_str() != nullptr);
@@ -43,16 +44,16 @@ namespace Quanta
         
         DEBUG_ASSERT(handle != 0);
 
-        const char* sourcePointer = source.c_str();
-        USize length = source.length();
+        const char* const sourcePointer = source.c_str();
+        const USize length = source.length();
         
-        glShaderSource(handle, 1, &sourcePointer, reinterpret_cast<GLint*>(&length));
+        glShaderSource(handle, 1, &sourcePointer, reinterpret_cast<const GLint*>(&length));
         
         glCompileShader(handle);
         
         if constexpr (DEBUG)
         {
-            int success;
+            int success = 0;
 
             glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
 
@@ -62,7 +63,7 @@ namespace Quanta
 
                 glGetShaderInfoLog(handle, sizeof(infoLog), nullptr, infoLog);
 
-                printf("%s\n", infoLog);
+                Log::Write(Log::Level::Error, infoLog);
 
                 DEBUG_ASSERT(success);
             }

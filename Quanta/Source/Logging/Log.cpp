@@ -7,7 +7,7 @@
 
 namespace Quanta::Log
 {
-    static const char* LevelToString(Level level)
+    static const char* LevelToString(const Level level)
     {
         switch (level)
         {
@@ -36,12 +36,12 @@ namespace Quanta::Log
         log.callbacks.push_back(callback);
     }
 
-    void EnableStdCout(bool enable)
+    void EnableStdCout(const bool enable)
     {
         log.writeToCout = enable;
     }
     
-    void SetLevelMask(LevelMask value)
+    void SetLevelMask(const LevelMask value)
     {
         log.levelMask = value;
     }
@@ -51,7 +51,7 @@ namespace Quanta::Log
         return log.levelMask;
     }
     
-    void WriteFormat(Level level, const std::string& message, ...)
+    void WriteFormat(const Level level, const std::string& message, ...)
     {
         va_list args;
         
@@ -66,7 +66,7 @@ namespace Quanta::Log
         Log::Write(level, formatted);
     }
 
-    void Write(Level level, const std::string& message)
+    void Write(const Level level, const std::string& message)
     {
         if (!(log.levelMask & level))
         {

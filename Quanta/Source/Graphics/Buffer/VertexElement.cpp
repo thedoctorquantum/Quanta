@@ -2,7 +2,7 @@
 
 namespace Quanta
 {
-    VertexElement::VertexElement(BufferPrimitive primitive, U32 count, USize size, bool normalized)
+    VertexElement::VertexElement(const BufferPrimitive primitive, const U32 count, const USize size, const bool normalized)
     {
         this->primitve = primitive;
         this->count = count;

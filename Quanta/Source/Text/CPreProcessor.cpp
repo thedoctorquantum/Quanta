@@ -53,7 +53,7 @@ namespace Quanta
     {
         simplecpp::DUI dui;
 
-        for (const auto& define : defines)
+        for (const std::string& define : defines)
         {
             dui.defines.push_back(define);
         }

@@ -146,11 +146,11 @@ namespace Quanta::Glfw
         { GLFW_MOUSE_BUTTON_MIDDLE, MouseButton::Middle }
     };
 
-    Window::Window(GraphicsApi graphicsApi)
+    Window::Window(const GraphicsApi graphicsApi)
     {
         this->graphicsApi = graphicsApi;
 
-        bool isInitialized = glfwInit();
+        const bool isInitialized = glfwInit();
         
         DEBUG_ASSERT(isInitialized);
         
@@ -190,9 +190,9 @@ namespace Quanta::Glfw
         
         glfwSetWindowUserPointer(handle, this);
         
-        glfwSetKeyCallback(handle, [](GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods)
+        glfwSetKeyCallback(handle, [](GLFWwindow* const window, const int32_t key, const int32_t scancode, const int32_t action, const int32_t mods)
         {
-            Window* _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
             
             Key result = keyTranslations.at(key);
 
@@ -209,18 +209,18 @@ namespace Quanta::Glfw
             }
         });
 
-        glfwSetCharCallback(handle, [](GLFWwindow* window, uint32_t character)
+        glfwSetCharCallback(handle, [](GLFWwindow* const window, const uint32_t character)
         {
-            Window* _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
             _this->onCharacterDown(static_cast<char>(character));
         });
 
-        glfwSetMouseButtonCallback(handle, [](GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
+        glfwSetMouseButtonCallback(handle, [](GLFWwindow* const window, const int32_t button, const int32_t action, const int32_t mods)
         {
-            Window* _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
-            MouseButton result = mouseButtonTranslations.at(button);
+            const MouseButton result = mouseButtonTranslations.at(button);
 
             switch(action)
             {
@@ -235,16 +235,16 @@ namespace Quanta::Glfw
             }
         });
 
-		glfwSetCursorPosCallback(handle, [](GLFWwindow* window, double xPos, double yPos)
+		glfwSetCursorPosCallback(handle, [](GLFWwindow* const window, const double xPos, const double yPos)
 		{
-            Window* _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
             _this->onMouseMove({ static_cast<float>(xPos), static_cast<float>(yPos) });
 		});
 
-        glfwSetScrollCallback(handle, [](GLFWwindow* window, double xOffset, double yOffset)
+        glfwSetScrollCallback(handle, [](GLFWwindow* const window, const double xOffset, const double yOffset)
         {
-            Window* _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
             _this->onMouseScroll({ static_cast<float>(xOffset), static_cast<float>(yOffset) });
         });
@@ -276,37 +276,37 @@ namespace Quanta::Glfw
         glfwSwapBuffers(handle);
     }
 
-    void Window::AddKeyDownCallback(Event<Key>::Handler handler)
+    void Window::AddKeyDownCallback(const Event<Key>::Handler handler)
     {
         onKeyDown += handler;
     }
 
-    void Window::AddKeyUpCallback(Event<Key>::Handler handler)
+    void Window::AddKeyUpCallback(const Event<Key>::Handler handler)
     {
         onKeyUp += handler;
     }
 
-    void Window::AddMouseDownCallback(Event<MouseButton>::Handler handler)
+    void Window::AddMouseDownCallback(const Event<MouseButton>::Handler handler)
     {
         onMouseDown += handler;
     }
     
-    void Window::AddMouseUpCallback(Event<MouseButton>::Handler handler)
+    void Window::AddMouseUpCallback(const Event<MouseButton>::Handler handler)
     {
         onMouseUp += handler;
     }
 
-    void Window::AddMouseMoveCallback(Event<glm::vec2>::Handler handler)
+    void Window::AddMouseMoveCallback(const Event<glm::vec2>::Handler handler)
     {
         onMouseMove += handler;
     }
 
-    void Window::AddMouseScrollCallback(Event<glm::vec2>::Handler handler)
+    void Window::AddMouseScrollCallback(const Event<glm::vec2>::Handler handler)
     {
         onMouseScroll += handler;
     }
 
-    void Window::AddCharacterDownCallback(Event<char>::Handler handler)
+    void Window::AddCharacterDownCallback(const Event<char>::Handler handler)
     {
         onCharacterDown += handler;
     }
@@ -316,7 +316,7 @@ namespace Quanta::Glfw
         return state;
     }
     
-    void Window::SetState(WindowState value)
+    void Window::SetState(const WindowState value)
     {
         DEBUG_ASSERT(
             value == WindowState::Maximized ||
@@ -379,7 +379,7 @@ namespace Quanta::Glfw
         return x;
     }
 
-    void Window::SetX(uint32_t value)
+    void Window::SetX(const uint32_t value)
     {
         glfwSetWindowPos(handle, value, GetY());
     }
@@ -393,7 +393,7 @@ namespace Quanta::Glfw
         return y;
     }
 
-    void Window::SetY(uint32_t value)
+    void Window::SetY(const uint32_t value)
     {
         glfwSetWindowPos(handle, GetX(), value);
     }
@@ -407,7 +407,7 @@ namespace Quanta::Glfw
         return width;
     }
 
-    void Window::SetWidth(uint32_t value) 
+    void Window::SetWidth(const uint32_t value) 
     {
         glfwSetWindowSize(handle, value, GetHeight());
     }
@@ -421,7 +421,7 @@ namespace Quanta::Glfw
         return height;
     }
 
-    void Window::SetHeight(uint32_t value) 
+    void Window::SetHeight(const uint32_t value) 
     {
         glfwSetWindowSize(handle, GetWidth(), value);
     }
@@ -431,7 +431,7 @@ namespace Quanta::Glfw
         return glfwGetClipboardString(handle);
     }
     
-    void Window::SetClipboardText(const char* value) 
+    void Window::SetClipboardText(const char* const value) 
     {
         glfwSetClipboardString(handle, value);
     }

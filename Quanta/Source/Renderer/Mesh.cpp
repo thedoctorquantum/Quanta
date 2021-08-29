@@ -86,7 +86,7 @@ namespace Quanta
         
     }
     
-    Mesh::Mesh(size_t vertexCount, size_t indexCount)
+    Mesh::Mesh(const size_t vertexCount, const size_t indexCount)
     {
         this->vertexCount = vertexCount;
         this->indexCount = indexCount;
@@ -160,7 +160,7 @@ namespace Quanta
         return *this;
     }
     
-    void Mesh::SetVertices(const Vertex* vertices, size_t count)
+    void Mesh::SetVertices(const Vertex* vertices, const size_t count)
     {
         DEBUG_ASSERT(vertices != nullptr);
 
@@ -175,8 +175,8 @@ namespace Quanta
 
         this->vertexCount = count;
     }
-
-    void Mesh::SetIndices(const uint32_t* indices, size_t count)
+    
+    void Mesh::SetIndices(const uint32_t* indices, const size_t count)
     {
         DEBUG_ASSERT(indices != nullptr);
 

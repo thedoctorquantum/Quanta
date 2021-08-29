@@ -17,7 +17,7 @@ namespace Quanta::OpenAL
         alDeleteBuffers(1, &handle);
     }
     
-    void AudioBuffer::SetData(const void* data, size_t size, size_t frequency, SoundFormat format)
+    void AudioBuffer::SetData(const void* const data, const size_t size, const size_t frequency, const SoundFormat format)
     {
         DEBUG_ASSERT(data != nullptr);
         DEBUG_ASSERT(size != 0);

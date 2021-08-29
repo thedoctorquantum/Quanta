@@ -5,7 +5,7 @@
 
 namespace Quanta
 {
-    Image32::Image32(USize width, USize height)
+    Image32::Image32(const USize width, const USize height)
     {
         DEBUG_ASSERT(width != 0);
         DEBUG_ASSERT(height != 0);
@@ -16,7 +16,7 @@ namespace Quanta
         this->height = height;
     }
 
-    Image32::Image32(Color32* data, USize width, USize height)
+    Image32::Image32(Color32* const data, const USize width, const USize height)
     {
         DEBUG_ASSERT(data != nullptr);   
         DEBUG_ASSERT(width != 0);
@@ -34,7 +34,7 @@ namespace Quanta
 
     Image32::Image32(Image32&& other) noexcept
     {
-        if(this == &other) return;
+        if (this == &other) return;
 
         data = other.data;
         width = other.width;
@@ -47,11 +47,11 @@ namespace Quanta
     
     std::shared_ptr<Image32> Image32::FromFile(const std::string& filepath)
     {
-        int width;
-        int height;
-        int channels;
+        int width = 0;
+        int height = 0;
+        int channels = 0;
 
-        stbi_uc* data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        stbi_uc* const data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         
         DEBUG_ASSERT(data != nullptr);
         
@@ -60,7 +60,7 @@ namespace Quanta
 
     Image32& Image32::operator=(Image32&& other) noexcept
     {
-        if(this == &other) return *this;
+        if (this == &other) return *this;
 
         delete[] data;
 
@@ -75,21 +75,21 @@ namespace Quanta
         return *this;
     }
 
-    Color32& Image32::operator[](USize index)
+    Color32& Image32::operator[](const USize index)
     {
         DEBUG_ASSERT(index < width * height);
 
         return data[index];
     }
     
-    const Color32& Image32::operator[](USize index) const
+    const Color32& Image32::operator[](const USize index) const
     {
         DEBUG_ASSERT(index < width * height);
 
         return data[index];
     }
 
-    Color32& Image32::operator()(USize x, USize y)
+    Color32& Image32::operator()(const USize x, const USize y)
     {
         DEBUG_ASSERT(x < width);
         DEBUG_ASSERT(y < height);
@@ -97,7 +97,7 @@ namespace Quanta
         return data[x + width * y];
     }
     
-    const Color32& Image32::operator()(USize x, USize y) const
+    const Color32& Image32::operator()(const USize x, const USize y) const
     {
         return this->operator()(x, y);
     }

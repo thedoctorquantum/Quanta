@@ -8,11 +8,11 @@ namespace Quanta
 {
     std::shared_ptr<RasterPipeline> RasterPipeline::Create(const RasterPipeline::Description& description)
     {
-        GraphicsApi api = GraphicsDevice::GetApi();
+        const GraphicsApi api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
-
-        switch(api)
+        
+        switch (api)
         {
         case GraphicsApi::OpenGL: 
             return std::make_shared<OpenGL::RasterPipeline>(description);

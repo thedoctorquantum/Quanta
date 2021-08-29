@@ -383,7 +383,7 @@ namespace Quanta::OpenGL
         glBindVertexArray(glVertexArray->GetHandle());
     }
     
-    void GraphicsDevice::InternalBindSampler(const Quanta::Sampler* sampler, USize index)
+    void GraphicsDevice::InternalBindSampler(const Quanta::Sampler* const sampler, const USize index)
     {
         const Sampler* internalSampler = nullptr;
         const Texture* internalTexture = nullptr;

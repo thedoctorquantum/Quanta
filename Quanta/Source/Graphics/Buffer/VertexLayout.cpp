@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    const VertexElement& VertexLayout::operator[](USize index) const
+    const VertexElement& VertexLayout::operator[](const USize index) const
     {
         DEBUG_ASSERT(index < elements.size());
         

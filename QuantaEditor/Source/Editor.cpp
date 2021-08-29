@@ -121,7 +121,7 @@ namespace Quanta
         ImGuiRenderer::Destroy();
     }
     
-    void Editor::OnUpdate(float frameTime)
+    void Editor::OnUpdate(const float frameTime)
     {
         GraphicsDevice::ClearBackBuffer(glm::vec4(1.0f), 1.0f, 0);
 
@@ -147,7 +147,7 @@ namespace Quanta
             {
                 if (ImGui::BeginMenu("File"))
                 {
-                    if (ImGui::MenuItem("Exit", "Alt+F4"))
+                    if (ImGui::MenuItem("Exit"))
                     {
                         window->Close();
                     }

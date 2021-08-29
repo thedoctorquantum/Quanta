@@ -30,6 +30,9 @@ namespace Quanta
         {
             scene->registry.emplace<Type>(handle, std::forward(args)...);
         }
+
+        bool operator==(Entity) const;
+        bool operator!=(Entity) const; 
     private:
         Scene* scene = nullptr; 
 

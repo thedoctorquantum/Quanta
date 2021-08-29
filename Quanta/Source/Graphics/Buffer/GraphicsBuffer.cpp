@@ -6,13 +6,13 @@
 
 namespace Quanta
 {
-    std::shared_ptr<GraphicsBuffer> GraphicsBuffer::Create(BufferUsage usage, USize size)
+    std::shared_ptr<GraphicsBuffer> GraphicsBuffer::Create(const BufferUsage usage, const USize size)
     {
-        GraphicsApi api = GraphicsDevice::GetApi();
+        const GraphicsApi api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
 
-        switch(api)
+        switch (api)
         {
         case GraphicsApi::OpenGL: 
             return std::make_shared<OpenGL::GraphicsBuffer>(usage, size);

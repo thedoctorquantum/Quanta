@@ -10,7 +10,7 @@ namespace Quanta
     public:
         static std::shared_ptr<AudioSource> Create();
         
-        virtual ~AudioSource() = 0;
+        virtual ~AudioSource() = default;
 
         virtual const glm::vec3& GetTranslation() const = 0;
         virtual void SetTranslation(const glm::vec3& value) = 0;

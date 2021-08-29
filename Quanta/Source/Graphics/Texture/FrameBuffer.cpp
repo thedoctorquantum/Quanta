@@ -8,11 +8,11 @@ namespace Quanta
 {
     static std::shared_ptr<FrameBuffer> Create(const FrameBuffer::Description& description)
     {
-        GraphicsApi api = GraphicsDevice::GetApi();
+        const GraphicsApi api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
 
-        switch(api)
+        switch (api)
         {
         case GraphicsApi::OpenGL:
             return nullptr;

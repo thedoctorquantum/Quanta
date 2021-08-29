@@ -10,11 +10,11 @@ namespace Quanta
     {
         DEBUG_ASSERT(texture != nullptr);
 
-        GraphicsApi api = GraphicsDevice::GetApi();
+        const GraphicsApi api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
         
-        switch(api)
+        switch (api)
         {
         case GraphicsApi::OpenGL:
             return std::make_shared<OpenGL::Sampler>(texture);            

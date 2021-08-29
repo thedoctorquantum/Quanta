@@ -77,7 +77,7 @@ namespace Quanta
         return shininess;
     }
 
-    void Material::SetShininess(float value)
+    void Material::SetShininess(const float value)
     {
         shininess = value;
     }
@@ -87,7 +87,7 @@ namespace Quanta
         return opacity;
     }        
     
-    void Material::SetOpacity(float value)
+    void Material::SetOpacity(const float value)
     {
         opacity = value;
     }
@@ -97,7 +97,7 @@ namespace Quanta
         return albedoSampler;
     }
     
-    void Material::SetAlbedoSampler(std::shared_ptr<Sampler> value)
+    void Material::SetAlbedoSampler(const std::shared_ptr<Sampler>& value)
     {
         albedoSampler = value;
     }
@@ -107,7 +107,7 @@ namespace Quanta
         return specularSampler;
     }
 
-    void Material::SetSpecularSampler(std::shared_ptr<Sampler> value)
+    void Material::SetSpecularSampler(const std::shared_ptr<Sampler>& value)
     {
         specularSampler = value;
     }
@@ -117,7 +117,7 @@ namespace Quanta
         return normalSampler;
     }
     
-    void Material::SetNormalSampler(std::shared_ptr<Sampler> value)
+    void Material::SetNormalSampler(const std::shared_ptr<Sampler>& value)
     {
         normalSampler = value;
     }
@@ -126,8 +126,8 @@ namespace Quanta
     {
         return opacitySampler;
     }
-
-    void Material::SetOpacitySampler(std::shared_ptr<Sampler> value)
+    
+    void Material::SetOpacitySampler(const std::shared_ptr<Sampler>& value)
     {
         opacitySampler = value;
     }

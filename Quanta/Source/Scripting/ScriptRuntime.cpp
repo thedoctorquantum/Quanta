@@ -8,7 +8,7 @@
 
 namespace Quanta
 {
-    static void MessageCallback(const asSMessageInfo* message, void* param)
+    static void MessageCallback(const asSMessageInfo* const message, void* const param)
     {
         Log::Level level = Log::Level::Information;
 
@@ -43,7 +43,7 @@ namespace Quanta
         Log::Write(level, outputMessage.str());
     };
 
-    static void ExceptionCallback(asIScriptContext* context, void* userParam)
+    static void ExceptionCallback(asIScriptContext* const context, void* const userParam)
     {
         try 
         {

@@ -6,7 +6,7 @@ namespace Quanta
 {
     static const char* modes[] = { "rb", "wb", "rw", "a" };
 
-    FileStream::FileStream(const std::string& path, Mode mode)
+    FileStream::FileStream(const std::string& path, const Mode mode)
     {
         this->path = path;
         this->mode = mode;
