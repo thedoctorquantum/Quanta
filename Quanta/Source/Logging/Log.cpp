@@ -23,7 +23,7 @@ namespace Quanta::Log
                 return "Information";
         }
     }
-
+    
     struct 
     {
         std::vector<Callback> callbacks;
@@ -31,7 +31,7 @@ namespace Quanta::Log
         LevelMask levelMask = LevelMask::All;
     } static log;
 
-    void AddCallback(Callback callback)
+    void AddCallback(const Callback& callback)
     {
         log.callbacks.push_back(callback);
     }
@@ -110,7 +110,7 @@ namespace Quanta::Log
         
         for (std::size_t i = 0; i < log.callbacks.size(); i++)
         {
-            Callback callback = log.callbacks[i];
+            const Callback& callback = log.callbacks[i];
 
             if (!callback)
             {

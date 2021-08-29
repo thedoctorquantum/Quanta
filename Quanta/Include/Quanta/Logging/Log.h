@@ -9,7 +9,7 @@ namespace Quanta::Log
 {
     using Callback = std::function<void(Level, const std::string&)>;
 
-    void AddCallback(Callback callback);
+    void AddCallback(const Callback& callback);
 
     void EnableStdCout(bool enable);
 
