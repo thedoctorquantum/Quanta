@@ -19,6 +19,8 @@ namespace Quanta::Log
                 return "Warning";
             case Level::Error:
                 return "Error";
+            case Level::Fatal:
+                return "Fatal";
             default:
                 return "Information";
         }
@@ -53,7 +55,7 @@ namespace Quanta::Log
     
     void WriteFormat(const Level level, const std::string& message, ...)
     {
-        va_list args;
+        va_list args { };
         
         va_start(args, message);
 
@@ -96,6 +98,11 @@ namespace Quanta::Log
 
                     break;
                 case Level::Error:
+                    begin = "\x1B[31m";
+                    end = "\033[0m\t\t\n";
+
+                    break;
+                case Level::Fatal:
                     begin = "\x1B[31m";
                     end = "\033[0m\t\t\n";
 

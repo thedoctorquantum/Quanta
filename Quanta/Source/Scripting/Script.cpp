@@ -30,6 +30,7 @@ namespace Quanta
     Script::~Script()
     {
         module->Discard();
+        context->Release();
     }
     
     I32 Script::Main()
@@ -45,7 +46,7 @@ namespace Quanta
 
         context->Execute();
         
-        double exit = context->GetReturnDouble();
+        asQWORD exit = context->GetReturnQWord();
 
         context->Unprepare();
 

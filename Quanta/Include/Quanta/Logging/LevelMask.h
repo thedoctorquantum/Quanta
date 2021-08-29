@@ -8,11 +8,12 @@ namespace Quanta::Log
     {
         None = 0b00000000,
         All = 0b11111111,
-
+        
         Information = static_cast<U8>(Level::Information),
         Trace = static_cast<U8>(Level::Trace),
         Warning = static_cast<U8>(Level::Warning),
-        Error = static_cast<U8>(Level::Error)
+        Error = static_cast<U8>(Level::Error),
+        Fatal = static_cast<U8>(Level::Fatal)
     };
     
     constexpr LevelMask operator+(const LevelMask left, const LevelMask right)

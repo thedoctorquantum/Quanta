@@ -1,5 +1,4 @@
 #include <imgui.h>
-#include <iostream>
 
 #include "LogWidget.h"
 
@@ -7,59 +6,38 @@ namespace Quanta
 {
     struct LogFormat final
     {
-        ImVec4 color;
+        ImVec4 color { 1.0f, 1.0f, 1.0f, 1.0f };
         const char* message = "%s\n";
     };
     
-    static LogFormat GetLogFormat(Log::Level level)
+    static LogFormat GetLogFormat(const Log::Level level)
     {
-        LogFormat format;
-
         switch (level)
         {
             case Log::Level::Trace:
-                format.message = "[Trace] %s";
-
-                new(&format.color) ImVec4(1.0f, 1.0f, 1.0f, 0.8f);
-
-                break;
+                return { { 1.0f, 1.0f, 1.0f, 0.8f }, "[Trace] %s" };
             case Log::Level::Information:
-                format.message = "[Information] %s";
-
-                new(&format.color) ImVec4(0.0f, 1.0f, 0.0f, 0.8f);
-
-                break;
+                return { { 0.0f, 1.0f, 0.0f, 0.8f }, "[Information] %s" };
             case Log::Level::Warning:
-                format.message = "[Warning] %s";
-
-                new(&format.color) ImVec4(1.0f, 1.0f, 0.0f, 0.8f);
-
-                break;
+                return { { 1.0f, 1.0f, 0.0f, 0.8f }, "[Warning] %s" };
             case Log::Level::Error:
-                format.message = "[Error] %s";
-
-                new(&format.color) ImVec4(1.0f, 0.0f, 0.0f, 0.8f);
-
-                break;
+                return { { 1.0f, 0.0f, 0.0f, 0.8f }, "[Error] %s" };
+            case Log::Level::Fatal:
+                return { { 1.0f, 0.0f, 0.0f, 0.8f }, "[Fatal] %s" };
+            default:
+                return { };
         }
-
-        return format;
     }
 
     LogWidget::LogWidget()
     {
-        Log::AddCallback([&](Log::Level level, const std::string& text) 
+        Log::AddCallback([&](const Log::Level level, const std::string& text) 
         {
             this->messages.push_back({ text, level });
         });
     }
 
-    LogWidget::~LogWidget()
-    {
-
-    }
-
-    void LogWidget::Render(const char* title, bool* open)
+    void LogWidget::Render(const char* const title, bool* const open)
     {   
         if (!*open)
         {
@@ -79,6 +57,7 @@ namespace Quanta
             bool enableInfo = mask & Log::Level::Information;
             bool enableWarn = mask & Log::Level::Warning;
             bool enableError = mask & Log::Level::Error;
+            bool enableFatal = mask & Log::Level::Fatal;
 
             if (ImGui::Checkbox("Trace", &enableTrace))
             {
@@ -134,19 +113,38 @@ namespace Quanta
                 }
             }
 
-            ImGui::NewLine();
-
-            for (const auto& message : messages)
+            ImGui::SameLine();
+            
+            if (ImGui::Checkbox("Fatal", &enableFatal))
             {
-                if (!(mask & message.level))
+                if (enableFatal)
                 {
-                    continue;
+                    mask += Log::LevelMask::Fatal;
                 }
-
-                LogFormat format = GetLogFormat(message.level);
-                
-                ImGui::TextColored(format.color, format.message, message.text.c_str());
+                else
+                {
+                    mask -= Log::LevelMask::Fatal;
+                }
             }
+
+            ImGui::Separator();
+
+            if (ImGui::BeginChild("Scroll Area", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar))
+            {
+                for (const auto& message : messages)
+                {
+                    if (!(mask & message.level))
+                    {
+                        continue;
+                    }
+
+                    LogFormat format = GetLogFormat(message.level);
+                    
+                    ImGui::TextColored(format.color, format.message, message.text.c_str());
+                }
+            }
+            
+            ImGui::EndChild();
         }
 
         ImGui::End();

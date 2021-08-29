@@ -181,13 +181,13 @@ namespace Quanta
                 {
                     static auto runScript = [](const TextEditor& editor)
                     {
-                        std::ofstream file("Resources/Scripts/test.as");
+                        {
+                            std::ofstream file("Resources/Scripts/test.as");
                         
-                        std::string source = editor.GetText();
+                            const std::string source = editor.GetText();
 
-                        file.write(source.c_str(), source.size());
-                        
-                        file.close();
+                            file.write(source.c_str(), source.size());
+                        }
 
                         Script script("Resources/Scripts/test.as");
 

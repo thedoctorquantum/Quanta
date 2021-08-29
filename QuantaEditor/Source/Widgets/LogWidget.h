@@ -4,7 +4,6 @@
 
 #include <vector>
 #include <string>
-#include <sstream>
 
 namespace Quanta
 {
@@ -12,7 +11,6 @@ namespace Quanta
     {
     public:
         LogWidget();
-        ~LogWidget();
 
         void Render(const char* title, bool* open = nullptr);
     private:
@@ -24,8 +22,6 @@ namespace Quanta
 
         std::vector<Message> messages;
         
-        std::ostringstream stream;
-
         Log::LevelMask mask = Log::LevelMask::All;
     };
 }

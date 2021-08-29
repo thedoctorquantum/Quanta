@@ -90,7 +90,7 @@ namespace Quanta
     
     void ScriptRuntime::Destroy()
     {
-        engine->Release();
+        engine->Release();      
     }
     
     asIScriptEngine* ScriptRuntime::GetEngine() 

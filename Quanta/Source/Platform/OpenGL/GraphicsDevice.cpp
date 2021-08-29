@@ -1,5 +1,6 @@
-#include <iostream>
+#include <Quanta/Logging/Log.h>
 #include <glad/glad.h>
+#include <sstream>
 
 #include "GraphicsDevice.h"
 #include "VertexArray.h"
@@ -11,11 +12,62 @@
 
 namespace Quanta::OpenGL
 {
+    static void OnDebugMessage(
+        const GLenum source,
+        const GLenum type,
+        const unsigned int id, 
+        const GLenum severity, 
+        const GLsizei length, 
+        const char* const message, 
+        const void* const userParam
+    ) 
+    {
+        Log::Level logLevel = Log::Level::Trace;
+        const char* severityString = nullptr;
+
+        switch(severity)
+        {
+        case GL_DEBUG_SEVERITY_NOTIFICATION:
+            logLevel = Log::Level::Information;
+            severityString = "Notification";
+
+            break;
+        case GL_DEBUG_SEVERITY_LOW:
+            logLevel = Log::Level::Information;
+            severityString = "Low";
+
+            break;
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            logLevel = Log::Level::Warning;
+            severityString = "Medium";
+
+            break;
+        case GL_DEBUG_SEVERITY_HIGH:
+            logLevel = Log::Level::Error;
+            severityString = "High";
+
+            break;
+        }
+
+        DEBUG_ASSERT(severityString != nullptr);
+
+        std::ostringstream output;
+
+        output << "[GraphicsApi=OpenGL] [";
+        output << id;
+        output << "] [";
+        output << severityString;
+        output << "]: ";
+        output << message;
+
+        Log::Write(logLevel, output.str());
+    }
+
     GraphicsDevice::GraphicsDevice(const Window& window)
     {
         DEBUG_ASSERT(window.GetGraphicsApi() == GraphicsApi::OpenGL);
         
-        bool isLoaded = gladLoadGL();
+        const bool isLoaded = gladLoadGL();
 
         DEBUG_ASSERT(isLoaded);
 
@@ -26,35 +78,8 @@ namespace Quanta::OpenGL
             glEnable(GL_DEBUG_OUTPUT);
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
 
-            glDebugMessageCallback([](GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) 
-            {
-                const GraphicsDevice* _this = static_cast<const GraphicsDevice*>(userParam);
-
-                const char* severityString = "Notification";
-
-                switch(severity)
-                {
-                case GL_DEBUG_SEVERITY_NOTIFICATION:
-                    severityString = "Notification";
-
-                    break;
-                case GL_DEBUG_SEVERITY_LOW:
-                    severityString = "Low";
-
-                    break;
-                case GL_DEBUG_SEVERITY_MEDIUM:
-                    severityString = "Medium";
-
-                    break;
-                case GL_DEBUG_SEVERITY_HIGH:
-                    severityString = "High";
-
-                    break;
-                }
-
-                std::cout << "[GraphicsApi=OpenGL] [" << id << "] [" << severityString << "]: " << message << '\n';
-            }, this);
-
+            glDebugMessageCallback(OnDebugMessage, this);
+            
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);
         }
         else
@@ -64,14 +89,14 @@ namespace Quanta::OpenGL
         }
     }
     
-    void GraphicsDevice::InternalClearBackBuffer(const glm::vec4& color, float depth, int stencil)
+    void GraphicsDevice::InternalClearBackBuffer(const glm::vec4& color, const float depth, const int stencil)
     {
         glClearNamedFramebufferfv(0, GL_COLOR, 0, &color.x);
         glClearNamedFramebufferfv(0, GL_DEPTH, 0, &depth);
         glClearNamedFramebufferiv(0, GL_STENCIL, 0, &stencil);
     }
     
-    void GraphicsDevice::InternalSetRasterPipeline(const Quanta::RasterPipeline* value)
+    void GraphicsDevice::InternalSetRasterPipeline(const Quanta::RasterPipeline* const value)
     {
         if(!value)
         {
@@ -333,7 +358,7 @@ namespace Quanta::OpenGL
         rasterPipeline = glPipeline;
     }
     
-    void GraphicsDevice::InternalSetVertexArray(const Quanta::VertexArray* value)
+    void GraphicsDevice::InternalSetVertexArray(const Quanta::VertexArray* const value)
     {
         if(vertexArray == value) return;
 
