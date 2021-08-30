@@ -8,6 +8,7 @@
 #include "RasterPipeline.h"
 #include "Texture.h"
 #include "Sampler.h"
+#include "FrameBuffer.h"
 #include "../../Debugging/Validation.h"
 
 namespace Quanta::OpenGL
@@ -98,7 +99,7 @@ namespace Quanta::OpenGL
     
     void GraphicsDevice::InternalSetRasterPipeline(const Quanta::RasterPipeline* const value)
     {
-        if(!value)
+        if (!value)
         {
             rasterPipeline = nullptr;
 
@@ -131,9 +132,33 @@ namespace Quanta::OpenGL
             glPipeline = static_cast<const RasterPipeline*>(value);
         }
 
-        if(rasterPipeline != glPipeline)
+        if (rasterPipeline != glPipeline)
         {
-            for(size_t i = 0; i < value->GetUniformBufferCount(); i++)
+            const std::shared_ptr<Quanta::FrameBuffer>& frameBuffer = value->GetFrameBuffer();
+
+            if (frameBuffer != nullptr)
+            {
+                const OpenGL::FrameBuffer* glFrameBuffer = nullptr;
+
+                if constexpr (DEBUG)
+                {
+                    glFrameBuffer = dynamic_cast<const OpenGL::FrameBuffer*>(frameBuffer.get());
+                }
+                else
+                {
+                    glFrameBuffer = static_cast<const OpenGL::FrameBuffer*>(frameBuffer.get());
+                }
+
+                DEBUG_ASSERT(glFrameBuffer != nullptr);
+
+                glBindFramebuffer(GL_FRAMEBUFFER, glFrameBuffer->GetHandle());
+            }
+            else
+            {
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            }
+
+            for (size_t i = 0; i < value->GetUniformBufferCount(); i++)
             {
                 const std::shared_ptr<Quanta::GraphicsBuffer>& buffer = value->GetUniformBuffer(i);
 
@@ -162,13 +187,13 @@ namespace Quanta::OpenGL
                 if constexpr (DEBUG)
                 {
                     glBuffer = dynamic_cast<GraphicsBuffer*>(buffer.get());
-
-                    DEBUG_ASSERT(glBuffer != nullptr);
                 }
                 else
                 {
                     glBuffer = static_cast<GraphicsBuffer*>(buffer.get());
                 }
+
+                DEBUG_ASSERT(glBuffer != nullptr);
 
                 glBindBufferBase(GL_SHADER_STORAGE_BUFFER, i, glBuffer->GetHandle());
             }

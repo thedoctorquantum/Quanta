@@ -34,6 +34,8 @@ namespace Quanta::Glfw
         WindowState GetState() const override;
         void SetState(WindowState value) override;
         
+        glm::uvec2 GetFrameBufferSize() const override;
+
         glm::uvec2 GetPosition() const override;
         glm::uvec2 GetSize() const override;
         
@@ -64,10 +66,13 @@ namespace Quanta::Glfw
         const GLFWwindow* GetHandle() const;
         GLFWwindow* GetHandle();
     private:
-        GLFWwindow* handle;
+        GLFWwindow* handle = nullptr;
         GraphicsApi graphicsApi;
 
         std::string title;
+
+        glm::uvec2 position = glm::uvec2(0u);
+        glm::uvec2 size = glm::uvec2(640u, 480u);
 
         WindowState state;
 

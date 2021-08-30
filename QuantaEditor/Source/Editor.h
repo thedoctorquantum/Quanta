@@ -19,6 +19,14 @@ namespace Quanta
 
         void OnUpdate(float frameTime) override;
     private:
+        std::shared_ptr<FrameBuffer> sceneBuffer;
+        glm::uvec2 sceneViewPos = glm::uvec2(0);  
+        glm::uvec2 sceneViewSize = glm::uvec2(1);  
+
+        std::shared_ptr<Sampler> sceneSampler = nullptr;
+
+        std::shared_ptr<Sampler> skyboxSampler = nullptr;
+
         Renderer3D::View view;
 
         Model model;
@@ -30,6 +38,8 @@ namespace Quanta
 
         LogWidget log;
         bool logOpen = true;
+
+        bool sceneViewOpen = true;
 
         entt::registry scene;
     };

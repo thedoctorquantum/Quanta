@@ -18,6 +18,8 @@ namespace Quanta::OpenGL
         const std::shared_ptr<Quanta::GraphicsBuffer>& GetUniformBuffer(USize index) const override;
         const std::shared_ptr<Quanta::GraphicsBuffer>& GetStorageBuffer(USize index) const override;
         
+        const std::shared_ptr<Quanta::FrameBuffer>& GetFrameBuffer() const override;
+
         USize GetShaderModuleCount() const override;
         USize GetUniformBufferCount() const override;
         USize GetStorageBufferCount() const override;
@@ -62,9 +64,11 @@ namespace Quanta::OpenGL
         std::vector<std::shared_ptr<Quanta::ShaderModule>> shaderModules;
         std::vector<std::shared_ptr<Quanta::GraphicsBuffer>> uniformBuffers;
         std::vector<std::shared_ptr<Quanta::GraphicsBuffer>> storageBuffers;
+
+        std::shared_ptr<Quanta::FrameBuffer> frameBuffer = nullptr;
         
-        glm::uvec4 viewport = { };
-        glm::uvec4 scissorViewport = { };
+        glm::uvec4 viewport = glm::uvec4(0.0f);
+        glm::uvec4 scissorViewport = glm::uvec4(0.0f);
 
         PolygonFillMode polygonFillMode = PolygonFillMode::Solid;
         DepthTestMode depthTestMode = DepthTestMode::None;

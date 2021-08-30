@@ -1,3 +1,4 @@
+#include <Quanta/Logging/Log.h>
 #include <glad/glad.h>
 
 #include "RasterPipeline.h"
@@ -8,11 +9,12 @@ namespace Quanta::OpenGL
 {
     RasterPipeline::RasterPipeline(const RasterPipeline::Description& description)
     {
-        DEBUG_ASSERT(description.ShaderModules.size() >= 2);
+        DEBUG_ASSERT(description.shaderModules.size() >= 2);
         
-        this->shaderModules = description.ShaderModules;
-        this->uniformBuffers = description.UniformBuffers;
-        this->storageBuffers = description.StorageBuffers;
+        this->shaderModules = description.shaderModules;
+        this->uniformBuffers = description.uniformBuffers;
+        this->storageBuffers = description.storageBuffers;
+        this->frameBuffer = description.frameBuffer;
         
         handle = glCreateProgram();
 
@@ -40,7 +42,7 @@ namespace Quanta::OpenGL
 
         if constexpr (DEBUG)
         {
-            int success;
+            int success = 0;
 
             glGetProgramiv(handle, GL_LINK_STATUS, &success);
 
@@ -50,7 +52,9 @@ namespace Quanta::OpenGL
 
                 glGetProgramInfoLog(handle, sizeof(infoLog), nullptr, infoLog);
 
-                DEBUG_FAILURE_MESSAGE(infoLog);
+                Log::Write(Log::Level::Fatal, infoLog);
+
+                DEBUG_FAILURE();
             }
         }
         
@@ -97,6 +101,11 @@ namespace Quanta::OpenGL
         DEBUG_ASSERT(index < storageBuffers.size());
 
         return storageBuffers[index];
+    }
+
+    const std::shared_ptr<Quanta::FrameBuffer>& RasterPipeline::GetFrameBuffer() const
+    {
+        return frameBuffer;
     }
 
     const glm::uvec4& RasterPipeline::GetViewport() const

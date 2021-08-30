@@ -6,6 +6,7 @@
 
 #include "../Buffer/GraphicsBuffer.h"
 #include "../Shader/ShaderModule.h"
+#include "../Texture/FrameBuffer.h"
 #include "BlendFactor.h"
 #include "BlendMode.h"
 #include "DepthTestMode.h"
@@ -22,9 +23,11 @@ namespace Quanta
         struct Description final
         {
         public:
-            std::vector<std::shared_ptr<ShaderModule>> ShaderModules;
-            std::vector<std::shared_ptr<GraphicsBuffer>> UniformBuffers;
-            std::vector<std::shared_ptr<GraphicsBuffer>> StorageBuffers;
+            std::vector<std::shared_ptr<ShaderModule>> shaderModules;
+            std::vector<std::shared_ptr<GraphicsBuffer>> uniformBuffers;
+            std::vector<std::shared_ptr<GraphicsBuffer>> storageBuffers;
+
+            std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
         };
     
         static std::shared_ptr<RasterPipeline> Create(const Description& description);
@@ -34,6 +37,8 @@ namespace Quanta
         virtual const std::shared_ptr<ShaderModule>& GetShaderModule(USize index) const = 0;
         virtual const std::shared_ptr<GraphicsBuffer>& GetUniformBuffer(USize index) const = 0;
         virtual const std::shared_ptr<GraphicsBuffer>& GetStorageBuffer(USize index) const = 0;
+
+        virtual const std::shared_ptr<FrameBuffer>& GetFrameBuffer() const = 0;
         
         virtual USize GetShaderModuleCount() const = 0;
         virtual USize GetUniformBufferCount() const = 0;

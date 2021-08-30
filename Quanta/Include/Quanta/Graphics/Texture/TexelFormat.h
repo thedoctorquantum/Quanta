@@ -8,6 +8,8 @@ namespace Quanta
     {
         Rgba8I,
         Rgba16F,
-        Rgba32F
+        Rgba32F,
+
+        Depth24Stencil8
     };
 }

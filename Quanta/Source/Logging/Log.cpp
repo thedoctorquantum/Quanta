@@ -29,7 +29,7 @@ namespace Quanta::Log
     struct 
     {
         std::vector<Callback> callbacks;
-        bool writeToCout = false;
+        bool writeToCout = true;
         LevelMask levelMask = LevelMask::All;
     } static log;
 

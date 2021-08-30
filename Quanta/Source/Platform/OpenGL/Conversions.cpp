@@ -53,7 +53,8 @@ namespace Quanta
         {
         case TexelFormat::Rgba8I: return GL_RGBA;    
         case TexelFormat::Rgba16F: return GL_RGBA;
-        case TexelFormat::Rgba32F: return GL_RGBA;                
+        case TexelFormat::Rgba32F: return GL_RGBA;
+        case TexelFormat::Depth24Stencil8: return GL_DEPTH_STENCIL;                
         }
 
         return 0;
@@ -66,6 +67,7 @@ namespace Quanta
             case TexelFormat::Rgba8I: return GL_RGBA8;
             case TexelFormat::Rgba16F: return GL_RGBA16F;
             case TexelFormat::Rgba32F: return GL_RGBA32F;
+            case TexelFormat::Depth24Stencil8: return GL_DEPTH24_STENCIL8;
         }
 
         return 0;
@@ -78,6 +80,7 @@ namespace Quanta
             case TexelFormat::Rgba8I: return GL_UNSIGNED_BYTE;
             case TexelFormat::Rgba16F: return GL_FLOAT;
             case TexelFormat::Rgba32F: return GL_FLOAT;
+            case TexelFormat::Depth24Stencil8: return GL_UNSIGNED_INT_24_8;
         }
 
         return 0;

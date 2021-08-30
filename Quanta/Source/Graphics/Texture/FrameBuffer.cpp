@@ -2,11 +2,11 @@
 #include <Quanta/Graphics/GraphicsDevice.h>
 
 #include "../../Debugging/Validation.h"
-#include "../../Platform/OpenGL/Texture.h"
+#include "../../Platform/OpenGL/FrameBuffer.h"
 
 namespace Quanta
 {
-    static std::shared_ptr<FrameBuffer> Create(const FrameBuffer::Description& description)
+    std::shared_ptr<FrameBuffer> FrameBuffer::Create(const FrameBuffer::Description& description)
     {
         const GraphicsApi api = GraphicsDevice::GetApi();
 
@@ -15,8 +15,7 @@ namespace Quanta
         switch (api)
         {
         case GraphicsApi::OpenGL:
-            return nullptr;
-            //return std::make_shared<OpenGLTexture>(type, format, width, height, depth);
+            return std::make_shared<OpenGL::FrameBuffer>(description);
         }
         
         return nullptr;

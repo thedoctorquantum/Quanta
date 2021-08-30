@@ -17,9 +17,29 @@ namespace Quanta
     Editor::Editor()
     {
         window->SetTitle("Quanta Editor");
-        window->SetState(WindowState::Maximized);
 
-        Renderer3D::Create(*window);
+        FrameBuffer::Description fbDescription;
+
+        FrameBuffer::AttachmentDescription colorAttachment;
+
+        colorAttachment.format = TexelFormat::Rgba8I;
+        colorAttachment.isSwapChainTarget = true;
+
+        FrameBuffer::AttachmentDescription depthAttachment;
+
+        depthAttachment.format = TexelFormat::Depth24Stencil8;
+
+        fbDescription.colorAttachments.push_back(colorAttachment);
+        fbDescription.depthAttachment = depthAttachment;
+
+        fbDescription.width = window->GetFrameBufferSize().x;
+        fbDescription.height = window->GetFrameBufferSize().y;
+
+        sceneBuffer = FrameBuffer::Create(fbDescription);
+
+        sceneSampler = Sampler::Create(sceneBuffer->GetColorTexture(0));
+
+        Renderer3D::Create(*window, sceneBuffer);
         ImGuiRenderer::Create(window);
 
         ImGuiIO& io = ImGui::GetIO();
@@ -80,23 +100,37 @@ namespace Quanta
         style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
         style.GrabRounding = style.FrameRounding = 2.3f;
 
+        std::shared_ptr<Texture> skybox = Quanta::Texture::Create(Quanta::TextureType::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
+
+        std::shared_ptr<Quanta::Image32> images[] 
+        {
+            Quanta::Image32::FromFile("Resources/Textures/Skybox/right.png"),
+            Quanta::Image32::FromFile("Resources/Textures/Skybox/left.png"),
+            Quanta::Image32::FromFile("Resources/Textures/Skybox/top.png"),
+            Quanta::Image32::FromFile("Resources/Textures/Skybox/bottom.png"),
+            Quanta::Image32::FromFile("Resources/Textures/Skybox/back.png"),
+            Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
+        };
+
+        for(size_t i = 0; i < 6; i++)
+        {
+            Quanta::Image32& image = *images[i];
+
+            skybox->SetData(image.GetData(), 0, 0, i);
+        }
+
+        skyboxSampler = Sampler::Create(skybox);
+
+        Renderer3D::SetEnvironmentSampler(skyboxSampler);
+
         model = Model::FromFile("Resources/Models/test_scene_01.fbx");
 
-        Log::EnableStdCout(true);
-
-        Log::SetLevelMask(Log::LevelMask::All);
-        
-        Log::Write(Log::Level::Information, "Hello, log!");
-        Log::Write(Log::Level::Trace, "Trace");
-        Log::Write(Log::Level::Warning, "Warning example"); 
-        Log::Write(Log::Level::Error, "Error example");
-
-        Log::WriteFormat(Log::Level::Warning, "Hello, world! look at this ptr: %p", &model);
-
-        view.fieldOfView = 70.0f;
+        view.matrix = glm::lookAt(glm::vec3 { 0.0f, 10.0f, 10.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, glm::vec3 { 0.0f, 1.0f, 0.0f });
+        view.fieldOfView = 60.0f;
         view.far = 10000.0f;
-        view.matrix = glm::mat4(1.0f);
-        
+        view.width = sceneBuffer->GetWidth();
+        view.height = sceneBuffer->GetHeight();
+
         ScriptRuntime::Create();
 
         std::ifstream source("Resources/Scripts/test.as");
@@ -127,21 +161,53 @@ namespace Quanta
 
         static DirectionalLight light;
 
-        static glm::mat4 transform = glm::translate(glm::mat4(1.0f), { 0.0f, 0.0f, 0.0f });
+        static glm::mat4 transform = glm::identity<glm::mat4>();
 
-        Renderer3D::BeginPass(view);
+        static std::vector<PointLight> lights {
+            {  }
+        };
+
+        static bool initStatics = true;
+
+        if (initStatics)
         {
-            //Renderer3D::SetDirectionalLight(light);
+            lights[0].Ambient = glm::vec3(1.0f);
+            lights[0].Diffuse = { 0.5f, 0.5f, 0.5f };
+            lights[0].Specular = { 1.0f, 1.0f, 1.0f };
+            
+            lights[0].Position = { 0.0f, 0.0f, 0.0f };
+            lights[0].Linear = 0.045f;
+            lights[0].Quadratic = 0.0075f;
 
-            //Renderer3D::DrawModel(model, transform);
+            initStatics = false;
         }
-        Renderer3D::EndPass();
+        
+        if (sceneViewOpen)
+        {
+            sceneBuffer->Clear(glm::vec4(1.0f), 1.0f, 0);
+
+            Renderer3D::BeginPass(view);
+            {
+                //Renderer3D::SetDirectionalLight(light);
+                Renderer3D::SetPointLights(lights.data(), lights.size());
+
+                Renderer3D::DrawModel(model, transform);
+            }
+            Renderer3D::EndPass();
+        }
 
         ImGuiRenderer::Begin(frameTime);
         {
             ImGuizmo::BeginFrame();
 
             ImGui::DockSpaceOverViewport();
+
+            if (ImGui::Begin("Debug Items"))
+            {
+                ImGui::ColorEdit3("Light ambient", &lights[0].Ambient.x);
+            }
+
+            ImGui::End();
 
             if (ImGui::BeginMainMenuBar());
             {
@@ -165,6 +231,11 @@ namespace Quanta
                     if (ImGui::MenuItem("Log"))
                     {
                         logOpen = !logOpen;
+                    }
+
+                    if (ImGui::MenuItem("Scene View"))
+                    {
+                        sceneViewOpen = !sceneViewOpen;
                     }
 
                     ImGui::EndMenu();
@@ -224,17 +295,33 @@ namespace Quanta
                 ImGui::End();
             }
 
-            ImGuizmo::SetRect(0, 0, static_cast<float>(window->GetWidth()), static_cast<float>(window->GetHeight()));
-            ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
-            ImGuizmo::AllowAxisFlip(false);
+            if (sceneViewOpen)
+            {
+                if (ImGui::Begin("Scene View", &sceneViewOpen, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+                {
+                    const ImVec2 pos = ImGui::GetWindowPos();
+                    const ImVec2 size = ImGui::GetWindowSize();
 
-            ImGuizmo::ViewManipulate(glm::value_ptr(view.matrix), 100, ImVec2 { 0, 0 }, ImVec2 { 128, 128 }, 0x00FFFFFF);
+                    view.width = ImGui::GetWindowWidth();
+                    view.height = ImGui::GetWindowHeight();
 
-            glm::mat4 proj = Renderer3D::GetProjectionMatrix();
-            
-            ImGuizmo::Enable(true);
-            
-            ImGuizmo::Manipulate(glm::value_ptr(view.matrix), glm::value_ptr(proj), ImGuizmo::OPERATION::UNIVERSAL, ImGuizmo::MODE::WORLD, glm::value_ptr(transform));
+                    ImGui::Image(sceneSampler.get(), size, ImVec2(0, 0), ImVec2(1, -1));
+
+                    ImGuizmo::SetRect(pos.x, pos.y, size.x, size.y);
+                    ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+                    ImGuizmo::AllowAxisFlip(false);
+
+                    ImGuizmo::ViewManipulate(glm::value_ptr(view.matrix), 100, pos, ImVec2 { 128, 128 }, 0x00FFFFFF);
+
+                    const glm::mat4 proj = Renderer3D::GetProjectionMatrix();
+                                        
+                    ImGuizmo::Enable(ImGui::IsWindowFocused());
+                    
+                    ImGuizmo::Manipulate(glm::value_ptr(view.matrix), glm::value_ptr(proj), ImGuizmo::OPERATION::UNIVERSAL, ImGuizmo::MODE::WORLD, glm::value_ptr(transform));
+                }
+
+                ImGui::End();
+            }
         }   
         ImGuiRenderer::End();
 

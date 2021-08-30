@@ -204,10 +204,10 @@ namespace Quanta
 
         RasterPipeline::Description pipelineDescription;
 
-        pipelineDescription.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Vertex, vertexSource));
-        pipelineDescription.ShaderModules.emplace_back(ShaderModule::Create(ShaderType::Pixel, fragmentSource));
+        pipelineDescription.shaderModules.emplace_back(ShaderModule::Create(ShaderType::Vertex, vertexSource));
+        pipelineDescription.shaderModules.emplace_back(ShaderModule::Create(ShaderType::Pixel, fragmentSource));
 
-        pipelineDescription.UniformBuffers.emplace_back(state->uniformBuffer);
+        pipelineDescription.uniformBuffers.emplace_back(state->uniformBuffer);
         
         state->pipeline = RasterPipeline::Create(pipelineDescription);
         
@@ -273,11 +273,15 @@ namespace Quanta
     {
         BuildFontAtlas();
         
-        state->io->DisplaySize = ImVec2(static_cast<float>(state->window->GetWidth()), static_cast<float>(state->window->GetHeight()));
-        state->io->DeltaTime = elapsed;
-        state->io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+        const std::uint32_t displayWidth = state->window->GetFrameBufferSize().x; 
+        const std::uint32_t displayHeight = state->window->GetFrameBufferSize().y; 
 
-        state->pipeline->SetViewport({ 0.0f, 0.0f, state->window->GetWidth(), state->window->GetHeight() });
+        state->io->DisplaySize.x = displayWidth;
+        state->io->DisplaySize.y = displayHeight;
+        
+        state->io->DeltaTime = elapsed;
+
+        state->pipeline->SetViewport({ 0u, 0u, displayWidth, displayHeight });
 
         ImGui::NewFrame();
     }

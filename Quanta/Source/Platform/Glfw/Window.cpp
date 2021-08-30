@@ -178,8 +178,10 @@ namespace Quanta::Glfw
 
             break;
         }
-        
-        handle = glfwCreateWindow(640, 480, "Window", nullptr, nullptr);
+
+        glfwWindowHint(GLFW_MAXIMIZED, true);
+
+        handle = glfwCreateWindow(size.x, size.y, "Window", nullptr, nullptr);
         
         DEBUG_ASSERT(handle != nullptr);
 
@@ -247,6 +249,38 @@ namespace Quanta::Glfw
             Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
             _this->onMouseScroll({ static_cast<float>(xOffset), static_cast<float>(yOffset) });
+        });
+
+        glfwSetWindowPosCallback(handle, [](GLFWwindow* const window, const int x, const int y)
+        {
+            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+			_this->position.x = static_cast<std::uint32_t>(x);
+            _this->position.y = static_cast<std::uint32_t>(y);
+        });
+
+		glfwSetWindowSizeCallback(handle, [](GLFWwindow* const window, const int width, const int height)
+		{
+			Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+			_this->size.x = static_cast<std::uint32_t>(width);
+            _this->size.y = static_cast<std::uint32_t>(height);
+		});
+
+        glfwSetWindowMaximizeCallback(handle, [](GLFWwindow* const window, const int maximized)
+        {
+            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+            _this->position.x = 0;
+            _this->position.y = 0;
+
+            int width = 0;
+            int height = 0;
+
+            glfwGetMonitorPhysicalSize(glfwGetPrimaryMonitor(), &width, &height);
+
+            _this->size.x = width;
+            _this->size.y = height;
         });
     }
     
@@ -327,7 +361,7 @@ namespace Quanta::Glfw
         {
         case WindowState::Maximized:
             glfwMaximizeWindow(handle);
-
+            
             break;
         case WindowState::Minimized:
 
@@ -336,47 +370,35 @@ namespace Quanta::Glfw
 
         state = value;
     }
+    
+    glm::uvec2 Window::GetFrameBufferSize() const
+    {
+        int width = 0;
+        int height = 0;
+
+        glfwGetFramebufferSize(handle, &width, &height);
+
+        return glm::uvec2(static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height));
+    }
 
     glm::uvec2 Window::GetPosition() const
     {
-        int x;
-        int y;
-
-        glfwGetWindowPos(handle, &x, &y);
-
-        return glm::uvec2(x, y);
+        return position;
     }
     
     glm::uvec2 Window::GetSize() const
     {
-        int x; 
-        int y;
-
-        glfwGetWindowSize(handle, &x, &y);
-
-        return glm::uvec2(x, y);
+        return size;
     }
 
     glm::uvec4 Window::GetBounds() const
     {
-        int x;
-        int y; 
-        int width;
-        int height;
-
-        glfwGetWindowPos(handle, &x, &y);
-        glfwGetWindowSize(handle, &width, &height);
-        
-        return glm::uvec4(x, y, width, height);
+        return glm::uvec4(position, size);
     }
 
-    uint32_t Window::GetX() const
+    std::uint32_t Window::GetX() const
     {
-        int x;
-
-        glfwGetWindowPos(handle, &x, nullptr);
-
-        return x;
+        return position.x; 
     }
 
     void Window::SetX(const uint32_t value)
@@ -386,39 +408,27 @@ namespace Quanta::Glfw
 
     uint32_t Window::GetY() const
     {
-        int y;
-
-        glfwGetWindowPos(handle, nullptr, &y);
-
-        return y;
+        return position.y;
     }
 
-    void Window::SetY(const uint32_t value)
+    void Window::SetY(const std::uint32_t value)
     {
         glfwSetWindowPos(handle, GetX(), value);
     }
 
-    uint32_t Window::GetWidth() const
+    std::uint32_t Window::GetWidth() const
     {
-        int width;
-
-        glfwGetWindowSize(handle, &width, nullptr);
-
-        return width;
+        return size.x;
     }
 
-    void Window::SetWidth(const uint32_t value) 
+    void Window::SetWidth(const std::uint32_t value) 
     {
         glfwSetWindowSize(handle, value, GetHeight());
     }
     
-    uint32_t Window::GetHeight() const
+    std::uint32_t Window::GetHeight() const
     {
-        int height;
-
-        glfwGetWindowSize(handle, nullptr, &height);
-
-        return height;
+        return size.y;
     }
 
     void Window::SetHeight(const uint32_t value) 

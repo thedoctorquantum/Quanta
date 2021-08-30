@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../Core/Windowing/Window.h"
+#include "../Graphics/Texture/FrameBuffer.h"
 #include "Model.h"
 #include "Mesh.h"
 #include "Material.h"
@@ -15,13 +16,15 @@ namespace Quanta::Renderer3D
     {
     public:
         glm::mat4 matrix = glm::mat4(1.0f); 
-
-        float fieldOfView = 45.0f;
-        float near = 0.1f;
+        
+        float width = 0;
+        float height = 0;
         float far = 1000.0f;
+        float near = 0.1f;
+        float fieldOfView = 45.0f;
     };
     
-    void Create(const Window& window);
+    void Create(const Window& window, const std::shared_ptr<FrameBuffer>& frameBuffer);
     void Destroy();
 
     void BeginPass(const View& view);

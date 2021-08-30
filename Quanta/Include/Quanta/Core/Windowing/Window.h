@@ -39,6 +39,8 @@ namespace Quanta
         virtual WindowState GetState() const = 0;
         virtual void SetState(WindowState) = 0;
         
+        virtual glm::uvec2 GetFrameBufferSize() const = 0;
+
         virtual glm::uvec2 GetPosition() const = 0;
         virtual glm::uvec2 GetSize() const = 0;
         

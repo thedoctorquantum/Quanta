@@ -466,6 +466,8 @@ namespace Quanta::Renderer3D
         std::shared_ptr<Sampler> defaultNormalSampler = nullptr;
         std::shared_ptr<Sampler> defaultOpacitySampler = nullptr;
 
+        std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
+
         std::shared_ptr<VertexArray> environmentVertexArray = nullptr;
 
         std::vector<DrawCall> opaqueDraws;
@@ -476,7 +478,7 @@ namespace Quanta::Renderer3D
     static void TransparentPass();
     static void DrawEnvironment();
     
-    void Create(const Window& window)
+    void Create(const Window& window, const std::shared_ptr<FrameBuffer>& frameBuffer)
     {
         state = new State;
 
@@ -542,17 +544,19 @@ namespace Quanta::Renderer3D
         state->defaultEnvironmentSampler = Sampler::Create(environmentMap); 
 
         std::shared_ptr<ShaderModule> vertexShader = ShaderModule::Create(ShaderType::Vertex, vertexShaderSource);
-
+        
         RasterPipeline::Description opaquePipelineDescription;
 
-        opaquePipelineDescription.UniformBuffers.push_back(state->uniformView);
-        opaquePipelineDescription.UniformBuffers.push_back(state->uniformMaterial);
-        opaquePipelineDescription.UniformBuffers.push_back(state->uniformDirectionalLight);
+        opaquePipelineDescription.uniformBuffers.push_back(state->uniformView);
+        opaquePipelineDescription.uniformBuffers.push_back(state->uniformMaterial);
+        opaquePipelineDescription.uniformBuffers.push_back(state->uniformDirectionalLight);
 
-        opaquePipelineDescription.StorageBuffers.push_back(state->uniformPointLights);
+        opaquePipelineDescription.storageBuffers.push_back(state->uniformPointLights);
 
-        opaquePipelineDescription.ShaderModules.push_back(vertexShader);
-        opaquePipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, opaqueFragmentShaderSource));
+        opaquePipelineDescription.frameBuffer = frameBuffer;
+
+        opaquePipelineDescription.shaderModules.push_back(vertexShader);
+        opaquePipelineDescription.shaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, opaqueFragmentShaderSource));
 
         state->opaquePipeline = RasterPipeline::Create(opaquePipelineDescription);
         
@@ -563,14 +567,16 @@ namespace Quanta::Renderer3D
 
         RasterPipeline::Description transparentPipelineDescription;
 
-        transparentPipelineDescription.UniformBuffers.push_back(state->uniformView);
-        transparentPipelineDescription.UniformBuffers.push_back(state->uniformMaterial);
-        transparentPipelineDescription.UniformBuffers.push_back(state->uniformDirectionalLight);
+        transparentPipelineDescription.uniformBuffers.push_back(state->uniformView);
+        transparentPipelineDescription.uniformBuffers.push_back(state->uniformMaterial);
+        transparentPipelineDescription.uniformBuffers.push_back(state->uniformDirectionalLight);
 
-        transparentPipelineDescription.StorageBuffers.push_back(state->uniformPointLights);
+        transparentPipelineDescription.storageBuffers.push_back(state->uniformPointLights);
 
-        transparentPipelineDescription.ShaderModules.push_back(vertexShader);
-        transparentPipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, transparentFragmentShaderSource));
+        transparentPipelineDescription.frameBuffer = frameBuffer;
+
+        transparentPipelineDescription.shaderModules.push_back(vertexShader);
+        transparentPipelineDescription.shaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, transparentFragmentShaderSource));
 
         state->transparentPipeline = RasterPipeline::Create(transparentPipelineDescription);
         
@@ -583,10 +589,12 @@ namespace Quanta::Renderer3D
 
         RasterPipeline::Description environmentPipelineDescription;
 
-        environmentPipelineDescription.UniformBuffers.push_back(state->uniformView);
+        environmentPipelineDescription.uniformBuffers.push_back(state->uniformView);
 
-        environmentPipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Vertex, environmentVertexShaderSource));
-        environmentPipelineDescription.ShaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, environmentFragmentShaderSource));
+        environmentPipelineDescription.frameBuffer = frameBuffer;
+
+        environmentPipelineDescription.shaderModules.push_back(ShaderModule::Create(ShaderType::Vertex, environmentVertexShaderSource));
+        environmentPipelineDescription.shaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, environmentFragmentShaderSource));
 
         state->environmentPipeline = RasterPipeline::Create(environmentPipelineDescription);
 
@@ -641,8 +649,16 @@ namespace Quanta::Renderer3D
     {
         DEBUG_ASSERT(state != nullptr);
 
-        state->viewport = { 0, 0, state->window->GetWidth(), state->window->GetHeight() };
-        state->aspectRatio = static_cast<float>(state->window->GetWidth()) / static_cast<float>(state->window->GetHeight());
+        state->aspectRatio = static_cast<float>(view.width) / static_cast<float>(view.height);
+
+        if (state->frameBuffer == nullptr)
+        {
+            state->viewport = { 0u, 0u, state->window->GetFrameBufferSize().x, state->window->GetFrameBufferSize().y };
+        }
+        else
+        {
+            state->viewport = { 0u, 0u, state->frameBuffer->GetWidth(), state->frameBuffer->GetHeight() };
+        }
         
         state->view = view;
 
@@ -665,7 +681,7 @@ namespace Quanta::Renderer3D
         OpaquePass();   
         DrawEnvironment();     
         TransparentPass();
-    }
+    } 
 
     glm::mat4 GetProjectionMatrix()
     {
@@ -820,7 +836,7 @@ namespace Quanta::Renderer3D
 
             GraphicsDevice::SetVertexArray(vertexArray.get());
 
-            glm::mat4 modelViewProjection = transform * state->shaderView.viewProjection;
+            const glm::mat4 modelViewProjection = transform * state->shaderView.viewProjection;
 
             state->uniformView->SetData(&transform, sizeof(transform), offsetof(ShaderView, ShaderView::model));
             state->uniformView->SetData(&modelViewProjection, sizeof(modelViewProjection), offsetof(ShaderView, ShaderView::modelViewProjection));
@@ -879,7 +895,7 @@ namespace Quanta::Renderer3D
     {
         GraphicsDevice::SetRasterPipeline(state->environmentPipeline.get());
 
-        glm::mat4 transform = glm::scale(glm::mat4(1.0f), glm::vec3(state->view.far));
+        const glm::mat4 transform = glm::scale(glm::mat4(1.0f), glm::vec3(state->view.far));
 
         state->uniformView->SetData(&transform, sizeof(transform), offsetof(ShaderView, ShaderView::model));
 

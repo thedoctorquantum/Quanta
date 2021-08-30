@@ -50,14 +50,14 @@ namespace Quanta
             { 
                 messages.clear();
             }
-
+    
             ImGui::SameLine();
 
             bool enableTrace = mask & Log::Level::Trace;
             bool enableInfo = mask & Log::Level::Information;
             bool enableWarn = mask & Log::Level::Warning;
             bool enableError = mask & Log::Level::Error;
-            bool enableFatal = mask & Log::Level::Fatal;
+            bool enableFatal = mask & Log::Level::Fatal;    
 
             if (ImGui::Checkbox("Trace", &enableTrace))
             {
@@ -114,7 +114,7 @@ namespace Quanta
             }
 
             ImGui::SameLine();
-            
+
             if (ImGui::Checkbox("Fatal", &enableFatal))
             {
                 if (enableFatal)
@@ -131,7 +131,7 @@ namespace Quanta
 
             if (ImGui::BeginChild("Scroll Area", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar))
             {
-                for (const auto& message : messages)
+                for (const Message& message : messages)
                 {
                     if (!(mask & message.level))
                     {
