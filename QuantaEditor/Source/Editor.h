@@ -5,6 +5,7 @@
 #include <Quanta/Scripting/ScriptRuntime.h>
 #include <Quanta/Scripting/Script.h>
 #include <Quanta/Scene/Entity.h>
+#include <Quanta/Renderer/Renderer3D.h>
 
 #include "Widgets/TextEditor/TextEditor.h"
 #include "Widgets/LogWidget.h"
@@ -19,7 +20,8 @@ namespace Quanta
 
         void OnUpdate(float frameTime) override;
     private:
-        std::shared_ptr<FrameBuffer> sceneBuffer;
+        std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
+
         glm::uvec2 sceneViewPos = glm::uvec2(0);  
         glm::uvec2 sceneViewSize = glm::uvec2(1);  
 
@@ -29,18 +31,24 @@ namespace Quanta
 
         Renderer3D::View view;
 
-        Model model;
-        
         std::unique_ptr<Script> script = nullptr;
 
         TextEditor textEditor;
         bool textEditorOpen = true;
+
+        Entity sponza;
 
         LogWidget log;
         bool logOpen = true;
 
         bool sceneViewOpen = true;
 
-        entt::registry scene;
+        Scene scene;
+
+        bool entityViewOpen = true;
+
+        std::vector<PointLight> lights { 1 };
+
+        entt::entity selectedEntity = entt::null;
     };
 }

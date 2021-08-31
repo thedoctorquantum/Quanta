@@ -61,7 +61,7 @@ namespace Quanta::Log
 
         std::string formatted(200, '\0');
 
-        snprintf(&formatted[0], formatted.size(), message.c_str(), args);
+        std::snprintf(&formatted[0], formatted.size(), message.c_str(), args);
 
         va_end(args);
 

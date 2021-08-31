@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <sstream>
 
-#include "GraphicsDevice.h"
+#include "Implementation.h"
 #include "VertexArray.h"
 #include "GraphicsBuffer.h"
 #include "RasterPipeline.h"
@@ -64,7 +64,7 @@ namespace Quanta::OpenGL
         Log::Write(logLevel, output.str());
     }
 
-    GraphicsDevice::GraphicsDevice(const Window& window)
+    Implementation::Implementation(const Window& window)
     {
         DEBUG_ASSERT(window.GetGraphicsApi() == GraphicsApi::OpenGL);
         
@@ -90,14 +90,14 @@ namespace Quanta::OpenGL
         }
     }
     
-    void GraphicsDevice::InternalClearBackBuffer(const glm::vec4& color, const float depth, const int stencil)
+    void Implementation::ClearBackBuffer(const glm::vec4& color, const float depth, const std::int32_t stencil)
     {
         glClearNamedFramebufferfv(0, GL_COLOR, 0, &color.x);
         glClearNamedFramebufferfv(0, GL_DEPTH, 0, &depth);
         glClearNamedFramebufferiv(0, GL_STENCIL, 0, &stencil);
     }
     
-    void GraphicsDevice::InternalSetRasterPipeline(const Quanta::RasterPipeline* const value)
+    void Implementation::SetRasterPipeline(const Quanta::RasterPipeline* const value)
     {
         if (!value)
         {
@@ -383,7 +383,7 @@ namespace Quanta::OpenGL
         rasterPipeline = glPipeline;
     }
     
-    void GraphicsDevice::InternalSetVertexArray(const Quanta::VertexArray* const value)
+    void Implementation::SetVertexArray(const Quanta::VertexArray* const value)
     {
         if(vertexArray == value) return;
 
@@ -433,7 +433,7 @@ namespace Quanta::OpenGL
         glBindVertexArray(glVertexArray->GetHandle());
     }
     
-    void GraphicsDevice::InternalBindSampler(const Quanta::Sampler* const sampler, const USize index)
+    void Implementation::BindSampler(const Quanta::Sampler* const sampler, const USize index)
     {
         const Sampler* internalSampler = nullptr;
         const Texture* internalTexture = nullptr;
@@ -458,7 +458,7 @@ namespace Quanta::OpenGL
         glBindTextureUnit(index, internalTexture->GetHandle());
     }
     
-    void OpenGL::GraphicsDevice::InternalDispatchDraw(const DrawCommand& command)
+    void Implementation::DispatchDraw(const DrawCommand& command)
     {
         glDrawElementsInstancedBaseVertexBaseInstance(
             geometryLayout, 

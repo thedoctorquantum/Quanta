@@ -18,7 +18,7 @@ namespace Quanta
 
         void operator()(Args... args) const
         {
-            for(const Handler& handler : listeners)
+            for (const Handler& handler : listeners)
             {
                 handler(args...);
             }

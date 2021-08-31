@@ -9,7 +9,7 @@ namespace Quanta
         Rgba8I,
         Rgba16F,
         Rgba32F,
-
+        R32I,
         Depth24Stencil8
     };
 }

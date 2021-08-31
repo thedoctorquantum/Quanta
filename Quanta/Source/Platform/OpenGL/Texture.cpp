@@ -6,17 +6,17 @@
 
 namespace Quanta::OpenGL
 {
-    Texture::Texture(const TextureType type, const TexelFormat format, const USize width, const USize height, const USize depth)
+    Texture::Texture(const Type type, const TexelFormat format, const USize width, const USize height, const USize depth)
     {
         this->width = width;
         this->height = height;
         this->depth = depth;
 
         DEBUG_ASSERT(
-            type == TextureType::Texture1D ||
-            type == TextureType::Texture2D ||
-            type == TextureType::Texture3D ||
-            type == TextureType::CubeMap 
+            type == Type::Texture1D ||
+            type == Type::Texture2D ||
+            type == Type::Texture3D ||
+            type == Type::CubeMap 
         );
         
         this->type = type;
@@ -29,19 +29,19 @@ namespace Quanta::OpenGL
 
         switch(type)
         {
-        case TextureType::Texture1D:
+        case Type::Texture1D:
             textureTarget = GL_TEXTURE_1D;
 
             break;
-        case TextureType::Texture2D:
+        case Type::Texture2D:
             textureTarget = GL_TEXTURE_2D;
 
             break;
-        case TextureType::Texture3D:
+        case Type::Texture3D:
             textureTarget = GL_TEXTURE_3D;
 
             break;
-        case TextureType::CubeMap:
+        case Type::CubeMap:
             textureTarget = GL_TEXTURE_CUBE_MAP;
 
             break;
@@ -53,19 +53,19 @@ namespace Quanta::OpenGL
 
         switch(type)
         {
-        case TextureType::Texture1D:
+        case Type::Texture1D:
             glTextureStorage1D(handle, 1, glInternalFormat, width);
 
             break;
-        case TextureType::Texture2D:
+        case Type::Texture2D:
             glTextureStorage2D(handle, 1, glInternalFormat, width, height);
 
             break;
-        case TextureType::Texture3D:
+        case Type::Texture3D:
             glTextureStorage3D(handle, 1, glInternalFormat, width, height, depth);
 
             break;
-        case TextureType::CubeMap:
+        case Type::CubeMap:
             glTextureStorage2D(handle, 1, glInternalFormat, width, height);
 
             break;
@@ -83,19 +83,19 @@ namespace Quanta::OpenGL
 
         switch(type)
         {
-        case TextureType::Texture1D:
+        case Type::Texture1D:
             glTextureSubImage1D(handle, 0, 0, width, glPixelFormat, glPixelType, data);
 
             break;
-        case TextureType::Texture2D:
+        case Type::Texture2D:
             glTextureSubImage2D(handle, 0, 0, 0, width, height, glPixelFormat, glPixelType, data);
 
             break;
-        case TextureType::Texture3D:
+        case Type::Texture3D:
             glTextureSubImage3D(handle, 0, 0, 0, 0, width, height, depth, glPixelFormat, glPixelType, data);
 
             break;
-        case TextureType::CubeMap:
+        case Type::CubeMap:
             glTextureSubImage3D(handle, 0, 0, 0, 0, width, height, 6, glPixelFormat, glPixelType, data);
 
             break;
@@ -108,26 +108,42 @@ namespace Quanta::OpenGL
 
         switch(type)
         {
-        case TextureType::Texture1D:
+        case Type::Texture1D:
             glTextureSubImage1D(handle, 0, xOffset, width, glPixelFormat, glPixelType, data);
 
             break;
-        case TextureType::Texture2D:
+        case Type::Texture2D:
             glTextureSubImage2D(handle, 0, xOffset, yOffset, width, height, glPixelFormat, glPixelType, data);
 
             break;
-        case TextureType::Texture3D:
+        case Type::Texture3D:
             glTextureSubImage3D(handle, 0, xOffset, yOffset, zOffset, width, height, depth, glPixelFormat, glPixelType, data);
 
             break;
-        case TextureType::CubeMap:
+        case Type::CubeMap:
             glTextureSubImage3D(handle, 0, xOffset, yOffset, zOffset, width, height, 1, glPixelFormat, glPixelType, data);
 
             break;
         } 
     }
 
-    TextureType Texture::GetType() const
+    void Texture::GetData(
+        void* const data,
+        const USize x, 
+        const USize y, 
+        const USize z, 
+        const USize width, 
+        const USize height, 
+        const USize depth) const
+    {
+        DEBUG_ASSERT(x + width <= this->width);
+        DEBUG_ASSERT(y + height <= this->height);
+        DEBUG_ASSERT(z + depth <= this->depth);
+
+        glGetTextureSubImage(handle, 0, x, y, z, width, height, depth, glPixelFormat, glPixelType, width * height * depth, data);
+    }
+
+    Texture::Type Texture::GetType() const
     {
         return type;
     }

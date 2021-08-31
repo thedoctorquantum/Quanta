@@ -46,7 +46,7 @@ namespace Quanta
             const AttachmentDescription& attachmentDescription = description.colorAttachments[i];
 
             const std::shared_ptr<Quanta::Texture> texture = Quanta::Texture::Create(
-                TextureType::Texture2D,
+                Texture::Type::Texture2D,
                 attachmentDescription.format, 
                 description.width,
                 description.height,
@@ -63,7 +63,7 @@ namespace Quanta
         }
 
         depthTexture = Quanta::Texture::Create(
-            TextureType::Texture2D,
+            Texture::Type::Texture2D,
             description.depthAttachment.format, 
             description.width,
             description.height,
@@ -82,44 +82,6 @@ namespace Quanta
         DEBUG_ASSERT(handle != 0);
 
         glDeleteFramebuffers(1, &handle);
-    }
-
-    size_t OpenGL::FrameBuffer::GetWidth() const
-    {
-        return width;
-    }
-
-    size_t OpenGL::FrameBuffer::GetHeight() const
-    {
-        return height;
-    }
-    
-    void OpenGL::FrameBuffer::ClearColorTexture(const size_t index, const glm::vec4& color)
-    {
-        DEBUG_ASSERT(index < colorTextures.size());
-
-        const std::shared_ptr<Quanta::Texture>& texture = colorTextures[index];
-
-        DEBUG_ASSERT(texture != nullptr);
-        
-        glClearTexImage(
-            GetTextureHandle(texture),
-            0, 
-            TexelFormatToInternalFormat(texture->GetFormat()),
-            TexelFormatToPixelType(texture->GetFormat()),
-            &color
-        );
-    }
-    
-    void OpenGL::FrameBuffer::ClearDepthTexture(const float depth)
-    {
-        glClearTexImage(
-            GetTextureHandle(depthTexture),
-            0, 
-            TexelFormatToInternalFormat(depthTexture->GetFormat()),
-            TexelFormatToPixelType(depthTexture->GetFormat()),
-            &depth
-        );
     }
     
     void OpenGL::FrameBuffer::Clear(const glm::vec4& color, const float depth, const std::int32_t stencil) 
@@ -140,6 +102,16 @@ namespace Quanta
     {
         return depthTexture;
     } 
+
+    size_t OpenGL::FrameBuffer::GetWidth() const
+    {
+        return width;
+    }
+
+    size_t OpenGL::FrameBuffer::GetHeight() const
+    {
+        return height;
+    }
 
     std::uint32_t OpenGL::FrameBuffer::GetHandle() const 
     {

@@ -1,74 +1,75 @@
 #include <Quanta/Graphics/GraphicsDevice.h>
 
-#include "../Platform/OpenGL/GraphicsDevice.h"
+#include "Implementation.h"
+#include "../Platform/OpenGL/Implementation.h"
 #include "../Debugging/Validation.h"
 
-namespace Quanta
+namespace Quanta::GraphicsDevice
 {
-    struct State
+    struct
     {
-        GraphicsDevice* device = nullptr;
+        Implementation* implementation = nullptr;
         GraphicsApi api = GraphicsApi::OpenGL;
     } static state;
     
-    void GraphicsDevice::Create(const Window& window)
+    void Create(const Window& window)
     {
-        GraphicsApi api = window.GetGraphicsApi();
+        const GraphicsApi api = window.GetGraphicsApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
         
+        state.api = api;
+
         switch (api)
         {
         case GraphicsApi::OpenGL:
-            state.device = new OpenGL::GraphicsDevice(window);
+            state.implementation = new OpenGL::Implementation(window);
 
             break;
         }
-
-        state.api = api;
     }
     
-    void GraphicsDevice::Destroy()
+    void Destroy()
     {
-        delete state.device;
+        delete state.implementation;
     }
 
-    void GraphicsDevice::ClearBackBuffer(const glm::vec4& color, const float depth, const int stencil)
+    void ClearBackBuffer(const glm::vec4& color, const float depth, const std::int32_t stencil)
     {
-        DEBUG_ASSERT(state.device != nullptr);
+        DEBUG_ASSERT(state.implementation != nullptr);
 
-        state.device->InternalClearBackBuffer(color, depth, stencil);
+        state.implementation->ClearBackBuffer(color, depth, stencil);
     }
         
-    void GraphicsDevice::SetRasterPipeline(const RasterPipeline* value)
+    void SetRasterPipeline(const RasterPipeline* const value)
     {
-        DEBUG_ASSERT(state.device != nullptr);
+        DEBUG_ASSERT(state.implementation != nullptr);
 
-        state.device->InternalSetRasterPipeline(value);
+        state.implementation->SetRasterPipeline(value);
     }
 
-    void GraphicsDevice::SetVertexArray(const VertexArray* value)
+    void SetVertexArray(const VertexArray* const value)
     {
-        DEBUG_ASSERT(state.device != nullptr);
+        DEBUG_ASSERT(state.implementation != nullptr);
 
-        state.device->InternalSetVertexArray(value);
+        state.implementation->SetVertexArray(value);
     }
         
-    void GraphicsDevice::BindSampler(const Sampler* sampler, const size_t index)
+    void BindSampler(const Sampler* const sampler, const size_t index)
     {
-        DEBUG_ASSERT(state.device != nullptr);
+        DEBUG_ASSERT(state.implementation != nullptr);
 
-        state.device->InternalBindSampler(sampler, index);
+        state.implementation->BindSampler(sampler, index);
     }
     
-    void GraphicsDevice::DispatchDraw(const DrawCommand& command)
+    void DispatchDraw(const DrawCommand& command)
     {
-        DEBUG_ASSERT(state.device != nullptr);
+        DEBUG_ASSERT(state.implementation != nullptr);
     
-        state.device->InternalDispatchDraw(command);
+        state.implementation->DispatchDraw(command);
     }
     
-    GraphicsApi GraphicsDevice::GetApi()
+    GraphicsApi GetApi()
     {
         return state.api;
     }

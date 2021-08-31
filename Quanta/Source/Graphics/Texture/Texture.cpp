@@ -6,7 +6,7 @@
 
 namespace Quanta
 {
-    std::shared_ptr<Texture> Texture::Create(const TextureType type, const TexelFormat format, const USize width, const USize height, const USize depth)
+    std::shared_ptr<Texture> Texture::Create(const Type type, const TexelFormat format, const USize width, const USize height, const USize depth)
     {
         const GraphicsApi api = GraphicsDevice::GetApi();
 
@@ -32,7 +32,7 @@ namespace Quanta
     
     std::shared_ptr<Texture> Texture::FromImage2D(const Image32& image)
     {
-        const std::shared_ptr<Texture> texture = Create(TextureType::Texture2D, TexelFormat::Rgba8I, image.GetWidth(), image.GetHeight(), 1);
+        const std::shared_ptr<Texture> texture = Create(Type::Texture2D, TexelFormat::Rgba8I, image.GetWidth(), image.GetHeight(), 1);
 
         DEBUG_ASSERT(texture != nullptr);
         DEBUG_ASSERT(image.GetData() != nullptr);

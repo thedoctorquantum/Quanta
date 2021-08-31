@@ -33,7 +33,7 @@ namespace Quanta
 
         state->io->Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
-        state->fontTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, width, height, 1);
+        state->fontTexture = Texture::Create(Texture::Type::Texture2D, TexelFormat::Rgba8I, width, height, 1);
 
         state->fontTexture->SetData(pixels);
 

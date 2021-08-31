@@ -12,4 +12,32 @@ namespace Quanta
 
         return entity;
     }
+
+    void Scene::Destroy(const Entity entity)
+    {
+        registry.destroy(entity.handle);
+    }
+
+    void Scene::ForEach(const std::function<void(Entity)>& function)
+    {
+        registry.each([&](const entt::entity entityHandle)
+        {
+            Entity entity;
+
+            entity.handle = entityHandle;
+            entity.scene = this;
+
+            function(entity);
+        });
+    }
+    
+    const entt::registry& Scene::GetRegistry() const
+    {
+        return registry;
+    }
+
+    entt::registry& Scene::GetRegistry()
+    {
+        return registry;
+    }
 }

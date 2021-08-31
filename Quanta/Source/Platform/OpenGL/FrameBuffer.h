@@ -10,16 +10,13 @@ namespace Quanta::OpenGL
         FrameBuffer(const Description& description);
         ~FrameBuffer();
 
-        void ClearColorTexture(size_t index, const glm::vec4& color) override;
-        void ClearDepthTexture(float depth) override;
-
         void Clear(const glm::vec4& color, float depth, std::int32_t stencil) override;
-
-        std::size_t GetWidth() const override;
-        std::size_t GetHeight() const override;
 
         std::shared_ptr<Quanta::Texture> GetColorTexture(size_t index) const override;
         std::shared_ptr<Quanta::Texture> GetDepthTexture() const override; 
+
+        std::size_t GetWidth() const override;
+        std::size_t GetHeight() const override;
 
         std::uint32_t GetHandle() const;
     private:

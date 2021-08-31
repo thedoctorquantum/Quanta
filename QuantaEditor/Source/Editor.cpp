@@ -1,12 +1,13 @@
-#include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
-#include <Quanta/Graphics/GraphicsDevice.h>
-#include <Quanta/Logging/Log.h>
 #include <iostream>
 #include <imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <fstream>
+#include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
+#include <Quanta/Graphics/GraphicsDevice.h>
+#include <Quanta/Logging/Log.h>
 
 #include "Editor.h"
 #include "Gizmo/ImGuizmo.h"
@@ -14,6 +15,29 @@
 
 namespace Quanta
 {
+    struct TransformComponent final
+    {
+        glm::vec3 translation { 0.0f, 0.0f, 0.0f };
+        glm::vec3 scale { 1.0f, 1.0f, 1.0f };
+        glm::vec3 rotation { 0.0f, 0.0f, 0.0f };
+
+        glm::mat4 ToMatrix() const
+        {
+            glm::mat4 matrix(1.0f);
+
+            matrix = glm::scale(matrix, scale);
+            matrix = glm::translate(matrix, translation);
+            matrix *= glm::toMat4(glm::quat(glm::radians(rotation)));
+
+            return matrix;
+        }
+    };
+
+    struct ModelComponent final
+    {
+        std::shared_ptr<Model> model;
+    };
+
     Editor::Editor()
     {
         window->SetTitle("Quanta Editor");
@@ -35,18 +59,18 @@ namespace Quanta
         fbDescription.width = window->GetFrameBufferSize().x;
         fbDescription.height = window->GetFrameBufferSize().y;
 
-        sceneBuffer = FrameBuffer::Create(fbDescription);
+        frameBuffer = FrameBuffer::Create(fbDescription);
 
-        sceneSampler = Sampler::Create(sceneBuffer->GetColorTexture(0));
+        sceneSampler = Sampler::Create(frameBuffer->GetColorTexture(0));
 
-        Renderer3D::Create(*window, sceneBuffer);
+        Renderer3D::Create(*window, frameBuffer);
         ImGuiRenderer::Create(window);
 
-        ImGuiIO& io = ImGui::GetIO();
+        auto& io = ImGui::GetIO();
         
         io.FontDefault = io.Fonts->AddFontFromFileTTF("Resources/Fonts/Consolas-Font/CONSOLA.TTF", 15.0f);
 
-        ImGuiStyle& style = ImGui::GetStyle();        
+        auto& style = ImGui::GetStyle();        
 
         style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
@@ -100,7 +124,7 @@ namespace Quanta
         style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
         style.GrabRounding = style.FrameRounding = 2.3f;
 
-        std::shared_ptr<Texture> skybox = Quanta::Texture::Create(Quanta::TextureType::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
+        std::shared_ptr<Texture> skybox = Texture::Create(Texture::Type::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
 
         std::shared_ptr<Quanta::Image32> images[] 
         {
@@ -122,14 +146,12 @@ namespace Quanta
         skyboxSampler = Sampler::Create(skybox);
 
         Renderer3D::SetEnvironmentSampler(skyboxSampler);
-
-        model = Model::FromFile("Resources/Models/test_scene_01.fbx");
-
+        
         view.matrix = glm::lookAt(glm::vec3 { 0.0f, 10.0f, 10.0f }, glm::vec3 { 0.0f, 0.0f, 0.0f }, glm::vec3 { 0.0f, 1.0f, 0.0f });
         view.fieldOfView = 60.0f;
         view.far = 10000.0f;
-        view.width = sceneBuffer->GetWidth();
-        view.height = sceneBuffer->GetHeight();
+        view.width = frameBuffer->GetWidth();
+        view.height = frameBuffer->GetHeight();
 
         ScriptRuntime::Create();
 
@@ -146,6 +168,46 @@ namespace Quanta
         strStream << source.rdbuf();
 
         textEditor.SetText(strStream.str());
+
+        sponza = scene.Create();
+
+        sponza.Set<TransformComponent>();
+        sponza.Set<ModelComponent>();
+
+        auto& transform = sponza.Get<TransformComponent>();
+
+        transform.translation.y -= 10;
+
+        auto& modelComponent = sponza.Get<ModelComponent>();
+
+        const auto modelMem = std::make_shared<Model>();
+        const auto modelMem2 = std::make_shared<Model>();
+
+        *modelMem = Model::FromFile("Resources/Models/sponza/sponza.fbx"); 
+
+        modelComponent.model = modelMem; 
+        
+        *modelMem2 = Model::FromFile("Resources/Models/test_scene_01.fbx");
+
+        auto ent2 = scene.Create();
+
+        ent2.Set<TransformComponent>();
+        ent2.Set<ModelComponent>();
+
+        auto& transform2 = ent2.Get<TransformComponent>();
+        auto& modelComponent2 = ent2.Get<ModelComponent>();
+        
+        modelComponent2.model = modelMem2;
+
+        lights[0].Ambient = glm::vec3(1.0f);
+        lights[0].Diffuse = { 0.5f, 0.5f, 0.5f };
+        lights[0].Specular = { 1.0f, 1.0f, 1.0f };
+        
+        lights[0].Position = { 0.0f, 0.0f, 0.0f };
+        lights[0].Linear = 0.045f;
+        lights[0].Quadratic = 0.0075f;
+
+        selectedEntity = ent2;
     }
 
     Editor::~Editor()
@@ -154,60 +216,18 @@ namespace Quanta
         Renderer3D::Destroy();
         ImGuiRenderer::Destroy();
     }
-    
+
     void Editor::OnUpdate(const float frameTime)
     {
         GraphicsDevice::ClearBackBuffer(glm::vec4(1.0f), 1.0f, 0);
 
-        static DirectionalLight light;
-
         static glm::mat4 transform = glm::identity<glm::mat4>();
-
-        static std::vector<PointLight> lights {
-            {  }
-        };
-
-        static bool initStatics = true;
-
-        if (initStatics)
-        {
-            lights[0].Ambient = glm::vec3(1.0f);
-            lights[0].Diffuse = { 0.5f, 0.5f, 0.5f };
-            lights[0].Specular = { 1.0f, 1.0f, 1.0f };
-            
-            lights[0].Position = { 0.0f, 0.0f, 0.0f };
-            lights[0].Linear = 0.045f;
-            lights[0].Quadratic = 0.0075f;
-
-            initStatics = false;
-        }
-        
-        if (sceneViewOpen)
-        {
-            sceneBuffer->Clear(glm::vec4(1.0f), 1.0f, 0);
-
-            Renderer3D::BeginPass(view);
-            {
-                //Renderer3D::SetDirectionalLight(light);
-                Renderer3D::SetPointLights(lights.data(), lights.size());
-
-                Renderer3D::DrawModel(model, transform);
-            }
-            Renderer3D::EndPass();
-        }
 
         ImGuiRenderer::Begin(frameTime);
         {
             ImGuizmo::BeginFrame();
 
             ImGui::DockSpaceOverViewport();
-
-            if (ImGui::Begin("Debug Items"))
-            {
-                ImGui::ColorEdit3("Light ambient", &lights[0].Ambient.x);
-            }
-
-            ImGui::End();
 
             if (ImGui::BeginMainMenuBar());
             {
@@ -250,21 +270,21 @@ namespace Quanta
             {
                 if (ImGui::Begin("Text Editor", &textEditorOpen))
                 {
-                    static auto runScript = [](const TextEditor& editor)
+                    static const auto runScript = [](const TextEditor& editor)
                     {
-                        {
-                            std::ofstream file("Resources/Scripts/test.as");
+                        std::ofstream file("Resources/Scripts/test.as");
                         
-                            const std::string source = editor.GetText();
+                        const auto source = editor.GetText();
 
-                            file.write(source.c_str(), source.size());
-                        }
+                        file.write(source.c_str(), source.size());
+
+                        file.close();
 
                         Script script("Resources/Scripts/test.as");
 
                         script.Main();
                     };
-
+                
                     if (ImGui::IsItemFocused() && ImGui::GetIO().KeysDown[static_cast<USize>(Key::F5)])
                     {
                         runScript(textEditor);
@@ -276,7 +296,7 @@ namespace Quanta
                         {
                             std::ofstream file("Resources/Scripts/test.as");
 
-                            std::string text = textEditor.GetText();
+                            const auto text = textEditor.GetText();
 
                             file.write(text.c_str(), text.size());
                         }
@@ -294,16 +314,32 @@ namespace Quanta
 
                 ImGui::End();
             }
-
+            
             if (sceneViewOpen)
-            {
-                if (ImGui::Begin("Scene View", &sceneViewOpen, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+            {                
+                if (ImGui::Begin("Scene", &sceneViewOpen, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
                 {
-                    const ImVec2 pos = ImGui::GetWindowPos();
-                    const ImVec2 size = ImGui::GetWindowSize();
+                    frameBuffer->Clear(glm::vec4(1.0f), 1.0f, 0);
+                    
+                    Renderer3D::BeginPass(view);
+                    {
+                        Renderer3D::SetPointLights(lights.data(), lights.size());
 
-                    view.width = ImGui::GetWindowWidth();
-                    view.height = ImGui::GetWindowHeight();
+                        const auto view = scene.GetRegistry().view<TransformComponent, ModelComponent>();
+
+                        for (const auto [entity, transform, model] : view.each())
+                        {
+                            Renderer3D::DrawModel(*model.model, transform.ToMatrix());
+                        }
+                    }
+                    Renderer3D::EndPass();
+
+                    const auto pos = ImGui::GetWindowPos();
+
+                    const auto size = ImGui::GetWindowSize();
+
+                    view.width = size.x;
+                    view.height = size.y;
 
                     ImGui::Image(sceneSampler.get(), size, ImVec2(0, 0), ImVec2(1, -1));
 
@@ -311,13 +347,77 @@ namespace Quanta
                     ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
                     ImGuizmo::AllowAxisFlip(false);
 
-                    ImGuizmo::ViewManipulate(glm::value_ptr(view.matrix), 100, pos, ImVec2 { 128, 128 }, 0x00FFFFFF);
+                    ImGuizmo::ViewManipulate(glm::value_ptr(view.matrix), 100, ImVec2(pos.x + 20, pos.y + 20), ImVec2(128, 128), 0x00FFFFFF);
 
-                    const glm::mat4 proj = Renderer3D::GetProjectionMatrix();
-                                        
-                    ImGuizmo::Enable(ImGui::IsWindowFocused());
+                    const auto proj = Renderer3D::GetProjectionMatrix();
                     
-                    ImGuizmo::Manipulate(glm::value_ptr(view.matrix), glm::value_ptr(proj), ImGuizmo::OPERATION::UNIVERSAL, ImGuizmo::MODE::WORLD, glm::value_ptr(transform));
+                    if (selectedEntity != entt::null)
+                    {
+                        if (scene.GetRegistry().try_get<TransformComponent>(selectedEntity))
+                        {
+                            const auto decompose = [](const glm::mat4& m, glm::vec3& pos, glm::quat& rot, glm::vec3& scale)
+                            {
+                                pos = m[3];
+
+                                for(int i = 0; i < 3; i++)
+                                {
+                                    scale[i] = glm::length(glm::vec3(m[i]));
+                                }
+
+                                const glm::mat3 rotMtx(
+                                    glm::vec3(m[0]) / scale[0],
+                                    glm::vec3(m[1]) / scale[1],
+                                    glm::vec3(m[2]) / scale[2]);
+                                rot = glm::quat_cast(rotMtx);
+                            };
+                            
+                            auto& transform = scene.GetRegistry().get<TransformComponent>(selectedEntity);
+
+                            ImGuizmo::Enable(ImGui::IsWindowFocused());
+                            
+                            auto matrix = transform.ToMatrix();
+
+                            if(ImGuizmo::Manipulate(
+                                glm::value_ptr(view.matrix), 
+                                glm::value_ptr(proj), 
+                                ImGuizmo::OPERATION::UNIVERSAL, 
+                                ImGuizmo::MODE::WORLD, 
+                                glm::value_ptr(matrix)
+                            ))
+                            {
+                                auto quaternion = glm::identity<glm::quat>();
+
+                                decompose(matrix, transform.translation, quaternion, transform.scale);
+
+                                transform.rotation = glm::degrees(glm::eulerAngles(quaternion));
+                            }
+                        }
+                    }
+                }
+
+                ImGui::End();
+            }
+            
+            if (entityViewOpen)
+            {
+                if (ImGui::Begin("Entities"))
+                {
+                    const auto view = scene.GetRegistry().view<TransformComponent>();
+
+                    for (const auto [entity, transform] : view.each())
+                    {
+                        const auto id = static_cast<std::uint32_t>(entity);
+
+                        ImGui::PushID(id);
+
+                        ImGui::Text("Entity %u", id);
+
+                        ImGui::DragFloat3("Translation", &transform.translation.x);
+                        ImGui::DragFloat3("Scale", &transform.scale.x);
+                        ImGui::DragFloat3("Rotation", &transform.rotation.x);
+
+                        ImGui::PopID();
+                    } 
                 }
 
                 ImGui::End();

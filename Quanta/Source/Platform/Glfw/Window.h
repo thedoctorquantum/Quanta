@@ -71,8 +71,8 @@ namespace Quanta::Glfw
 
         std::string title;
 
-        glm::uvec2 position = glm::uvec2(0u);
-        glm::uvec2 size = glm::uvec2(640u, 480u);
+        glm::uvec2 position { 0u };
+        glm::uvec2 size { 640u, 480u };
 
         WindowState state;
 

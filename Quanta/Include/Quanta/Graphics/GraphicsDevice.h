@@ -9,32 +9,19 @@
 #include "DrawCommand.h"
 #include "../Core/Windowing/Window.h"
 
-namespace Quanta
+namespace Quanta::GraphicsDevice
 {
-    class GraphicsDevice
-    {
-    public:
-        static void Create(const Window& window);
-        static void Destroy();
+    void Create(const Window& window);
+    void Destroy();
 
-        static void ClearBackBuffer(const glm::vec4& color, float depth, int stencil);
+    void ClearBackBuffer(const glm::vec4& color, float depth, std::int32_t stencil);
 
-        static void SetRasterPipeline(const RasterPipeline* value);
-        static void SetVertexArray(const VertexArray* value);
+    void SetRasterPipeline(const RasterPipeline*);
+    void SetVertexArray(const VertexArray*);
 
-        static void BindSampler(const Sampler* sampler, size_t index);
+    void BindSampler(const Sampler* sampler, std::size_t index);
 
-        static void DispatchDraw(const DrawCommand& command);
+    void DispatchDraw(const DrawCommand& command);
 
-        static GraphicsApi GetApi();
-    private:
-        virtual void InternalClearBackBuffer(const glm::vec4& color, float depth, int stencil) = 0;
-
-        virtual void InternalSetRasterPipeline(const RasterPipeline* value) = 0;
-        virtual void InternalSetVertexArray(const VertexArray* value) = 0;
-        
-        virtual void InternalBindSampler(const Sampler* sampler, size_t index) = 0;
-        
-        virtual void InternalDispatchDraw(const DrawCommand& command) = 0;
-    };
+    GraphicsApi GetApi();
 }

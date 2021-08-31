@@ -490,18 +490,18 @@ namespace Quanta::Renderer3D
 
         state->uniformPointLights = GraphicsBuffer::Create(BufferUsage::Dynamic, 0);
 
-        std::shared_ptr<Texture> environmentMap = Texture::Create(TextureType::CubeMap, TexelFormat::Rgba8I, 1, 1, 1);
+        const std::shared_ptr<Texture> environmentMap = Texture::Create(Texture::Type::CubeMap, TexelFormat::Rgba8I, 1, 1, 1);
 
-        Color32 environmentColor { 255, 255, 255, 255 };
+        const Color32 environmentColor { 255, 255, 255, 255 };
 
-        for(size_t i = 0; i < 6; i++)
+        for(std::size_t i = 0; i < 6; i++)
         {
             environmentMap->SetData(&environmentColor, 0, 0, i);
         }
 
         state->environmentVertexArray = VertexArray::Create();
 
-        float vertices[]
+        const float vertices[]
         {
             -0.5f, -0.5f, 0.5f,
             0.5f, -0.5f, 0.5f,
@@ -513,7 +513,7 @@ namespace Quanta::Renderer3D
             -0.5f, 0.5f, -0.5f
         };
 
-        uint8_t indices[] 
+        const uint8_t indices[] 
         {
             0, 1, 2, 2, 3, 0,
             1, 5, 6, 6, 2, 1,
@@ -523,8 +523,8 @@ namespace Quanta::Renderer3D
             3, 2, 6, 6, 7, 3
         };
 
-        std::shared_ptr<GraphicsBuffer> environmentVertexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(vertices));
-        std::shared_ptr<GraphicsBuffer> environmentIndexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(indices));
+        const std::shared_ptr<GraphicsBuffer> environmentVertexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(vertices));
+        const std::shared_ptr<GraphicsBuffer> environmentIndexBuffer = GraphicsBuffer::Create(BufferUsage::Static, sizeof(indices));
 
         environmentVertexBuffer->SetData(vertices, sizeof(vertices));
         environmentIndexBuffer->SetData(indices, sizeof(indices));
@@ -543,7 +543,7 @@ namespace Quanta::Renderer3D
 
         state->defaultEnvironmentSampler = Sampler::Create(environmentMap); 
 
-        std::shared_ptr<ShaderModule> vertexShader = ShaderModule::Create(ShaderType::Vertex, vertexShaderSource);
+        const std::shared_ptr<ShaderModule> vertexShader = ShaderModule::Create(ShaderType::Vertex, vertexShaderSource);
         
         RasterPipeline::Description opaquePipelineDescription;
 
@@ -602,15 +602,15 @@ namespace Quanta::Renderer3D
         state->environmentPipeline->SetEnableDepthWriting(true);
         state->environmentPipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
 
-        Color32 albedo { 0xFFFFFFFF };
-        Color32 specular { 0xFFFFFFFF };
-        Color32 normal { 128, 128, 255, 0 };
-        Color32 opacity { 0xFFFFFFFF };
+        const Color32 albedo { 0xFFFFFFFF };
+        const Color32 specular { 0xFFFFFFFF };
+        const Color32 normal { 128, 128, 255, 0 };
+        const Color32 opacity { 0xFFFFFFFF };
 
-        std::shared_ptr<Texture> albedoTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
-        std::shared_ptr<Texture> specularTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
-        std::shared_ptr<Texture> normalTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
-        std::shared_ptr<Texture> opacityTexture = Texture::Create(TextureType::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
+        const std::shared_ptr<Texture> albedoTexture = Texture::Create(Texture::Type::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
+        const std::shared_ptr<Texture> specularTexture = Texture::Create(Texture::Type::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
+        const std::shared_ptr<Texture> normalTexture = Texture::Create(Texture::Type::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
+        const std::shared_ptr<Texture> opacityTexture = Texture::Create(Texture::Type::Texture2D, TexelFormat::Rgba8I, 1, 1, 1);
         
         albedoTexture->SetData(&albedo);
         specularTexture->SetData(&specular);
@@ -700,12 +700,12 @@ namespace Quanta::Renderer3D
         state->uniformDirectionalLight->SetData(&light, sizeof(light));
     }
     
-    void SetPointLights(const PointLight* lights, const size_t count)
+    void SetPointLights(const PointLight* lights, const std::size_t count)
     {
         DEBUG_ASSERT(lights != nullptr);
         DEBUG_ASSERT(state != nullptr);
 
-        size_t size = count * sizeof(PointLight);
+        const std::size_t size = count * sizeof(PointLight);
 
         if(size > state->uniformPointLights->GetSize())
         {
@@ -766,7 +766,7 @@ namespace Quanta::Renderer3D
 
             GraphicsDevice::SetVertexArray(vertexArray.get());
 
-            glm::mat4 modelViewProjection = transform * state->shaderView.viewProjection;
+            const glm::mat4 modelViewProjection = transform * state->shaderView.viewProjection;
 
             state->uniformView->SetData(&transform, sizeof(transform), offsetof(ShaderView, ShaderView::model));
             state->uniformView->SetData(&modelViewProjection, sizeof(modelViewProjection), offsetof(ShaderView, ShaderView::modelViewProjection));
