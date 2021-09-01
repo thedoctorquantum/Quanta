@@ -91,6 +91,28 @@ namespace Quanta
         glClearNamedFramebufferiv(handle, GL_STENCIL, 0, &stencil);
     }
 
+    void OpenGL::FrameBuffer::GetPixel(const std::size_t index, void* const data, const std::size_t x, const std::size_t y)
+    {
+        glNamedFramebufferReadBuffer(handle, GL_COLOR_ATTACHMENT0 + index);
+
+        const OpenGL::Texture* texture = nullptr;
+
+        if constexpr (DEBUG)
+        {
+            texture = dynamic_cast<const OpenGL::Texture*>(GetColorTexture(0).get());
+
+            DEBUG_ASSERT(texture != nullptr);
+        }
+        else
+        {
+            texture = static_cast<const OpenGL::Texture*>(GetColorTexture(0).get());
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, handle);
+
+        glReadPixels(x, y, 1, 1, texture->GetGLPixelFormat(), texture->GetGLPixelType(), data);
+    }
+
     std::shared_ptr<Quanta::Texture> OpenGL::FrameBuffer::GetColorTexture(const size_t index) const
     {
         DEBUG_ASSERT(index < colorTextures.size());

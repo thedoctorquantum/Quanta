@@ -13,7 +13,7 @@ namespace Quanta
 {
     std::string GetDirectory(const std::string& filepath)
     {
-        size_t pos = filepath.find_last_of("/");
+        std::size_t pos = filepath.find_last_of("/");
 
         return std::string::npos == pos ? "" : filepath.substr(0, pos);
     }
@@ -24,19 +24,19 @@ namespace Quanta
 
         Model model;
         
-        const aiScene* scene = importer.ReadFile(filepath, 
+        const aiScene* const scene = importer.ReadFile(filepath, 
             aiProcess_Triangulate | 
             aiProcess_CalcTangentSpace |
             aiProcess_FlipUVs |
             aiProcess_RemoveRedundantMaterials |
             aiProcess_PreTransformVertices |
             aiProcess_GlobalScale |
-            aiProcess_OptimizeMeshes 
+            aiProcess_OptimizeMeshes
         ); 
         
         DEBUG_ASSERT(scene != nullptr);
 
-        for(size_t i = 0; i < scene->mNumMeshes; i++)
+        for (std::size_t i = 0; i < scene->mNumMeshes; i++)
         {
             aiMesh* meshData = scene->mMeshes[i];
 
@@ -45,28 +45,28 @@ namespace Quanta
 
             Mesh mesh;
 
-            for(size_t j = 0; j < meshData->mNumVertices; j++)
+            for (size_t j = 0; j < meshData->mNumVertices; j++)
             {                
                 Vertex vertex;
 
-                aiVector3D& translation = meshData->mVertices[j];
-                aiVector3D& normal = meshData->mNormals[j];
+                const aiVector3D& translation = meshData->mVertices[j];
+                const aiVector3D& normal = meshData->mNormals[j];
 
                 aiVector3D uv = aiVector3D(0.0f);
 
-                if(meshData->HasTextureCoords(0))
+                if (meshData->HasTextureCoords(0))
                 {
                     uv = meshData->mTextureCoords[0][j]; 
                 }
 
                 aiColor4D color = aiColor4D(1.0f);
 
-                if(meshData->HasVertexColors(0))
+                if (meshData->HasVertexColors(0))
                 {
                     color = meshData->mColors[0][j]; 
                 }
 
-                aiVector3D tangent = meshData->mTangents[j];
+                const aiVector3D tangent = meshData->mTangents[j];
                 
                 vertex.Translation = glm::vec3(translation.x, translation.y, translation.z);
                 vertex.Normal = glm::vec3(normal.x, normal.y, normal.z);
@@ -77,11 +77,11 @@ namespace Quanta
                 vertices.push_back(vertex);
             }
 
-            for(size_t j = 0; j < meshData->mNumFaces; j++)
+            for (std::size_t j = 0; j < meshData->mNumFaces; j++)
             {
-                aiFace& face = meshData->mFaces[j];
+                const aiFace& face = meshData->mFaces[j];
 
-                for(size_t k = 0; k < face.mNumIndices; k++)
+                for (std::size_t k = 0; k < face.mNumIndices; k++)
                 {
                     indices.push_back(face.mIndices[k]);
                 }
@@ -93,41 +93,41 @@ namespace Quanta
             model.parts.push_back({ std::move(mesh), glm::mat4(1.0f), meshData->mMaterialIndex });    
         }
 
-        std::string directory = GetDirectory(filepath);
+        const std::string directory = GetDirectory(filepath);
 
-        for(size_t i = 0; i < scene->mNumMaterials; i++)
+        for (std::size_t i = 0; i < scene->mNumMaterials; i++)
         {
-            aiMaterial* materialData = scene->mMaterials[i];
+            const aiMaterial* const materialData = scene->mMaterials[i];
 
             Material material;
 
             aiColor3D color = aiColor3D(1.0f);
             float shininess = 1.0f;
             float opacity = 1.0f;
-
-            if(materialData->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn_SUCCESS)
+            
+            if (materialData->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn_SUCCESS)
             {
                 material.SetAlbedo({ color.r, color.g, color.b });
             }
             
-            if(materialData->Get(AI_MATKEY_COLOR_SPECULAR, color) == aiReturn_SUCCESS)
+            if (materialData->Get(AI_MATKEY_COLOR_SPECULAR, color) == aiReturn_SUCCESS)
             {
                 material.SetSpecular({ color.r, color.g, color.b });
             }
 
-            if(materialData->Get(AI_MATKEY_SHININESS, shininess) == aiReturn_SUCCESS)
+            if (materialData->Get(AI_MATKEY_SHININESS, shininess) == aiReturn_SUCCESS)
             {
                 material.SetShininess(shininess);
             }
 
-            if(materialData->Get(AI_MATKEY_OPACITY, opacity) == aiReturn_SUCCESS)
+            if (materialData->Get(AI_MATKEY_OPACITY, opacity) == aiReturn_SUCCESS)
             {
                 material.SetOpacity(opacity);
             }
 
             aiString path;
             
-            if(materialData->GetTexture(aiTextureType_DIFFUSE, 0, &path) == aiReturn_SUCCESS)
+            if (materialData->GetTexture(aiTextureType_DIFFUSE, 0, &path) == aiReturn_SUCCESS)
             {                
                 std::string fullPath = directory + '/' + path.data;
                 
@@ -136,7 +136,7 @@ namespace Quanta
                 material.SetAlbedoSampler(Sampler::Create(albedo));   
             }
             
-            if(materialData->GetTexture(aiTextureType_SPECULAR, 0, &path) == aiReturn_SUCCESS)
+            if (materialData->GetTexture(aiTextureType_SPECULAR, 0, &path) == aiReturn_SUCCESS)
             {
                 std::string fullPath = directory + '/' + path.data;
 
@@ -145,7 +145,7 @@ namespace Quanta
                 material.SetSpecularSampler(Sampler::Create(specular));
             }
 
-            if(materialData->GetTexture(aiTextureType_NORMALS, 0, &path) == aiReturn_SUCCESS)
+            if (materialData->GetTexture(aiTextureType_NORMALS, 0, &path) == aiReturn_SUCCESS)
             {
                 std::string fullPath = directory + '/' + path.data;
 
@@ -154,7 +154,7 @@ namespace Quanta
                 material.SetNormalSampler(Sampler::Create(normal));
             }
 
-            if(materialData->GetTexture(aiTextureType_OPACITY, 0, &path) == aiReturn_SUCCESS)
+            if (materialData->GetTexture(aiTextureType_OPACITY, 0, &path) == aiReturn_SUCCESS)
             {
                 std::string fullPath = directory + '/' + path.data;
 
@@ -164,6 +164,16 @@ namespace Quanta
             }
 
             model.materials.push_back(std::move(material));
+        }
+
+        if (model.materials.empty())
+        {
+            model.materials.emplace_back();
+
+            for (auto& part : model.parts)
+            {
+                part.materialIndex = 0;
+            }
         }
 
         return model;
@@ -212,12 +222,12 @@ namespace Quanta
         return materials;
     }
 
-    size_t Model::GetPartCount() const
+    std::size_t Model::GetPartCount() const
     {
         return parts.size(); 
     }
 
-    size_t Model::GetMaterialCount() const
+    std::size_t Model::GetMaterialCount() const
     {
         return materials.size();
     }

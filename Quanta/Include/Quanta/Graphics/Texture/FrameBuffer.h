@@ -34,6 +34,8 @@ namespace Quanta
 
         virtual void Clear(const glm::vec4& color, float depth, std::int32_t stencil) = 0;
         
+        virtual void GetPixel(std::size_t index, void* data, std::size_t x, std::size_t y) = 0;
+
         virtual std::shared_ptr<Texture> GetColorTexture(size_t index) const = 0;
         virtual std::shared_ptr<Texture> GetDepthTexture() const = 0; 
         

@@ -9,6 +9,7 @@
 
 #include "Widgets/TextEditor/TextEditor.h"
 #include "Widgets/LogWidget.h"
+#include "Widgets/SceneViewer.h"
 
 namespace Quanta
 {
@@ -20,17 +21,14 @@ namespace Quanta
 
         void OnUpdate(float frameTime) override;
     private:
-        std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
+        std::unique_ptr<SceneViewer> sceneViewer = nullptr;
+        bool sceneViewerOpen = true;
 
         glm::uvec2 sceneViewPos = glm::uvec2(0);  
         glm::uvec2 sceneViewSize = glm::uvec2(1);  
 
-        std::shared_ptr<Sampler> sceneSampler = nullptr;
-
         std::shared_ptr<Sampler> skyboxSampler = nullptr;
-
-        Renderer3D::View view;
-
+        
         std::unique_ptr<Script> script = nullptr;
 
         TextEditor textEditor;
@@ -41,14 +39,8 @@ namespace Quanta
         LogWidget log;
         bool logOpen = true;
 
-        bool sceneViewOpen = true;
-
         Scene scene;
 
-        bool entityViewOpen = true;
-
-        std::vector<PointLight> lights { 1 };
-
-        entt::entity selectedEntity = entt::null;
+        bool entityViewOpen = true; 
     };
 }

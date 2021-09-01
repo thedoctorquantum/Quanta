@@ -25,9 +25,9 @@ namespace Quanta
         }
         
         template<typename Type, typename... Args>
-        void Set(Args&&... args)
+        Type& Set(Args&&... args)
         {
-            scene->registry.emplace<Type>(handle, std::forward(args)...);
+            return scene->registry.emplace<Type>(handle, std::forward(args)...);
         }
 
         operator entt::entity() const;
@@ -39,33 +39,4 @@ namespace Quanta
 
         entt::entity handle = entt::null;
     }; 
-
-    template<typename ComponentA, typename ComponentB>
-    void Scene::ForEach(const std::function<void(ComponentA, ComponentB)>& function)
-    {
-        auto view = registry.view<ComponentA, ComponentB>();
-
-        for (auto [a, b] : view.each())
-        {
-            function(a, b);
-        }
-    }
-
-/*
-    template<typename... Component>
-    void Scene::ForEach(const std::function<void(Entity, Component...)>& function)
-    {
-        const auto view = registry.view<Component...>();
-
-        view.each([&](const entt::entity entityHandle, Component... args)
-        {
-            Entity entity;
-
-            entity.handle = entityHandle;
-            entity.scene = this;
-
-            function(entity, std::forward(args)...);
-        });
-    }
-    */
 }

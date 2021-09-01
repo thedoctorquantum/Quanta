@@ -16,6 +16,8 @@ namespace Quanta::OpenGL
 
         void GetData(void* data, USize x, USize y, USize z, USize width, USize height, USize depth) const override;
 
+        void Clear(const void* data) override;
+
         Type GetType() const override;
         TexelFormat GetFormat() const override;
 
@@ -24,6 +26,10 @@ namespace Quanta::OpenGL
         USize GetDepth() const override;
 
         U32 GetHandle() const;
+
+        GLenum GetGLPixelFormat() const;
+        GLenum GetGLInternalFormat() const;
+        GLenum GetGLPixelType() const;
     private:
         Type type = Type::Texture1D;
         TexelFormat format = TexelFormat::Rgba8I;

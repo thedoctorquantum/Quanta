@@ -9,8 +9,9 @@ namespace Quanta::Log
         None = 0b00000000,
         All = 0b11111111,
         
-        Information = static_cast<U8>(Level::Information),
         Trace = static_cast<U8>(Level::Trace),
+        Information = static_cast<U8>(Level::Information),
+        Debug = static_cast<U8>(Level::Debug),
         Warning = static_cast<U8>(Level::Warning),
         Error = static_cast<U8>(Level::Error),
         Fatal = static_cast<U8>(Level::Fatal)

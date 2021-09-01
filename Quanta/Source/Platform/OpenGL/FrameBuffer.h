@@ -12,8 +12,10 @@ namespace Quanta::OpenGL
 
         void Clear(const glm::vec4& color, float depth, std::int32_t stencil) override;
 
-        std::shared_ptr<Quanta::Texture> GetColorTexture(size_t index) const override;
+        std::shared_ptr<Quanta::Texture> GetColorTexture(std::size_t index) const override;
         std::shared_ptr<Quanta::Texture> GetDepthTexture() const override; 
+
+        void GetPixel(std::size_t index, void* data, std::size_t x, std::size_t y) override;
 
         std::size_t GetWidth() const override;
         std::size_t GetHeight() const override;

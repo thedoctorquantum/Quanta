@@ -127,6 +127,11 @@ namespace Quanta::OpenGL
         } 
     }
 
+    void Texture::Clear(const void* const data)
+    {
+        glClearTexImage(handle, 0, glPixelFormat, glPixelType, data);
+    }
+
     void Texture::GetData(
         void* const data,
         const USize x, 
@@ -171,5 +176,20 @@ namespace Quanta::OpenGL
     U32 Texture::GetHandle() const
     {
         return handle;
+    }
+
+    GLenum Texture::GetGLPixelFormat() const
+    {
+        return glPixelFormat;
+    }
+
+    GLenum Texture::GetGLInternalFormat() const
+    {
+        return glInternalFormat;
+    }
+    
+    GLenum Texture::GetGLPixelType() const
+    {
+        return glPixelType;
     }
 }

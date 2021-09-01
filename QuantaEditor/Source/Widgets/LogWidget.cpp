@@ -18,6 +18,8 @@ namespace Quanta
                 return { { 1.0f, 1.0f, 1.0f, 0.8f }, "[Trace] %s" };
             case Log::Level::Information:
                 return { { 0.0f, 1.0f, 0.0f, 0.8f }, "[Information] %s" };
+            case Log::Level::Debug:
+                return { { 0.0f, 1.0f, 0.0f, 0.8f }, "[Debug] %s" };
             case Log::Level::Warning:
                 return { { 1.0f, 1.0f, 0.0f, 0.8f }, "[Warning] %s" };
             case Log::Level::Error:
@@ -55,6 +57,7 @@ namespace Quanta
 
             bool enableTrace = mask & Log::Level::Trace;
             bool enableInfo = mask & Log::Level::Information;
+            bool enableDebug = mask & Log::Level::Debug;
             bool enableWarn = mask & Log::Level::Warning;
             bool enableError = mask & Log::Level::Error;
             bool enableFatal = mask & Log::Level::Fatal;    
@@ -82,6 +85,20 @@ namespace Quanta
                 else
                 {
                     mask -= Log::LevelMask::Information;
+                }
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Checkbox("Debug", &enableDebug))
+            {
+                if (enableDebug)
+                {
+                    mask += Log::LevelMask::Debug;
+                }
+                else
+                {
+                    mask -= Log::LevelMask::Debug;
                 }
             }
 

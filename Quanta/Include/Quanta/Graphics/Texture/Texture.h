@@ -32,6 +32,8 @@ namespace Quanta
 
         virtual void GetData(void* data, USize x, USize y, USize z, USize width, USize height, USize depth) const = 0;
 
+        virtual void Clear(const void* data) = 0;
+
         virtual Type GetType() const = 0;
         virtual TexelFormat GetFormat() const = 0;
 

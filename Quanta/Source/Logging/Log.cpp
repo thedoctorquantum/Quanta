@@ -15,6 +15,8 @@ namespace Quanta::Log
                 return "Trace";
             case Level::Information:
                 return "Information";
+            case Level::Debug:
+                return "Debug";
             case Level::Warning:
                 return "Warning";
             case Level::Error:
@@ -59,22 +61,24 @@ namespace Quanta::Log
         
         va_start(args, message);
 
-        std::string formatted(200, '\0');
+        const std::size_t size = std::snprintf(nullptr, 0, message.c_str(), args);
 
-        std::snprintf(&formatted[0], formatted.size(), message.c_str(), args);
+        std::string output(size + 1, '\0');
+        
+        std::snprintf(&output[0], size, message.c_str(), args);
+
+        Log::Write(level, output);
 
         va_end(args);
-
-        Log::Write(level, formatted);
     }
-
+    
     void Write(const Level level, const std::string& message)
     {
         if (!(log.levelMask & level))
         {
             return;
         }
-
+        
         if (log.writeToCout)
         {   
             const char* begin = nullptr;
@@ -88,6 +92,11 @@ namespace Quanta::Log
 
                     break;
                 case Level::Information:
+                    begin = "\x1B[32m";
+                    end = "\033[0m\t\t\n";
+
+                    break;
+                case Level::Debug:
                     begin = "\x1B[32m";
                     end = "\033[0m\t\t\n";
 
