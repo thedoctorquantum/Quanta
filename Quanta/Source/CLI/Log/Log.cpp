@@ -1,9 +1,9 @@
-#include <Quanta/Logging/Log.h>
+#include <Quanta/CLI/Log/Log.h>
 #include <vector>
 #include <iostream>
 #include <cstdarg>
 
-#include "../Debugging/Validation.h"
+#include "../../Debugging/Validation.h"
 
 namespace Quanta::Log
 {
@@ -23,8 +23,6 @@ namespace Quanta::Log
                 return "Error";
             case Level::Fatal:
                 return "Fatal";
-            default:
-                return "Information";
         }
     }
     

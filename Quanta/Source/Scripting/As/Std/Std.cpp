@@ -1,4 +1,4 @@
-#include <Quanta/Logging/Log.h>
+#include <Quanta/CLI/Log/Log.h>
 
 #include "Std.h"
 #include "primitive/primitive.h"

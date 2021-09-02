@@ -1,4 +1,6 @@
 #include <imgui.h>
+#include <Quanta/CLI/Shell/Shell.h>
+#include <cstring>
 
 #include "LogWidget.h"
 
@@ -33,6 +35,8 @@ namespace Quanta
 
     LogWidget::LogWidget()
     {
+        std::memset(input, '\0', sizeof(input));
+
         Log::AddCallback([&](const Log::Level level, const std::string& text) 
         {
             this->messages.push_back({ text, level });
@@ -146,21 +150,35 @@ namespace Quanta
 
             ImGui::Separator();
 
-            if (ImGui::BeginChild("Scroll Area", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar))
-            {
-                for (const Message& message : messages)
-                {
-                    if (!(mask & message.level))
-                    {
-                        continue;
-                    }
+            const float reserveHeight = (ImGui::GetStyle().ItemSpacing.y * 2) + ImGui::GetFrameHeightWithSpacing();
 
-                    LogFormat format = GetLogFormat(message.level);
-                    
-                    ImGui::TextColored(format.color, format.message, message.text.c_str());
+            ImGui::BeginChild("Scroll Area", ImVec2(0, -reserveHeight), false, ImGuiWindowFlags_HorizontalScrollbar);
+
+            for (const auto& message : messages)
+            {
+                if (!(mask & message.level))
+                {
+                    continue;
                 }
+
+                const auto format = GetLogFormat(message.level);
+                
+                ImGui::TextColored(format.color, format.message, message.text.c_str());
             }
             
+            ImGui::EndChild();
+
+            ImGui::Separator();
+
+            ImGui::BeginChild("Input Area");
+
+            if (ImGui::InputText("Shell", input, sizeof(input), ImGuiInputTextFlags_EnterReturnsTrue))
+            {
+                const auto result = Shell::Execute(input);
+
+                std::memset(input, '\0', sizeof(input));
+            }
+
             ImGui::EndChild();
         }
 

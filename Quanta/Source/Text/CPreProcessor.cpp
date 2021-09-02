@@ -1,5 +1,5 @@
 #include <Quanta/Text/CPreProcessor.h>
-#include <Quanta/Logging/Log.h>
+#include <Quanta/CLI/Log/Log.h>
 #include <sstream>
 #include <fstream>
 #include <iostream>

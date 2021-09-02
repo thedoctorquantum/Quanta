@@ -1,4 +1,4 @@
-#include <Quanta/Logging/Log.h>
+#include <Quanta/CLI/Log/Log.h>
 #include <glad/glad.h>
 #include <sstream>
 

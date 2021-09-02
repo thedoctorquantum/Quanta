@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Quanta/Logging/Log.h>
+#include <Quanta/CLI/Log/Log.h>
 
 #include <vector>
 #include <string>
@@ -23,5 +23,7 @@ namespace Quanta
         std::vector<Message> messages;
         
         Log::LevelMask mask = Log::LevelMask::All;
+
+        char input[100];
     };
 }

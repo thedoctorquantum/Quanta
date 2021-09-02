@@ -1,5 +1,5 @@
 #include <Quanta/Scripting/ScriptRuntime.h>
-#include <Quanta/Logging/Log.h>
+#include <Quanta/CLI/Log/Log.h>
 #include <angelscript.h>
 #include <sstream>
 

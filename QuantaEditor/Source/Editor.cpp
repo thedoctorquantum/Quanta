@@ -7,7 +7,8 @@
 #include <fstream>
 #include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
-#include <Quanta/Logging/Log.h>
+#include <Quanta/CLI/Log/Log.h>
+#include <Quanta/CLI/Shell/Shell.h>
 #include <Quanta/Scene/Components/TransformComponent.h>
 #include <Quanta/Scene/Components/PointLightComponent.h>
 #include <Quanta/Scene/Components/ModelRendererComponent.h>
@@ -135,6 +136,22 @@ namespace Quanta
         *lightSphere = Model::FromFile("Resources/Models/light_sphere.fbx");
 
         lightEntity.Get<ModelRendererComponent>().model = lightSphere;
+
+        // add 4, 10, 11
+
+        Shell::AddCommand("add", Shell::PrimitiveType::Float, { Shell::PrimitiveType::Float, Shell::PrimitiveType::Float }, []()
+        {
+            const float a = Shell::GetArgFloat(0);
+            const float b = Shell::GetArgFloat(1);
+
+            const float res = a + b;
+
+            Shell::SetReturnFloat(res);
+
+            return true;
+        });
+
+        Shell::Execute("add: 5.2, 10.5; add: 1, 12.3;");
     }
 
     Editor::~Editor()

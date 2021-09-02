@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Math/Integer.h"
+#include "../../Math/Integer.h"
 
 namespace Quanta::Log
 {
