@@ -136,22 +136,15 @@ namespace Quanta
         *lightSphere = Model::FromFile("Resources/Models/light_sphere.fbx");
 
         lightEntity.Get<ModelRendererComponent>().model = lightSphere;
+        
+        Shell::AddCommand("set_wireframe", Shell::PrimitiveType::Void, { Shell::PrimitiveType::Int }, []()
+        {   
+            const bool enable = Shell::GetArgInt(0);
 
-        // add 4, 10, 11
-
-        Shell::AddCommand("add", Shell::PrimitiveType::Float, { Shell::PrimitiveType::Float, Shell::PrimitiveType::Float }, []()
-        {
-            const float a = Shell::GetArgFloat(0);
-            const float b = Shell::GetArgFloat(1);
-
-            const float res = a + b;
-
-            Shell::SetReturnFloat(res);
-
+            Renderer3D::EnableWireframe(enable);
+            
             return true;
         });
-
-        Shell::Execute("add: 5.2, 10.5; add: 1, 12.3;");
     }
 
     Editor::~Editor()

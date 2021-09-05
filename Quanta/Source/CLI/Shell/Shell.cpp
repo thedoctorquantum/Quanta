@@ -22,6 +22,21 @@ namespace Quanta::Shell
         ); 
     }
 
+    static const char* PrimitiveTypeToString(const PrimitiveType type)
+    {
+        switch (type)
+        {
+            case PrimitiveType::String:
+                return "String";
+            case PrimitiveType::Int:
+                return "Int";
+            case PrimitiveType::Float:
+                return "Float";
+        }
+
+        return nullptr;
+    } 
+
     struct Value final
     {
         PrimitiveType type = PrimitiveType::String;
@@ -184,6 +199,8 @@ namespace Quanta::Shell
 
         if (commandIterator == state.commands.end())
         {
+            Log::Write(Log::Level::Error, "Command '" + commandName + "' does not exist!");
+
             return false;
         }
 
@@ -191,6 +208,28 @@ namespace Quanta::Shell
 
         if (argCount != commandData.second.argTypes.size() || argCount > MaxArguments)
         {
+            std::ostringstream message;
+
+            message << "Syntax Error! Expected: ";
+            message << commandData.first;
+            message << ": ";
+
+            for (auto iter = commandData.second.argTypes.begin(); iter != commandData.second.argTypes.end(); iter++)
+            {
+                const auto asString = PrimitiveTypeToString(*iter);
+
+                if (iter == commandData.second.argTypes.begin())
+                {
+                    message << asString;
+
+                    continue;
+                }
+
+                message << ", " << asString; 
+            }
+
+            Log::Write(Log::Level::Error, message.str());
+
             return false;
         }
 
@@ -221,6 +260,8 @@ namespace Quanta::Shell
 
         const bool exit = commandData.second.command();
 
+        Log::Write(Log::Level::Debug, "[Command] " + commandData.first);
+
         if (commandData.second.returnType != PrimitiveType::Void)
         {
             std::ostringstream message;
@@ -243,7 +284,7 @@ namespace Quanta::Shell
                     break;
             }
 
-            Log::Write(Log::Level::Information, message.str());
+            Log::Write(Log::Level::Debug, message.str());
         }
 
         return exit;
@@ -251,12 +292,14 @@ namespace Quanta::Shell
     
     bool Execute(std::string commandString)
     {   
+        std::replace(commandString.begin(), commandString.end(), '\n', ' ');
+
         std::string whitespaceRemoved;
 
         RemoveExcessWhitespace(commandString, whitespaceRemoved);
 
         commandString = std::move(whitespaceRemoved);
-        
+
         std::istringstream commandStream(commandString);
 
         std::string command;

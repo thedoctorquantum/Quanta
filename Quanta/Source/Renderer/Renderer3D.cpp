@@ -692,6 +692,20 @@ namespace Quanta::Renderer3D
     {
         return state->shaderView.view;
     }
+
+    void EnableWireframe(bool enable)
+    {
+        if (enable)
+        {
+            state->opaquePipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);
+            state->transparentPipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);
+        }
+        else
+        {
+            state->opaquePipeline->SetPolygonFillMode(PolygonFillMode::Solid);
+            state->transparentPipeline->SetPolygonFillMode(PolygonFillMode::Solid);
+        }
+    }
     
     void SetDirectionalLight(const DirectionalLight& light)
     {

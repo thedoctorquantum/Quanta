@@ -33,6 +33,8 @@ namespace Quanta::Renderer3D
     glm::mat4 GetProjectionMatrix();
     glm::mat4 GetViewMatrix();
 
+    void EnableWireframe(bool enable);
+
     void SetViewProjection(const glm::mat4&);
     
     void SetDirectionalLight(const DirectionalLight& light);
