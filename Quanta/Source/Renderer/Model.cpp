@@ -24,7 +24,7 @@ namespace Quanta
 
         Model model;
         
-        const aiScene* const scene = importer.ReadFile(filepath, 
+        const auto scene = importer.ReadFile(filepath, 
             aiProcess_Triangulate | 
             aiProcess_CalcTangentSpace |
             aiProcess_FlipUVs |
@@ -38,7 +38,7 @@ namespace Quanta
 
         for (std::size_t i = 0; i < scene->mNumMeshes; i++)
         {
-            aiMesh* meshData = scene->mMeshes[i];
+            const auto meshData = scene->mMeshes[i];
 
             std::vector<Vertex> vertices;
             std::vector<uint32_t> indices;
@@ -49,24 +49,24 @@ namespace Quanta
             {                
                 Vertex vertex;
 
-                const aiVector3D& translation = meshData->mVertices[j];
-                const aiVector3D& normal = meshData->mNormals[j];
+                const auto& translation = meshData->mVertices[j];
+                const auto& normal = meshData->mNormals[j];
 
-                aiVector3D uv = aiVector3D(0.0f);
+                aiVector3D uv(0.0f);
 
                 if (meshData->HasTextureCoords(0))
                 {
                     uv = meshData->mTextureCoords[0][j]; 
                 }
 
-                aiColor4D color = aiColor4D(1.0f);
+                aiColor4D color(1.0f);
 
                 if (meshData->HasVertexColors(0))
                 {
                     color = meshData->mColors[0][j]; 
                 }
 
-                const aiVector3D tangent = meshData->mTangents[j];
+                const auto& tangent = meshData->mTangents[j];
                 
                 vertex.Translation = glm::vec3(translation.x, translation.y, translation.z);
                 vertex.Normal = glm::vec3(normal.x, normal.y, normal.z);
@@ -79,7 +79,7 @@ namespace Quanta
 
             for (std::size_t j = 0; j < meshData->mNumFaces; j++)
             {
-                const aiFace& face = meshData->mFaces[j];
+                const auto& face = meshData->mFaces[j];
 
                 for (std::size_t k = 0; k < face.mNumIndices; k++)
                 {
@@ -97,11 +97,11 @@ namespace Quanta
 
         for (std::size_t i = 0; i < scene->mNumMaterials; i++)
         {
-            const aiMaterial* const materialData = scene->mMaterials[i];
+            const auto materialData = scene->mMaterials[i];
 
             Material material;
 
-            aiColor3D color = aiColor3D(1.0f);
+            aiColor3D color(1.0f);
             float shininess = 1.0f;
             float opacity = 1.0f;
             
@@ -129,36 +129,36 @@ namespace Quanta
             
             if (materialData->GetTexture(aiTextureType_DIFFUSE, 0, &path) == aiReturn_SUCCESS)
             {                
-                std::string fullPath = directory + '/' + path.data;
+                const auto fullPath = directory + '/' + path.data;
                 
-                std::shared_ptr<Texture> albedo = Texture::Load2D(fullPath);
+                const auto albedo = Texture::Load2D(fullPath);
                 
                 material.SetAlbedoSampler(Sampler::Create(albedo));   
             }
             
             if (materialData->GetTexture(aiTextureType_SPECULAR, 0, &path) == aiReturn_SUCCESS)
             {
-                std::string fullPath = directory + '/' + path.data;
+                const auto fullPath = directory + '/' + path.data;
 
-                std::shared_ptr<Texture> specular = Texture::Load2D(fullPath);
+                const auto specular = Texture::Load2D(fullPath);
                 
                 material.SetSpecularSampler(Sampler::Create(specular));
             }
 
             if (materialData->GetTexture(aiTextureType_NORMALS, 0, &path) == aiReturn_SUCCESS)
             {
-                std::string fullPath = directory + '/' + path.data;
+                const auto fullPath = directory + '/' + path.data;
 
-                std::shared_ptr<Texture> normal = Texture::Load2D(fullPath);
+                const auto normal = Texture::Load2D(fullPath);
                 
                 material.SetNormalSampler(Sampler::Create(normal));
             }
 
             if (materialData->GetTexture(aiTextureType_OPACITY, 0, &path) == aiReturn_SUCCESS)
             {
-                std::string fullPath = directory + '/' + path.data;
+                const auto fullPath = directory + '/' + path.data;
 
-                std::shared_ptr<Texture> opacity = Texture::Load2D(fullPath);
+                const auto opacity = Texture::Load2D(fullPath);
                 
                 material.SetOpacitySampler(Sampler::Create(opacity));
             }

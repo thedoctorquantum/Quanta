@@ -8,7 +8,7 @@ namespace Quanta
 {
     std::shared_ptr<FrameBuffer> FrameBuffer::Create(const FrameBuffer::Description& description)
     {
-        const GraphicsApi api = GraphicsDevice::GetApi();
+        const auto api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
 

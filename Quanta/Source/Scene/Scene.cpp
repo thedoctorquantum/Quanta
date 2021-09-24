@@ -20,7 +20,7 @@ namespace Quanta
 
     void Scene::ForEach(const std::function<void(Entity)>& function)
     {
-        registry.each([&](const entt::entity entityHandle)
+        registry.each([&](const auto entityHandle)
         {
             Entity entity;
 

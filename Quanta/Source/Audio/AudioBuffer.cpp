@@ -9,7 +9,7 @@ namespace Quanta
 {
     std::shared_ptr<AudioBuffer> AudioBuffer::Create() 
     {
-        const AudioApi api = AudioDevice::GetApi();
+        const auto api = AudioDevice::GetApi();
 
         DEBUG_ASSERT(api == AudioApi::OpenAL);
 
@@ -26,7 +26,7 @@ namespace Quanta
     {
         SF_INFO sfinfo;
 
-        SNDFILE* const sndfile = sf_open(filepath.c_str(), SFM_READ, &sfinfo);
+        const auto sndfile = sf_open(filepath.c_str(), SFM_READ, &sfinfo);
 
         DEBUG_ASSERT(sndfile != nullptr);
 
@@ -64,9 +64,9 @@ namespace Quanta
 
         DEBUG_ASSERT(frameCount != 0);
 
-        const size_t bufferSize = frameCount * sfinfo.channels * sizeof(short);
+        const auto bufferSize = frameCount * sfinfo.channels * sizeof(short);
 
-        const std::shared_ptr<AudioBuffer> audioBuffer = Create();
+        const auto audioBuffer = Create();
 
         audioBuffer->SetData(buffer.get(), bufferSize, sfinfo.samplerate, format);
 

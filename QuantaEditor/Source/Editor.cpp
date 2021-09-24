@@ -38,8 +38,8 @@ namespace Quanta
         auto& style = ImGui::GetStyle();        
 
         ApplyEditorStyle(style);
-
-        std::shared_ptr<Texture> skybox = Texture::Create(Texture::Type::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
+        
+        const auto skybox = Texture::Create(Texture::Type::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
 
         std::shared_ptr<Quanta::Image32> images[] 
         {
@@ -51,9 +51,9 @@ namespace Quanta
             Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
         };
 
-        for(size_t i = 0; i < 6; i++)
+        for (size_t i = 0; i < 6; i++)
         {
-            Quanta::Image32& image = *images[i];
+            const auto& image = *images[i];
 
             skybox->SetData(image.GetData(), 0, 0, i);
         }
@@ -131,18 +131,18 @@ namespace Quanta
 
         lightEntity.Set<ModelRendererComponent>();
 
-        std::shared_ptr<Model> lightSphere = std::make_shared<Model>();
+        const auto lightSphere = std::make_shared<Model>();
 
         *lightSphere = Model::FromFile("Resources/Models/light_sphere.fbx");
 
         lightEntity.Get<ModelRendererComponent>().model = lightSphere;
-        
+
         Shell::AddCommand("set_wireframe", Shell::PrimitiveType::Void, { Shell::PrimitiveType::Int }, []()
         {   
-            const bool enable = Shell::GetArgInt(0);
+            const auto enable = Shell::GetArgInt(0);
 
             Renderer3D::EnableWireframe(enable);
-            
+
             return true;
         });
     }
@@ -158,7 +158,7 @@ namespace Quanta
     {
         GraphicsDevice::ClearBackBuffer(glm::vec4(1.0f), 1.0f, 0);
 
-        static glm::mat4 transform = glm::identity<glm::mat4>();
+        static auto transform = glm::identity<glm::mat4>();
 
         ImGuiRenderer::Begin(frameTime);
         {
@@ -166,7 +166,7 @@ namespace Quanta
 
             ImGui::DockSpaceOverViewport();
 
-            if (ImGui::BeginMainMenuBar());
+            if (ImGui::BeginMainMenuBar())
             {
                 if (ImGui::BeginMenu("File"))
                 {
@@ -221,7 +221,7 @@ namespace Quanta
 
                         script.Main();
                     };
-                
+                                   
                     if (ImGui::IsItemFocused() && ImGui::GetIO().KeysDown[static_cast<USize>(Key::F5)])
                     {
                         runScript(textEditor);
@@ -266,7 +266,7 @@ namespace Quanta
 
                         ImGui::PushID(id);
 
-                        ImGui::Text("Entity %u", id);
+                        ImGui::Text("Entity %u", id);   
 
                         ImGui::DragFloat3("Translation", &transform.translation.x);
                         ImGui::DragFloat3("Scale", &transform.scale.x);

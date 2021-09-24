@@ -59,7 +59,7 @@ namespace Quanta
     {
         std::fseek(handle, 0, SEEK_END);
 
-        const std::size_t size = ftell(handle);
+        const auto size = ftell(handle);
 
         std::fseek(handle, 0, SEEK_SET);
 

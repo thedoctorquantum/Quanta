@@ -37,7 +37,7 @@ namespace Quanta
     {
         std::memset(input, '\0', sizeof(input));
 
-        Log::AddCallback([&](const Log::Level level, const std::string& text) 
+        Log::AddCallback([&](const auto level, const auto& text) 
         {
             this->messages.push_back({ text, level });
         });
@@ -59,12 +59,12 @@ namespace Quanta
     
             ImGui::SameLine();
 
-            bool enableTrace = mask & Log::Level::Trace;
-            bool enableInfo = mask & Log::Level::Information;
-            bool enableDebug = mask & Log::Level::Debug;
-            bool enableWarn = mask & Log::Level::Warning;
-            bool enableError = mask & Log::Level::Error;
-            bool enableFatal = mask & Log::Level::Fatal;    
+            auto enableTrace = mask & Log::Level::Trace;
+            auto enableInfo = mask & Log::Level::Information;
+            auto enableDebug = mask & Log::Level::Debug;
+            auto enableWarn = mask & Log::Level::Warning;
+            auto enableError = mask & Log::Level::Error;
+            auto enableFatal = mask & Log::Level::Fatal;    
 
             if (ImGui::Checkbox("Trace", &enableTrace))
             {
@@ -150,7 +150,7 @@ namespace Quanta
 
             ImGui::Separator();
 
-            const float reserveHeight = (ImGui::GetStyle().ItemSpacing.y * 2) + ImGui::GetFrameHeightWithSpacing();
+            const auto reserveHeight = (ImGui::GetStyle().ItemSpacing.y * 2) + ImGui::GetFrameHeightWithSpacing();
 
             ImGui::BeginChild("Scroll Area", ImVec2(0, -reserveHeight), false, ImGuiWindowFlags_HorizontalScrollbar);
 

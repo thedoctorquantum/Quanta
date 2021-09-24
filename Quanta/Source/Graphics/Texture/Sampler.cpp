@@ -10,7 +10,7 @@ namespace Quanta
     {
         DEBUG_ASSERT(texture != nullptr);
 
-        const GraphicsApi api = GraphicsDevice::GetApi();
+        const auto api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
         

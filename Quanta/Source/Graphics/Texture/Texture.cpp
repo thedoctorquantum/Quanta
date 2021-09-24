@@ -8,7 +8,7 @@ namespace Quanta
 {
     std::shared_ptr<Texture> Texture::Create(const Type type, const TexelFormat format, const USize width, const USize height, const USize depth)
     {
-        const GraphicsApi api = GraphicsDevice::GetApi();
+        const auto api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
 
@@ -23,7 +23,7 @@ namespace Quanta
     
     std::shared_ptr<Texture> Texture::Load2D(const std::string& filepath)
     {
-        std::shared_ptr<Image32> image = Image32::FromFile(filepath);
+        const auto image = Image32::FromFile(filepath);
 
         DEBUG_ASSERT(image != nullptr);
         
@@ -32,7 +32,7 @@ namespace Quanta
     
     std::shared_ptr<Texture> Texture::FromImage2D(const Image32& image)
     {
-        const std::shared_ptr<Texture> texture = Create(Type::Texture2D, TexelFormat::Rgba8I, image.GetWidth(), image.GetHeight(), 1);
+        const auto texture = Create(Type::Texture2D, TexelFormat::Rgba8I, image.GetWidth(), image.GetHeight(), 1);
 
         DEBUG_ASSERT(texture != nullptr);
         DEBUG_ASSERT(image.GetData() != nullptr);

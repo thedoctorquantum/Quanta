@@ -16,7 +16,7 @@ namespace Quanta
         
         CPreProcessor processor(filepath);
 
-        std::string output = processor.Process();
+        const auto output = processor.Process();
 
         module->AddScriptSection("Source", output.c_str(), output.size());
 
@@ -35,7 +35,7 @@ namespace Quanta
     
     I32 Script::Main()
     {
-        asIScriptFunction* main = module->GetFunctionByDecl("int32 Main()");
+        const auto main = module->GetFunctionByDecl("int32 Main()");
 
         if (main == nullptr)
         {
@@ -46,7 +46,7 @@ namespace Quanta
 
         context->Execute();
         
-        asQWORD exit = context->GetReturnQWord();
+        const auto exit = context->GetReturnQWord();
 
         context->Unprepare();
 

@@ -43,9 +43,9 @@ namespace Quanta
 
         for (std::size_t i = 0; i < description.colorAttachments.size(); i++)
         {
-            const AttachmentDescription& attachmentDescription = description.colorAttachments[i];
+            const auto& attachmentDescription = description.colorAttachments[i];
 
-            const std::shared_ptr<Quanta::Texture> texture = Quanta::Texture::Create(
+            const auto texture = Quanta::Texture::Create(
                 Texture::Type::Texture2D,
                 attachmentDescription.format, 
                 description.width,
@@ -53,7 +53,7 @@ namespace Quanta
                 1
             );
 
-            const GLuint glAttachment = GL_COLOR_ATTACHMENT0 + i;
+            const auto glAttachment = GL_COLOR_ATTACHMENT0 + i;
 
             glNamedFramebufferTexture(handle, glAttachment, GetTextureHandle(texture), 0);
 

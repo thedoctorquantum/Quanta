@@ -8,7 +8,7 @@ namespace Quanta
 {
     std::shared_ptr<ShaderModule> ShaderModule::Create(const ShaderType type, const std::string& source)
     {
-        const GraphicsApi api = GraphicsDevice::GetApi();
+        const auto api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
         

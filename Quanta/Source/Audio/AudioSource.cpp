@@ -8,7 +8,7 @@ namespace Quanta
 {
     std::shared_ptr<AudioSource> AudioSource::Create()
     {
-        const AudioApi api = AudioDevice::GetApi();
+        const auto api = AudioDevice::GetApi();
 
         DEBUG_ASSERT(api == AudioApi::OpenAL);
         

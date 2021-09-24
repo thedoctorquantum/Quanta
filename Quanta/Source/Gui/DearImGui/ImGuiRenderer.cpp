@@ -273,8 +273,8 @@ namespace Quanta
     {
         BuildFontAtlas();
         
-        const std::uint32_t displayWidth = state->window->GetFrameBufferSize().x; 
-        const std::uint32_t displayHeight = state->window->GetFrameBufferSize().y; 
+        const auto displayWidth = state->window->GetFrameBufferSize().x; 
+        const auto displayHeight = state->window->GetFrameBufferSize().y; 
 
         state->io->DisplaySize.x = displayWidth;
         state->io->DisplaySize.y = displayHeight;
@@ -290,7 +290,7 @@ namespace Quanta
     {
         ImGui::Render();
 
-        ImDrawData* const drawData = ImGui::GetDrawData();
+        const auto drawData = ImGui::GetDrawData();
 
         DEBUG_ASSERT(drawData != nullptr);
 
@@ -298,15 +298,15 @@ namespace Quanta
 
         drawData->ScaleClipRects(state->io->DisplayFramebufferScale);
 
-        const glm::mat4 matrix = glm::ortho(0.0f, state->io->DisplaySize.x, state->io->DisplaySize.y, 0.0f, -1.0f, 1.0f);
+        const auto matrix = glm::ortho(0.0f, state->io->DisplaySize.x, state->io->DisplaySize.y, 0.0f, -1.0f, 1.0f);
 
         state->uniformBuffer->SetData(&matrix, sizeof(glm::mat4));
 
         GraphicsDevice::SetRasterPipeline(state->pipeline.get());
         GraphicsDevice::SetVertexArray(state->vertexArray.get());
 
-        const size_t totalVertexBuffersize = drawData->TotalVtxCount * sizeof(ImDrawVert);
-        const size_t totalIndexBufferSize = drawData->TotalIdxCount * sizeof(uint16_t);
+        const auto totalVertexBuffersize = drawData->TotalVtxCount * sizeof(ImDrawVert);
+        const auto totalIndexBufferSize = drawData->TotalIdxCount * sizeof(uint16_t);
 
         if(totalVertexBuffersize > state->vertexBuffer->GetSize())
         {
@@ -327,21 +327,21 @@ namespace Quanta
 
         for (size_t i = 0; i < drawData->CmdListsCount; i++)
         {
-            const ImDrawList* const drawList = drawData->CmdLists[i];
+            const auto drawList = drawData->CmdLists[i];
 
-            const ImVector<ImDrawCmd>& commands = drawList->CmdBuffer;
+            const auto& commands = drawList->CmdBuffer;
 
-            const size_t vertexBufferSize = drawList->VtxBuffer.Size * sizeof(ImDrawVert);
-            const size_t indexBufferSize = drawList->IdxBuffer.Size * sizeof(ImWchar);
+            const auto vertexBufferSize = drawList->VtxBuffer.Size * sizeof(ImDrawVert);
+            const auto indexBufferSize = drawList->IdxBuffer.Size * sizeof(ImWchar);
 
             state->vertexBuffer->SetData(drawList->VtxBuffer.Data, vertexBufferSize, vertexOffset);
             state->indexBuffer->SetData(drawList->IdxBuffer.Data, indexBufferSize, indexOffset);
             
             for (size_t j = 0; j < commands.Size; j++)
             {
-                const ImDrawCmd& command = commands[j];
+                const auto& command = commands[j];
 
-                Sampler* const sampler = static_cast<Sampler*>(command.TextureId);
+                const auto sampler = static_cast<const Sampler*>(command.TextureId);
 
                 DEBUG_ASSERT(sampler != nullptr);
 

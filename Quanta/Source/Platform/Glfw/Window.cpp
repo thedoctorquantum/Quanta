@@ -5,7 +5,7 @@
 
 namespace Quanta::Glfw
 {
-    static const std::unordered_map<int32_t, Key> keyTranslations = 
+    static const std::unordered_map<int32_t, Key> keyTranslations
     {
         { GLFW_KEY_UNKNOWN, Key::Unknown },
         { GLFW_KEY_SPACE, Key::Space },
@@ -130,7 +130,7 @@ namespace Quanta::Glfw
         { GLFW_KEY_MENU, Key::Menu }
     };
 
-    static const std::unordered_map<int32_t, MouseButton> mouseButtonTranslations =
+    static const std::unordered_map<int32_t, MouseButton> mouseButtonTranslations
     {
         { GLFW_MOUSE_BUTTON_1, MouseButton::One },
         { GLFW_MOUSE_BUTTON_2, MouseButton::Two },
@@ -150,13 +150,13 @@ namespace Quanta::Glfw
     {
         this->graphicsApi = graphicsApi;
 
-        const bool isInitialized = glfwInit();
+        const auto isInitialized = glfwInit();
         
         DEBUG_ASSERT(isInitialized);
         
         if constexpr (DEBUG)
         {
-            glfwSetErrorCallback([](int level, const char* message)
+            glfwSetErrorCallback([](const auto level, const auto message)
             {
                 DEBUG_FAILURE_MESSAGE(message);
             });
@@ -192,9 +192,9 @@ namespace Quanta::Glfw
         
         glfwSetWindowUserPointer(handle, this);
         
-        glfwSetKeyCallback(handle, [](GLFWwindow* const window, const int32_t key, const int32_t scancode, const int32_t action, const int32_t mods)
+        glfwSetKeyCallback(handle, [](const auto window, const auto key, const auto scancode, const auto action, const auto mods)
         {
-            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            const auto _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
             
             Key result = keyTranslations.at(key);
 
@@ -211,18 +211,18 @@ namespace Quanta::Glfw
             }
         });
 
-        glfwSetCharCallback(handle, [](GLFWwindow* const window, const uint32_t character)
+        glfwSetCharCallback(handle, [](const auto window, const auto character)
         {
-            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            const auto _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
             _this->onCharacterDown(static_cast<char>(character));
         });
 
-        glfwSetMouseButtonCallback(handle, [](GLFWwindow* const window, const int32_t button, const int32_t action, const int32_t mods)
+        glfwSetMouseButtonCallback(handle, [](const auto window, const auto button, const auto action, const auto mods)
         {
-            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            const auto _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
-            const MouseButton result = mouseButtonTranslations.at(button);
+            const auto result = mouseButtonTranslations.at(button);
 
             switch(action)
             {
@@ -237,39 +237,39 @@ namespace Quanta::Glfw
             }
         });
 
-		glfwSetCursorPosCallback(handle, [](GLFWwindow* const window, const double xPos, const double yPos)
+		glfwSetCursorPosCallback(handle, [](const auto window, const auto xPos, const auto yPos)
 		{
-            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            const auto _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
             _this->onMouseMove({ static_cast<float>(xPos), static_cast<float>(yPos) });
 		});
 
-        glfwSetScrollCallback(handle, [](GLFWwindow* const window, const double xOffset, const double yOffset)
+        glfwSetScrollCallback(handle, [](const auto window, const auto xOffset, const auto yOffset)
         {
-            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            const auto _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
             _this->onMouseScroll({ static_cast<float>(xOffset), static_cast<float>(yOffset) });
         });
 
-        glfwSetWindowPosCallback(handle, [](GLFWwindow* const window, const int x, const int y)
+        glfwSetWindowPosCallback(handle, [](const auto window, const auto x, const auto y)
         {
-            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            const auto _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
 			_this->position.x = static_cast<std::uint32_t>(x);
             _this->position.y = static_cast<std::uint32_t>(y);
         });
 
-		glfwSetWindowSizeCallback(handle, [](GLFWwindow* const window, const int width, const int height)
+		glfwSetWindowSizeCallback(handle, [](const auto window, const auto width, const auto height)
 		{
-			Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+			const auto _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
 			_this->size.x = static_cast<std::uint32_t>(width);
             _this->size.y = static_cast<std::uint32_t>(height);
 		});
 
-        glfwSetWindowMaximizeCallback(handle, [](GLFWwindow* const window, const int maximized)
+        glfwSetWindowMaximizeCallback(handle, [](const auto window, const auto maximized)
         {
-            Window* const _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
+            const auto _this = static_cast<Window*>(glfwGetWindowUserPointer(window));
 
             _this->position.x = 0;
             _this->position.y = 0;

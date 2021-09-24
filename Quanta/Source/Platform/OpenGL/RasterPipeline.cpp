@@ -46,7 +46,7 @@ namespace Quanta::OpenGL
 
             glGetProgramiv(handle, GL_LINK_STATUS, &success);
 
-            if(!success)
+            if (!success)
             {
                 char infoLog[512];
 

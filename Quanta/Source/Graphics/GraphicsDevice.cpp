@@ -14,7 +14,7 @@ namespace Quanta::GraphicsDevice
     
     void Create(const Window& window)
     {
-        const GraphicsApi api = window.GetGraphicsApi();
+        const auto api = window.GetGraphicsApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
         

@@ -24,6 +24,8 @@ namespace Quanta::Log
             case Level::Fatal:
                 return "Fatal";
         }
+
+        return nullptr;
     }
     
     struct 
@@ -59,7 +61,7 @@ namespace Quanta::Log
         
         va_start(args, message);
 
-        const std::size_t size = std::snprintf(nullptr, 0, message.c_str(), args);
+        const auto size = std::snprintf(nullptr, 0, message.c_str(), args);
 
         std::string output(size + 1, '\0');
         
@@ -124,7 +126,7 @@ namespace Quanta::Log
         
         for (std::size_t i = 0; i < log.callbacks.size(); i++)
         {
-            const Callback& callback = log.callbacks[i];
+            const auto& callback = log.callbacks[i];
 
             if (!callback)
             {

@@ -17,7 +17,7 @@ namespace Quanta::As::Std
         {
             String str(data, length);
 
-            Cache::iterator it = cache.find(str);
+            auto it = cache.find(str);
             
             if (it != cache.end())
             {
@@ -31,13 +31,13 @@ namespace Quanta::As::Std
             return &it->first;
         }
 
-        int ReleaseStringConstant(const void* str)
+        int ReleaseStringConstant(const void* const str)
         {
-            const String& string = *static_cast<const String*>(str); 
+            const auto& string = *static_cast<const String*>(str); 
 
-            Cache::iterator it = cache.find(string);
+            auto it = cache.find(string);
 
-            int result = asSUCCESS;
+            auto result = asSUCCESS;
 
             if (it == cache.end())
             {
@@ -56,14 +56,14 @@ namespace Quanta::As::Std
             return result;
         }
         
-        int GetRawStringData(const void* str, char* data, asUINT* length) const
+        int GetRawStringData(const void* const str, char* const data, asUINT* const length) const
         {
             if (str == nullptr)
             {
                 return asERROR;
             }
 
-            const String& string = *reinterpret_cast<const String*>(str);
+            const auto& string = *reinterpret_cast<const String*>(str);
 
             if (length != nullptr)
             {
@@ -88,19 +88,19 @@ namespace Quanta::As::Std
         new(&self) String;
     }
     
-    void Construct(String& self, USize length, Char value)
+    void Construct(String& self, const USize length, const Char value)
     {   
         new(&self) String(length, value);
     }
 
-    void Construct(String& self, USize length)
+    void Construct(String& self, const USize length)
     {   
         Construct(self, length, '\0');
     }
 
     void ListConstruct(String& self, const Char* data)
     {
-        asUINT length = *reinterpret_cast<const asUINT*>(data);
+        const auto length = *reinterpret_cast<const asUINT*>(data);
 
         data += sizeof(asUINT);
 
@@ -117,7 +117,7 @@ namespace Quanta::As::Std
         return self == other;
     }
 
-    Char opIndex(const String& self, USize index)
+    Char opIndex(const String& self, const USize index)
     {
         if (index >= self.size())
         {
@@ -127,7 +127,7 @@ namespace Quanta::As::Std
         return self[index];
     }
 
-    Char& opIndex(String& self, USize index)
+    Char& opIndex(String& self, const USize index)
     {
         if (index >= self.size())
         {
@@ -147,7 +147,7 @@ namespace Quanta::As::Std
         return self += other;
     }
     
-    String& opAddAssign(String& self, Char value)
+    String& opAddAssign(String& self, const Char value)
     {
         return self += value;
     }
@@ -157,7 +157,7 @@ namespace Quanta::As::Std
         return self + other;
     }
 
-    String opAdd(const String& self, Char value)
+    String opAdd(const String& self, const Char value)
     {
         return self + value;
     }

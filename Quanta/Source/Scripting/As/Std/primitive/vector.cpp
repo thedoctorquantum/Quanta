@@ -13,40 +13,40 @@ namespace Quanta::As::Std
         self.y = 0;
     }
     
-    static void Construct(Vec2F32& self, F32 value)
+    static void Construct(Vec2F32& self, const F32 value)
     {
         self.x = value;
         self.y = value;
     }
     
-    static void Construct(Vec2F32& self, F32 x, F32 y)
+    static void Construct(Vec2F32& self, const F32 x, const F32 y)
     {
         self.x = x;
         self.y = y;
     }
     
-    static void Construct(Vec2F32& self, float* list)
+    static void Construct(Vec2F32& self, float* const list)
     {
         self.x = list[0];
         self.y = list[1];
     }
 
-    static Vec2F32 OpAddAssign(Vec2F32& self, Vec2F32 other)
+    static Vec2F32 OpAddAssign(Vec2F32& self, const Vec2F32 other)
     {
         return self = self + other;
     }
 
-    static Vec2F32 OpSubAssign(Vec2F32& self, Vec2F32 other)
+    static Vec2F32 OpSubAssign(Vec2F32& self, const Vec2F32 other)
     {
         return self = self - other;
     }
 
-    static Vec2F32 OpMulAssign(Vec2F32& self, Vec2F32 other)
+    static Vec2F32 OpMulAssign(Vec2F32& self, const Vec2F32 other)
     {
         return self = self * other;
     }
 
-    static Vec2F32 OpDivAssign(Vec2F32& self, Vec2F32 other)
+    static Vec2F32 OpDivAssign(Vec2F32& self, const Vec2F32 other)
     {
         if(other.x == 0.0f || other.y == 0.0f)
         {   
@@ -56,22 +56,22 @@ namespace Quanta::As::Std
         return self = self / other;
     }
     
-    static Vec2F32 OpAddAssign(Vec2F32& self, F32 other)
+    static Vec2F32 OpAddAssign(Vec2F32& self, const F32 other)
     {
         return self = self + other;
     }
 
-    static Vec2F32 OpSubAssign(Vec2F32& self, F32 other)
+    static Vec2F32 OpSubAssign(Vec2F32& self, const F32 other)
     {
         return self = self - other;
     }
 
-    static Vec2F32 OpMulAssign(Vec2F32& self, F32 other)
+    static Vec2F32 OpMulAssign(Vec2F32& self, const F32 other)
     {
         return self = self * other;
     }
     
-    static Vec2F32 OpDivAssign(Vec2F32& self, F32 other)
+    static Vec2F32 OpDivAssign(Vec2F32& self, const F32 other)
     {
         if(other == 0.0f)
         {   
@@ -81,7 +81,7 @@ namespace Quanta::As::Std
         return self = self / other;
     }
     
-    static F32 OpIndex(const Vec2F32& self, USize index)
+    static F32 OpIndex(const Vec2F32& self, const USize index)
     {
         if(index > 1) 
         {
@@ -91,7 +91,7 @@ namespace Quanta::As::Std
         return self[index];
     }
 
-    static F32& OpIndex(Vec2F32& self, USize index)
+    static F32& OpIndex(Vec2F32& self, const USize index)
     {
         if(index > 1) 
         {

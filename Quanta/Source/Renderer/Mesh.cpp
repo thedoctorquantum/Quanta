@@ -13,7 +13,7 @@ namespace Quanta
 
         Mesh mesh;
 
-        const aiScene* scene = importer.ReadFile(filepath, aiProcess_CalcTangentSpace); 
+        const auto scene = importer.ReadFile(filepath, aiProcess_CalcTangentSpace); 
 
         DEBUG_ASSERT(scene != nullptr);
 
@@ -24,30 +24,30 @@ namespace Quanta
         
         for(size_t i = 0; i < scene->mNumMeshes; i++)
         {
-            aiMesh* mesh = scene->mMeshes[i];
+            const auto mesh = scene->mMeshes[i];
 
             for(size_t j = 0; j < mesh->mNumVertices; j++)
             {                
                 Vertex vertex;
 
-                aiVector3D& translation = mesh->mVertices[j];
-                aiVector3D& normal = mesh->mNormals[j];
+                const auto& translation = mesh->mVertices[j];
+                const auto& normal = mesh->mNormals[j];
 
-                aiVector3D uv = aiVector3D(0.0f);
+                aiVector3D uv(0.0f);
 
                 if(mesh->HasTextureCoords(0))
                 {
                     uv = mesh->mTextureCoords[0][j]; 
                 }
 
-                aiColor4D color = aiColor4D(1.0f);
+                aiColor4D color(1.0f);
 
                 if(mesh->HasVertexColors(0))
                 {
                     color = mesh->mColors[0][j]; 
                 }
 
-                aiVector3D tangent = mesh->mTangents[j];
+                const auto& tangent = mesh->mTangents[j];
                 
                 vertex.Translation = glm::vec3(translation.x, translation.y, translation.z);
                 vertex.Normal = glm::vec3(normal.x, normal.y, normal.z);
@@ -62,7 +62,7 @@ namespace Quanta
 
             for(size_t j = 0; j < mesh->mNumFaces; j++)
             {
-                aiFace& face = mesh->mFaces[j];
+                const auto& face = mesh->mFaces[j];
 
                 for(size_t k = 0; k < face.mNumIndices; k++)
                 {
@@ -93,8 +93,8 @@ namespace Quanta
 
         vertexArray = VertexArray::Create();
 
-        std::shared_ptr<GraphicsBuffer> vertexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, vertexCount * sizeof(Vertex));
-        std::shared_ptr<GraphicsBuffer> indexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, indexCount * sizeof(uint32_t));
+        const auto vertexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, vertexCount * sizeof(Vertex));
+        const auto indexBuffer = GraphicsBuffer::Create(BufferUsage::Dynamic, indexCount * sizeof(uint32_t));
 
         VertexLayout layout;
 
@@ -164,7 +164,7 @@ namespace Quanta
     {
         DEBUG_ASSERT(vertices != nullptr);
 
-        size_t size = count * sizeof(Vertex);
+        const auto size = count * sizeof(Vertex);
 
         if(count > vertexCount)
         {
@@ -180,7 +180,7 @@ namespace Quanta
     {
         DEBUG_ASSERT(indices != nullptr);
 
-        size_t size = count * sizeof(uint32_t);
+        const auto size = count * sizeof(uint32_t);
         
         if(count > indexCount)
         {

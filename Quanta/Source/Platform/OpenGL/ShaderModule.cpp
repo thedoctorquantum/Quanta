@@ -20,7 +20,7 @@ namespace Quanta
 
         GLenum target = 0;
         
-        switch(type)
+        switch (type)
         {
         case ShaderType::Vertex:
             target = GL_VERTEX_SHADER;
@@ -44,8 +44,8 @@ namespace Quanta
         
         DEBUG_ASSERT(handle != 0);
 
-        const char* const sourcePointer = source.c_str();
-        const USize length = source.length();
+        const auto sourcePointer = source.c_str();
+        const auto length = source.length();
         
         glShaderSource(handle, 1, &sourcePointer, reinterpret_cast<const GLint*>(&length));
         
@@ -57,7 +57,7 @@ namespace Quanta
 
             glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
 
-            if(!success)
+            if (!success)
             {
                 char infoLog[512];
 

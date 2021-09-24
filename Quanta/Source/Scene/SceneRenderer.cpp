@@ -24,12 +24,12 @@ namespace Quanta::SceneRenderer
         {
             const auto cameras = scene.view<TransformComponent, CameraComponent>();
             
-            const entt::entity mainCamera = cameras.front();
+            const auto mainCamera = cameras.front();
     
             if (mainCamera != entt::null)
             {
-                const TransformComponent& transform = scene.get<TransformComponent>(mainCamera);
-                const CameraComponent& camera = scene.get<CameraComponent>(mainCamera);
+                const auto& transform = scene.get<TransformComponent>(mainCamera);
+                const auto& camera = scene.get<CameraComponent>(mainCamera);
 
                 view.width = camera.width;
                 view.height = camera.height;
@@ -63,9 +63,9 @@ namespace Quanta::SceneRenderer
 
         for (const auto [entity, transform, modelRenderer] : models.each())
         {
-            const glm::mat4 transformMatrix = transform.CreateMatrix();
+            const auto transformMatrix = transform.CreateMatrix();
 
-            const Model& model = *modelRenderer.model;
+            const auto& model = *modelRenderer.model;
 
             Renderer3D::DrawModel(model, transformMatrix);
         }

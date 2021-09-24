@@ -8,7 +8,7 @@ namespace Quanta
 {
     std::shared_ptr<GraphicsBuffer> GraphicsBuffer::Create(const BufferUsage usage, const USize size)
     {
-        const GraphicsApi api = GraphicsDevice::GetApi();
+        const auto api = GraphicsDevice::GetApi();
 
         DEBUG_ASSERT(api == GraphicsApi::OpenGL);
 

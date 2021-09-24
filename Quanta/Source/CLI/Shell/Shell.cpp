@@ -193,7 +193,7 @@ namespace Quanta::Shell
             i++;
         }
 
-        const std::size_t argCount = i;
+        const auto argCount = i;
 
         const auto commandIterator = state.commands.find(commandName);
 
@@ -258,7 +258,7 @@ namespace Quanta::Shell
             }
         }
 
-        const bool exit = commandData.second.command();
+        const auto exit = commandData.second.command();
 
         Log::Write(Log::Level::Debug, "[Command] " + commandData.first);
 
@@ -289,7 +289,7 @@ namespace Quanta::Shell
 
         return exit;
     }
-    
+
     bool Execute(std::string commandString)
     {   
         std::replace(commandString.begin(), commandString.end(), '\n', ' ');
@@ -304,7 +304,7 @@ namespace Quanta::Shell
 
         std::string command;
 
-        bool exitCode = false; 
+        auto exitCode = true; 
 
         while (std::getline(commandStream, command, ';'))
         {

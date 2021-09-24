@@ -23,7 +23,7 @@ namespace Quanta::OpenGL
         const void* const userParam
     ) 
     {
-        Log::Level logLevel = Log::Level::Trace;
+        auto logLevel = Log::Level::Trace;
         const char* severityString = nullptr;
 
         switch(severity)
@@ -68,7 +68,7 @@ namespace Quanta::OpenGL
     {
         DEBUG_ASSERT(window.GetGraphicsApi() == GraphicsApi::OpenGL);
         
-        const bool isLoaded = gladLoadGL();
+        const auto isLoaded = gladLoadGL();
 
         DEBUG_ASSERT(isLoaded);
 
@@ -134,7 +134,7 @@ namespace Quanta::OpenGL
 
         if (rasterPipeline != glPipeline)
         {
-            const std::shared_ptr<Quanta::FrameBuffer>& frameBuffer = value->GetFrameBuffer();
+            const auto& frameBuffer = value->GetFrameBuffer();
 
             if (frameBuffer != nullptr)
             {
@@ -160,7 +160,7 @@ namespace Quanta::OpenGL
 
             for (size_t i = 0; i < value->GetUniformBufferCount(); i++)
             {
-                const std::shared_ptr<Quanta::GraphicsBuffer>& buffer = value->GetUniformBuffer(i);
+                const auto& buffer = value->GetUniformBuffer(i);
 
                 GraphicsBuffer* glBuffer = nullptr;
 
@@ -180,7 +180,7 @@ namespace Quanta::OpenGL
             
             for(size_t i = 0; i < value->GetStorageBufferCount(); i++)
             {
-                const std::shared_ptr<Quanta::GraphicsBuffer>& buffer = value->GetStorageBuffer(i);
+                const auto& buffer = value->GetStorageBuffer(i);
 
                 GraphicsBuffer* glBuffer = nullptr;
 

@@ -10,7 +10,7 @@ namespace Quanta
 {
     static void MessageCallback(const asSMessageInfo* const message, void* const param)
     {
-        Log::Level level = Log::Level::Information;
+        auto level = Log::Level::Information;
 
         switch(message->type)
         {

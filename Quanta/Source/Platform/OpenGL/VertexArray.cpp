@@ -46,7 +46,7 @@ namespace Quanta::OpenGL
 
         for(USize i = 0; i < layout.GetCount(); i++)
         {
-            const VertexElement& element = layout[i];
+            const auto& element = layout[i];
 
             DEBUG_ASSERT(
                 element.primitve == BufferPrimitive::UInt8 ||

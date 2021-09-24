@@ -17,5 +17,4 @@ namespace Quanta
     using USize = std::uintptr_t;
 
     using Char = char;
-    using WChar = wchar_t;
 }

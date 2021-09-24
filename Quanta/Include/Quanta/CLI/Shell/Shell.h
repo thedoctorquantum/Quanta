@@ -34,6 +34,6 @@ namespace Quanta::Shell
     const char* GetReturnString();
     U32 GetReturnInt();
     float GetReturnFloat();
-
+    
     bool Execute(std::string command);
 }

@@ -18,7 +18,7 @@ namespace Quanta
 
         while (std::getline(inputStream, line))
         {
-            for (char chr : line)
+            for (const auto chr : line)
             {
                 if (chr == '#')
                 {
@@ -53,7 +53,7 @@ namespace Quanta
     {
         simplecpp::DUI dui;
 
-        for (const std::string& define : defines)
+        for (const auto& define : defines)
         {
             dui.defines.push_back(define);
         }
@@ -68,9 +68,9 @@ namespace Quanta
 
         rawTokens.removeComments();
 
-        std::map<std::string, simplecpp::TokenList*> included = simplecpp::load(rawTokens, files, dui, &outputList);
+        auto included = simplecpp::load(rawTokens, files, dui, &outputList);
         
-        for (std::pair<std::string, simplecpp::TokenList*> i : included)
+        for (const auto& i : included)
         {
             i.second->removeComments();
         }
@@ -79,9 +79,9 @@ namespace Quanta
         
         simplecpp::preprocess(outputTokens, rawTokens, files, included, dui, &outputList);
         
-        for (const simplecpp::Output &output : outputList) 
+        for (const auto& output : outputList) 
         {
-            Log::Level level = Log::Level::Information;
+            auto level = Log::Level::Information;
 
             switch (output.type)
             {
@@ -112,7 +112,7 @@ namespace Quanta
             Log::Write(level, message.str());
         }
 
-        std::string output = outputTokens.stringify();
+        auto output = outputTokens.stringify();
 
         simplecpp::cleanup(included);
         
