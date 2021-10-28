@@ -28,10 +28,6 @@ namespace Quanta
 
             std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
         };
-    
-        static std::shared_ptr<RasterPipeline> Create(const Description& description);
-
-        virtual ~RasterPipeline() = default;
 
         std::shared_ptr<ShaderModule> vertexShader;
         std::shared_ptr<ShaderModule> fragmentShader;
@@ -50,5 +46,9 @@ namespace Quanta
         FaceCullMode faceCullMode = FaceCullMode::None;
         GeometryLayout geometryLayout = GeometryLayout::Triangle;
         GeometryWinding geometryWinding = GeometryWinding::CounterClockwise;
+
+        static std::shared_ptr<RasterPipeline> Create(const Description& description);
+
+        virtual ~RasterPipeline() = default;
     };
 }
