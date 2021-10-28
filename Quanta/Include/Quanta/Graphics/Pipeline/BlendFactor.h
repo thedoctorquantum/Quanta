@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class BlendFactor : U8
+    enum struct BlendFactor : U8
     {
         Zero,
         One,

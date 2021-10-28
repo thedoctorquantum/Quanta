@@ -8,19 +8,16 @@
 
 namespace Quanta
 {
-    class FrameBuffer 
+    struct FrameBuffer 
     {
-    public:
-        struct AttachmentDescription final
+        struct AttachmentDescription
         {
-        public:
             TexelFormat format = TexelFormat::Rgba8I;
             bool isSwapChainTarget = false;
         };
 
-        struct Description final
+        struct Description
         {
-        public:
             std::vector<AttachmentDescription> colorAttachments;
             AttachmentDescription depthAttachment;
 

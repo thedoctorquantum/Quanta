@@ -5,9 +5,8 @@
 
 namespace Quanta
 {
-    class AudioSource 
+    struct AudioSource 
     {
-    public:
         static std::shared_ptr<AudioSource> Create();
         
         virtual ~AudioSource() = default;

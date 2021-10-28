@@ -7,9 +7,8 @@
 
 namespace Quanta
 {
-    class Image32 final
+    struct Image32
     {
-    public:
         Image32(USize width, USize height);
         Image32(Color32* data, USize width, USize height);
 

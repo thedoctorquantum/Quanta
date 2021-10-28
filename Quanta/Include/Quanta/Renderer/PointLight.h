@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    struct PointLight final
+    struct PointLight
     {
         glm::vec3 Position = glm::vec3(0.0f);
         float Intensity = 1.0f; 

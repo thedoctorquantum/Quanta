@@ -55,24 +55,24 @@ namespace Quanta::Log
         return log.levelMask;
     }
     
-    void WriteFormat(const Level level, const std::string& message, ...)
+    void WriteFormat(const Level level, const std::string_view& message, ...)
     {
         va_list args { };
         
         va_start(args, message);
 
-        const auto size = std::snprintf(nullptr, 0, message.c_str(), args);
+        const auto size = std::vsnprintf(nullptr, 0, message.data(), args);
 
         std::string output(size + 1, '\0');
         
-        std::snprintf(&output[0], size, message.c_str(), args);
+        std::vsnprintf(&output[0], size, message.data(), args);
 
         Log::Write(level, output);
 
         va_end(args);
     }
     
-    void Write(const Level level, const std::string& message)
+    void Write(const Level level, const std::string_view& message)
     {
         if (!(log.levelMask & level))
         {
@@ -121,14 +121,14 @@ namespace Quanta::Log
             DEBUG_ASSERT(begin != nullptr);
             DEBUG_ASSERT(end != nullptr);
 
-            std::cout << begin << "[Log] " << '[' << LevelToString(level) << "]: " << message.c_str() << end;
+            std::cout << begin << "[Log] " << '[' << LevelToString(level) << "]: " << message.data() << end;
         }
         
         for (std::size_t i = 0; i < log.callbacks.size(); i++)
         {
             const auto& callback = log.callbacks[i];
 
-            if (!callback)
+            if (!callback) 
             {
                 log.callbacks.erase(log.callbacks.begin() + i);
 

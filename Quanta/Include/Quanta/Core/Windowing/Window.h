@@ -12,9 +12,8 @@
 
 namespace Quanta
 {
-    class Window
+    struct Window
     {
-    public:
         static std::shared_ptr<Window> Create(GraphicsApi graphicsApi);
 
         virtual ~Window() = default;

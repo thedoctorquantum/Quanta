@@ -7,9 +7,8 @@
 
 namespace Quanta
 {
-    class ShaderModule
+    struct ShaderModule
     {
-    public:
         static std::shared_ptr<ShaderModule> Create(ShaderType type, const std::string& source);
 
         virtual ~ShaderModule() = default;

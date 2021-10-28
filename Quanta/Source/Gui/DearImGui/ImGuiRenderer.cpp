@@ -154,7 +154,7 @@ namespace Quanta
         window->AddMouseScrollCallback(OnMouseScroll);
         window->AddCharacterDownCallback(OnCharacterDown);
         
-        constexpr const char* vertexSource =
+        constexpr auto vertexSource =
             R"(
             #version 450 core
             
@@ -181,7 +181,7 @@ namespace Quanta
                 gl_Position = u_Matrices.matrix * vec4(a_Position, 0.0, 1.0);
             })";
             
-        constexpr const char* fragmentSource =
+        constexpr auto fragmentSource =
             R"(
             #version 450 core
 
@@ -204,16 +204,16 @@ namespace Quanta
 
         RasterPipeline::Description pipelineDescription;
 
-        pipelineDescription.shaderModules.emplace_back(ShaderModule::Create(ShaderType::Vertex, vertexSource));
-        pipelineDescription.shaderModules.emplace_back(ShaderModule::Create(ShaderType::Pixel, fragmentSource));
+        pipelineDescription.vertexShader = ShaderModule::Create(ShaderType::Vertex, vertexSource);
+        pipelineDescription.fragmentShader = ShaderModule::Create(ShaderType::Pixel, fragmentSource);
 
         pipelineDescription.uniformBuffers.emplace_back(state->uniformBuffer);
         
         state->pipeline = RasterPipeline::Create(pipelineDescription);
         
-        state->pipeline->SetBlendMode(BlendMode::Add);
-        state->pipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
-        state->pipeline->SetEnableScissorTesting(true);
+        state->pipeline->blendMode = BlendMode::Add;
+        state->pipeline->blendFactor = BlendFactor::InverseSourceAlpha;
+        state->pipeline->enableScissorTesting = true;
 
         state->vertexArray = VertexArray::Create();
 
@@ -222,7 +222,7 @@ namespace Quanta
 
         VertexLayout layout;
 
-        for(int32_t i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
         {
             layout.Add({
                 BufferPrimitive::Float,
@@ -236,7 +236,7 @@ namespace Quanta
         {
             BufferPrimitive::UInt8,
             4,
-            sizeof(uint8_t),
+            sizeof(std::uint8_t),
             true
         });
 
@@ -273,15 +273,10 @@ namespace Quanta
     {
         BuildFontAtlas();
         
-        const auto displayWidth = state->window->GetFrameBufferSize().x; 
-        const auto displayHeight = state->window->GetFrameBufferSize().y; 
-
-        state->io->DisplaySize.x = displayWidth;
-        state->io->DisplaySize.y = displayHeight;
+        state->io->DisplaySize.x = state->window->GetFrameBufferSize().x;
+        state->io->DisplaySize.y = state->window->GetFrameBufferSize().y; 
         
         state->io->DeltaTime = elapsed;
-
-        state->pipeline->SetViewport({ 0u, 0u, displayWidth, displayHeight });
 
         ImGui::NewFrame();
     }
@@ -302,6 +297,7 @@ namespace Quanta
 
         state->uniformBuffer->SetData(&matrix, sizeof(glm::mat4));
 
+        GraphicsDevice::SetViewport({ 0, 0, state->io->DisplaySize.x, state->io->DisplaySize.y });
         GraphicsDevice::SetRasterPipeline(state->pipeline.get());
         GraphicsDevice::SetVertexArray(state->vertexArray.get());
 
@@ -318,14 +314,14 @@ namespace Quanta
             state->indexBuffer->Resize(totalIndexBufferSize * 2);
         }
         
-        size_t vertexOffset = 0;
-        size_t indexOffset = 0;
+        std::size_t vertexOffset = 0;
+        std::size_t indexOffset = 0;
         
-        size_t startVertex = 0;
+        std::size_t startVertex = 0;
 
         DrawCommand drawCommand;
 
-        for (size_t i = 0; i < drawData->CmdListsCount; i++)
+        for (std::size_t i = 0; i < drawData->CmdListsCount; i++)
         {
             const auto drawList = drawData->CmdLists[i];
 
@@ -347,11 +343,11 @@ namespace Quanta
 
                 GraphicsDevice::BindSampler(sampler, 0);
 
-                state->pipeline->SetScissorViewport({
-                    static_cast<uint32_t>(command.ClipRect.x), 
-                    static_cast<uint32_t>(state->window->GetHeight() - command.ClipRect.w), 
-                    static_cast<uint32_t>(command.ClipRect.z - command.ClipRect.x),
-                    static_cast<uint32_t>(command.ClipRect.w - command.ClipRect.y) 
+                GraphicsDevice::SetScissorViewport({
+                    static_cast<std::uint32_t>(command.ClipRect.x), 
+                    static_cast<std::uint32_t>(state->window->GetHeight() - command.ClipRect.w), 
+                    static_cast<std::uint32_t>(command.ClipRect.z - command.ClipRect.x),
+                    static_cast<std::uint32_t>(command.ClipRect.w - command.ClipRect.y) 
                 });
                 
                 drawCommand.Count = command.ElemCount;

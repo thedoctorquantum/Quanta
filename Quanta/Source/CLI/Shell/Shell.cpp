@@ -32,6 +32,8 @@ namespace Quanta::Shell
                 return "Int";
             case PrimitiveType::Float:
                 return "Float";
+            case PrimitiveType::Bool:
+                return "Bool";
         }
 
         return nullptr;
@@ -46,6 +48,7 @@ namespace Quanta::Shell
             const char* stringValue;
             U32 intValue;
             float floatValue;
+            bool boolValue;
         };
     };
 
@@ -69,24 +72,16 @@ namespace Quanta::Shell
         Value returnValue;
     } static state;
 
-    void AddCommand(const std::string& signature, const PrimitiveType returnType, const std::vector<PrimitiveType>& argTypes, const Command& callback)
+    void AddCommand(const std::string_view& signature, const PrimitiveType returnType, const std::vector<PrimitiveType>& argTypes, const Command& callback)
     {
-        if (state.commands.find(signature) != state.commands.end())
-        {
-            return;
-        }
-
         state.commands.emplace(signature, CommandData { callback, returnType, argTypes });
     }
-
-    void RemoveCommand(const std::string& signature)
+    
+    void RemoveCommand(const std::string_view& signature)
     {
         auto command = state.commands.end();
 
-        if ((command = state.commands.find(signature)) != state.commands.end())
-        {
-            state.commands.erase(command);
-        }
+        state.commands.erase(command);
     }
 
     void SetMode(Mode value)
@@ -133,6 +128,14 @@ namespace Quanta::Shell
         return state.args[position].floatValue;
     }
     
+    bool GetArgBool(const USize position)
+    {
+        DEBUG_ASSERT(position < MaxArguments);
+        DEBUG_ASSERT(state.args[position].type == PrimitiveType::Bool);
+
+        return state.args[position].boolValue;
+    }
+
     void SetReturnString(const char* const value)
     {
         state.returnValue.type = PrimitiveType::String;
@@ -149,6 +152,12 @@ namespace Quanta::Shell
     {
         state.returnValue.type = PrimitiveType::Float;
         state.returnValue.floatValue = value;
+    }
+
+    void SetReturnBool(const bool value)
+    {
+        state.returnValue.type = PrimitiveType::Bool;
+        state.returnValue.boolValue = value;
     }
 
     const char* GetReturnString()
@@ -170,147 +179,353 @@ namespace Quanta::Shell
         DEBUG_ASSERT(state.returnValue.type == PrimitiveType::Float);
 
         return state.returnValue.floatValue;
-    }
+    }   
 
-    static bool ExecuteSingleCommand(const std::string& command)
+    bool GetReturnBool()
     {
-        std::istringstream input(command);
+        DEBUG_ASSERT(state.returnValue.type == PrimitiveType::Bool);
 
-        std::string commandName;
+        return state.returnValue.boolValue;
+    }   
 
-        std::getline(input, commandName, ':');
-
-        commandName.erase(remove(commandName.begin(), commandName.end(), ' '), commandName.end());
-
-        std::string token;
-
-        std::size_t i = 0;
-
-        while (std::getline(input, token, ','))
+    struct Token 
+    {   
+        enum struct Type : std::uint8_t
         {
-            state.stringArgs[i] = token;
+            Command,
+            String,
+            Float,
+            Int,
+            Bool,
+            Colon,
+            Semicolon,
+            Comma
+        };
 
-            i++;
+        Type type = Type::Bool;
+
+        std::string_view lexeme;
+    };
+
+    bool Execute(const std::string_view& string)
+    {
+        std::vector<Token> tokens;
+
+        Token token;
+
+        for (std::size_t i = 0; i < string.size(); i++)
+        {
+            const auto character = string[i];
+
+            switch (character)
+            {
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'F':
+                case 'G':
+                case 'H':
+                case 'I':
+                case 'J':
+                case 'K':
+                case 'L':
+                case 'M':
+                case 'N':
+                case 'O':
+                case 'P':
+                case 'Q':
+                case 'R':
+                case 'S':
+                case 'T':
+                case 'U':
+                case 'V':
+                case 'W':
+                case 'X':
+                case 'Y':
+                case 'Z':
+                case 'a':
+                case 'b':
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f':
+                case 'g':
+                case 'h':
+                case 'i':
+                case 'j':
+                case 'k':
+                case 'l':
+                case 'm':
+                case 'n':
+                case 'o':
+                case 'p':
+                case 'q':
+                case 'r':
+                case 's':
+                case 't':
+                case 'u':
+                case 'v':
+                case 'w':
+                case 'x':
+                case 'y':
+                case 'z':
+                case '_':
+                    {
+                        const auto begin = i;
+
+                        for (;; i++)
+                        {
+                            const auto character = string[i];
+
+                            if (isalpha(character) || character == '_')
+                            {
+                                continue;
+                            }
+
+                            token.lexeme = string.substr(begin, i - begin);
+
+                            if (token.lexeme == "true" || token.lexeme == "false")
+                            {
+                                token.type = Token::Type::Bool;
+                            }
+                            else
+                            {
+                                token.type = Token::Type::Command;
+                            }
+
+                            tokens.push_back(token);
+
+                            i--;
+
+                            break;
+                        }
+                    }
+
+                    break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case '-':
+                    {
+                        const auto begin = i;
+
+                        for (;; i++)
+                        {
+                            const auto character = string[i];
+
+                            if (isalnum(character) || character == '-')
+                            {
+                                continue;
+                            }
+
+                            token.lexeme = string.substr(begin, i - begin);
+
+                            token.type = Token::Type::Int;
+
+                            tokens.push_back(token);
+
+                            i--;
+
+                            break;
+                        }
+                    }
+
+                    break;
+                case ':':
+                    token.type = Token::Type::Colon;
+                    token.lexeme = string.substr(i, 1);                    
+
+                    tokens.push_back(token);
+
+                    break;
+                case ';':
+                    token.type = Token::Type::Semicolon;
+                    token.lexeme = string.substr(i, 1);
+
+                    tokens.push_back(token);
+
+                    break;
+                case ',':
+                    token.type = Token::Type::Comma;
+                    token.lexeme = string.substr(i, 1);
+
+                    tokens.push_back(token);
+
+                    break;
+                default:
+                    break;
+            }
         }
 
-        const auto argCount = i;
-
-        const auto commandIterator = state.commands.find(commandName);
-
-        if (commandIterator == state.commands.end())
+        if (tokens.empty())
         {
-            Log::Write(Log::Level::Error, "Command '" + commandName + "' does not exist!");
+            Log::Write(Log::Level::Error, "Empty input string");
 
             return false;
         }
 
-        const auto& commandData = *commandIterator;
-
-        if (argCount != commandData.second.argTypes.size() || argCount > MaxArguments)
+        for (const auto& token : tokens)
         {
-            std::ostringstream message;
+            Log::Write(Log::Level::Debug, std::string("Tok: ") + std::string(token.lexeme));
+        }
 
-            message << "Syntax Error! Expected: ";
-            message << commandData.first;
-            message << ": ";
+        auto iter = tokens.begin();
 
-            for (auto iter = commandData.second.argTypes.begin(); iter != commandData.second.argTypes.end(); iter++)
-            {
-                const auto asString = PrimitiveTypeToString(*iter);
+        if (iter->type != Token::Type::Command)
+        {
+            Log::Write(Log::Level::Error, "Expected token 'Command'");
 
-                if (iter == commandData.second.argTypes.begin())
+            return false;
+        }
+
+        std::string commandName(iter->lexeme);
+
+        const auto commandIter = state.commands.find(commandName);
+
+        if (commandIter == state.commands.end())
+        {
+            Log::Write(Log::Level::Error, "Could not find command " + commandName);
+
+            return false;
+        }
+
+        const auto& command = commandIter->second;
+
+        switch ((iter + 1)->type)
+        {
+            case Token::Type::Colon:
                 {
-                    message << asString;
+                    iter += 2;
 
-                    continue;
+                    std::size_t currentArg = 0;
+
+                    for (;; iter++)
+                    {
+                        Log::Write(Log::Level::Debug, "arg!");
+
+                        switch (iter->type)
+                        {
+                            case Token::Type::Int:
+
+                                if (command.argTypes[currentArg] == PrimitiveType::Int)
+                                {
+                                    Log::Write(Log::Level::Debug, "Found int!");
+
+                                    state.args[currentArg].intValue = atoi(iter->lexeme.data());
+                                    state.args[currentArg].type = PrimitiveType::Int;
+                                }
+                                else
+                                {
+                                    Log::Write(Log::Level::Error, "Type mismatch!");
+                                }
+
+                                currentArg++;
+
+                                break;
+                            case Token::Type::Float:
+                                if (command.argTypes[currentArg] == PrimitiveType::Float)
+                                {
+                                    state.args[currentArg].floatValue = 0.0f;
+                                    state.args[currentArg].type = PrimitiveType::Float;
+                                }
+                                else
+                                {
+                                    Log::Write(Log::Level::Error, "Type mismatch!");
+                                }
+
+                                currentArg++;
+
+                                break;
+                            case Token::Type::Bool:
+                                Log::Write(Log::Level::Debug, "Found bool!");
+
+                                if (command.argTypes[currentArg] == PrimitiveType::Bool)
+                                {
+                                    state.args[currentArg].boolValue = iter->lexeme == "true" ? true : false;
+                                    state.args[currentArg].type = PrimitiveType::Bool;
+                                }
+                                else
+                                {
+                                    Log::Write(Log::Level::Error, "Type mismatch!");
+                                }
+
+                                currentArg++;
+
+                                break;
+                            case Token::Type::String:
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (iter->type == Token::Type::Semicolon)
+                        {
+                            break;
+                        }
+
+                        if (iter->type != Token::Type::Comma)
+                        {
+                            Log::Write(Log::Level::Error, "Expected token ','");
+
+                            break;
+                        }
+                    }
                 }
 
-                message << ", " << asString; 
+                break;
+            case Token::Type::Semicolon:
+                break;
+            default:
+                Log::Write(Log::Level::Error, "Expected token ':' or ';'");
+
+                break;
+        }
+
+        command.command();
+
+        if (state.returnValue.type != PrimitiveType::Void)
+        {
+            std::ostringstream output;
+
+            switch (state.returnValue.type)
+            {
+                case PrimitiveType::Int:
+                    output << state.returnValue.intValue;
+
+                    break;
+                case PrimitiveType::Float:
+                    output << state.returnValue.floatValue;
+
+                    break;
+                case PrimitiveType::String:
+                    output << state.returnValue.stringValue;
+
+                    break;
+                case PrimitiveType::Bool:
+                    output << (state.returnValue.boolValue ? "true" : "false");
+
+                    break;
             }
 
-            Log::Write(Log::Level::Error, message.str());
+            Log::Write(Log::Level::Debug, "Command returned: " + output.str());
+        }
+
+        if (iter->type != Token::Type::Semicolon)
+        {
+            Log::Write(Log::Level::Error, "Expected token ';'");
 
             return false;
         }
 
-        for (std::size_t i = 0; i < commandData.second.argTypes.size(); i++)
-        {
-            const auto type = commandData.second.argTypes[i];
-            const auto string = state.stringArgs[i].c_str();
-            auto& value = state.args[i];
-
-            value.type = type;
-
-            switch (type)
-            {
-                case PrimitiveType::String:
-                    value.stringValue = string;
-
-                    break;
-                case PrimitiveType::Int:
-                    value.intValue = std::atoi(string);
-
-                    break;
-                case PrimitiveType::Float:
-                    value.floatValue = std::atof(string);
-
-                    break;
-            }
-        }
-
-        const auto exit = commandData.second.command();
-
-        Log::Write(Log::Level::Debug, "[Command] " + commandData.first);
-
-        if (commandData.second.returnType != PrimitiveType::Void)
-        {
-            std::ostringstream message;
-
-            message << "Command returned: ";
-
-            switch (commandData.second.returnType)
-            {
-                case PrimitiveType::String:
-                    message << state.returnValue.stringValue;
-
-                    break;
-                case PrimitiveType::Int:
-                    message << state.returnValue.intValue;
-
-                    break;
-                case PrimitiveType::Float:
-                    message << state.returnValue.floatValue;
-
-                    break;
-            }
-
-            Log::Write(Log::Level::Debug, message.str());
-        }
-
-        return exit;
-    }
-
-    bool Execute(std::string commandString)
-    {   
-        std::replace(commandString.begin(), commandString.end(), '\n', ' ');
-
-        std::string whitespaceRemoved;
-
-        RemoveExcessWhitespace(commandString, whitespaceRemoved);
-
-        commandString = std::move(whitespaceRemoved);
-
-        std::istringstream commandStream(commandString);
-
-        std::string command;
-
-        auto exitCode = true; 
-
-        while (std::getline(commandStream, command, ';'))
-        {
-            exitCode &= ExecuteSingleCommand(command);
-        }
-
-        return exitCode;
+        return true;
     }
 }

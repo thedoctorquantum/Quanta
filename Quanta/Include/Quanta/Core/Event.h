@@ -6,9 +6,8 @@
 namespace Quanta
 {
     template<typename... Args> 
-    class Event final
+    struct Event
     {
-    public:
         using Handler = std::function<void(Args...)>;
 
         void operator+=(const Handler& handler)

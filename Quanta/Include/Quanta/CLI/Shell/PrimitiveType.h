@@ -4,11 +4,12 @@
 
 namespace Quanta::Shell
 {
-    enum class PrimitiveType : U8
+    enum struct PrimitiveType : U8
     {
         Void,
         String,
         Int,
-        Float
+        Float,
+        Bool
     };
 }

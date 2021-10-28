@@ -12,9 +12,8 @@
 
 namespace Quanta::Renderer3D
 {
-    struct View final
+    struct View
     {
-    public:
         glm::mat4 matrix = glm::mat4(1.0f); 
         
         float width = 0;
@@ -34,6 +33,7 @@ namespace Quanta::Renderer3D
     glm::mat4 GetViewMatrix();
 
     void EnableWireframe(bool enable);
+    bool IsWireframe();
 
     void SetViewProjection(const glm::mat4&);
     

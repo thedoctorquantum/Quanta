@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class TexelFormat : U8
+    enum struct TexelFormat : U8
     {
         Rgba8I,
         Rgba16F,

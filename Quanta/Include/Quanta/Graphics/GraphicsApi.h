@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class GraphicsApi : uint8_t 
+    enum struct GraphicsApi : uint8_t 
     {
         OpenGL,
         Vulkan,

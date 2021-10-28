@@ -11,7 +11,7 @@
 
 namespace Quanta
 {
-    std::string GetDirectory(const std::string& filepath)
+    static std::string GetDirectory(const std::string& filepath)
     {
         std::size_t pos = filepath.find_last_of("/");
 
@@ -107,22 +107,22 @@ namespace Quanta
             
             if (materialData->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn_SUCCESS)
             {
-                material.SetAlbedo({ color.r, color.g, color.b });
+                material.albedo = { color.r, color.g, color.b };
             }
             
             if (materialData->Get(AI_MATKEY_COLOR_SPECULAR, color) == aiReturn_SUCCESS)
             {
-                material.SetSpecular({ color.r, color.g, color.b });
+                material.specular = { color.r, color.g, color.b };
             }
 
             if (materialData->Get(AI_MATKEY_SHININESS, shininess) == aiReturn_SUCCESS)
             {
-                material.SetShininess(shininess);
+                material.shininess = shininess;
             }
 
             if (materialData->Get(AI_MATKEY_OPACITY, opacity) == aiReturn_SUCCESS)
             {
-                material.SetOpacity(opacity);
+                material.opacity = opacity;
             }
 
             aiString path;
@@ -133,7 +133,7 @@ namespace Quanta
                 
                 const auto albedo = Texture::Load2D(fullPath);
                 
-                material.SetAlbedoSampler(Sampler::Create(albedo));   
+                material.albedoSampler = Sampler::Create(albedo);   
             }
             
             if (materialData->GetTexture(aiTextureType_SPECULAR, 0, &path) == aiReturn_SUCCESS)
@@ -142,7 +142,7 @@ namespace Quanta
 
                 const auto specular = Texture::Load2D(fullPath);
                 
-                material.SetSpecularSampler(Sampler::Create(specular));
+                material.specularSampler = Sampler::Create(specular);
             }
 
             if (materialData->GetTexture(aiTextureType_NORMALS, 0, &path) == aiReturn_SUCCESS)
@@ -151,7 +151,7 @@ namespace Quanta
 
                 const auto normal = Texture::Load2D(fullPath);
                 
-                material.SetNormalSampler(Sampler::Create(normal));
+                material.normalSampler = Sampler::Create(normal);
             }
 
             if (materialData->GetTexture(aiTextureType_OPACITY, 0, &path) == aiReturn_SUCCESS)
@@ -160,7 +160,7 @@ namespace Quanta
 
                 const auto opacity = Texture::Load2D(fullPath);
                 
-                material.SetOpacitySampler(Sampler::Create(opacity));
+                material.opacitySampler = Sampler::Create(opacity);
             }
 
             model.materials.push_back(std::move(material));
@@ -179,16 +179,6 @@ namespace Quanta
         return model;
     }
 
-    Model::Model()
-    {
-
-    }
-
-    Model::~Model()
-    {
-
-    }
-
     Model::Model(Model&& other)
     {
         *this = std::move(other);
@@ -200,35 +190,5 @@ namespace Quanta
         materials = std::move(other.materials);
 
         return *this;
-    }
-
-    const std::vector<Model::Part>& Model::GetParts() const
-    {
-        return parts;
-    }
-    
-    const std::vector<Material>& Model::GetMaterials() const
-    {
-        return materials;
-    }
-    
-    std::vector<Model::Part>& Model::GetParts()
-    {
-        return parts;
-    }
-
-    std::vector<Material>& Model::GetMaterials()  
-    {
-        return materials;
-    }
-
-    std::size_t Model::GetPartCount() const
-    {
-        return parts.size(); 
-    }
-
-    std::size_t Model::GetMaterialCount() const
-    {
-        return materials.size();
     }
 }

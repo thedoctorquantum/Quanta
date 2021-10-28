@@ -74,9 +74,4 @@ namespace Quanta
     {
         glDeleteShader(handle);
     }
-    
-    U32 OpenGL::ShaderModule::GetHandle() const
-    {
-        return handle;
-    }
 }

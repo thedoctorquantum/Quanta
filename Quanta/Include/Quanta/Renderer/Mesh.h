@@ -7,9 +7,8 @@
 
 namespace Quanta
 {
-    class Mesh final
+    struct Mesh
     {
-    public:
         static Mesh FromFile(const std::string& filepath);
         
         Mesh();

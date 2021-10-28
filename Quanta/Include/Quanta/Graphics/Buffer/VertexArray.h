@@ -8,9 +8,8 @@
 
 namespace Quanta
 {
-    class VertexArray 
+    struct VertexArray 
     {
-    public:
         static std::shared_ptr<VertexArray> Create();
 
         virtual ~VertexArray() = default;

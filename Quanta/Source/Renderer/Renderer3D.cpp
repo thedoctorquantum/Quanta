@@ -555,15 +555,15 @@ namespace Quanta::Renderer3D
 
         opaquePipelineDescription.frameBuffer = frameBuffer;
 
-        opaquePipelineDescription.shaderModules.push_back(vertexShader);
-        opaquePipelineDescription.shaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, opaqueFragmentShaderSource));
+        opaquePipelineDescription.vertexShader = vertexShader;
+        opaquePipelineDescription.fragmentShader = ShaderModule::Create(ShaderType::Pixel, opaqueFragmentShaderSource);
 
         state->opaquePipeline = RasterPipeline::Create(opaquePipelineDescription);
         
-        state->opaquePipeline->SetPolygonFillMode(PolygonFillMode::Solid);
-        state->opaquePipeline->SetFaceCullMode(FaceCullMode::Back);
-        state->opaquePipeline->SetEnableDepthWriting(true);
-        state->opaquePipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
+        state->opaquePipeline->polygonFillMode = PolygonFillMode::Solid;
+        state->opaquePipeline->faceCullMode = FaceCullMode::Back;
+        state->opaquePipeline->enableDepthWriting = true;
+        state->opaquePipeline->depthTestMode = DepthTestMode::LessOrEqual;
 
         RasterPipeline::Description transparentPipelineDescription;
 
@@ -575,17 +575,17 @@ namespace Quanta::Renderer3D
 
         transparentPipelineDescription.frameBuffer = frameBuffer;
 
-        transparentPipelineDescription.shaderModules.push_back(vertexShader);
-        transparentPipelineDescription.shaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, transparentFragmentShaderSource));
+        transparentPipelineDescription.vertexShader = vertexShader;
+        transparentPipelineDescription.fragmentShader = ShaderModule::Create(ShaderType::Pixel, transparentFragmentShaderSource);
 
         state->transparentPipeline = RasterPipeline::Create(transparentPipelineDescription);
         
-        state->transparentPipeline->SetPolygonFillMode(PolygonFillMode::Solid);
-        state->transparentPipeline->SetEnableDepthWriting(true);
-        state->transparentPipeline->SetFaceCullMode(FaceCullMode::Back);
-        state->transparentPipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
-        state->transparentPipeline->SetBlendFactor(BlendFactor::InverseSourceAlpha);
-        state->transparentPipeline->SetBlendMode(BlendMode::Add);
+        state->transparentPipeline->polygonFillMode = PolygonFillMode::Solid;
+        state->transparentPipeline->enableDepthWriting = true;
+        state->transparentPipeline->faceCullMode = FaceCullMode::Back;
+        state->transparentPipeline->depthTestMode = DepthTestMode::LessOrEqual;
+        state->transparentPipeline->blendFactor = BlendFactor::InverseSourceAlpha;
+        state->transparentPipeline->blendMode = BlendMode::Add;
 
         RasterPipeline::Description environmentPipelineDescription;
 
@@ -593,14 +593,14 @@ namespace Quanta::Renderer3D
 
         environmentPipelineDescription.frameBuffer = frameBuffer;
 
-        environmentPipelineDescription.shaderModules.push_back(ShaderModule::Create(ShaderType::Vertex, environmentVertexShaderSource));
-        environmentPipelineDescription.shaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, environmentFragmentShaderSource));
+        environmentPipelineDescription.vertexShader = ShaderModule::Create(ShaderType::Vertex, environmentVertexShaderSource);
+        environmentPipelineDescription.fragmentShader = ShaderModule::Create(ShaderType::Pixel, environmentFragmentShaderSource);
 
         state->environmentPipeline = RasterPipeline::Create(environmentPipelineDescription);
 
-        state->environmentPipeline->SetFaceCullMode(FaceCullMode::Front);
-        state->environmentPipeline->SetEnableDepthWriting(true);
-        state->environmentPipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
+        state->environmentPipeline->faceCullMode = FaceCullMode::Front;
+        state->environmentPipeline->enableDepthWriting = true;
+        state->environmentPipeline->depthTestMode = DepthTestMode::LessOrEqual;
 
         const Color32 albedo { 0xFFFFFFFF };
         const Color32 specular { 0xFFFFFFFF };
@@ -697,14 +697,19 @@ namespace Quanta::Renderer3D
     {
         if (enable)
         {
-            state->opaquePipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);
-            state->transparentPipeline->SetPolygonFillMode(PolygonFillMode::Wireframe);
+            state->opaquePipeline->polygonFillMode = PolygonFillMode::Wireframe;
+            state->transparentPipeline->polygonFillMode = PolygonFillMode::Wireframe;
         }
         else
         {
-            state->opaquePipeline->SetPolygonFillMode(PolygonFillMode::Solid);
-            state->transparentPipeline->SetPolygonFillMode(PolygonFillMode::Solid);
+            state->opaquePipeline->polygonFillMode = PolygonFillMode::Solid;
+            state->transparentPipeline->polygonFillMode = PolygonFillMode::Solid;
         }
+    }
+    
+    bool IsWireframe() 
+    {
+        return state->opaquePipeline->polygonFillMode == PolygonFillMode::Wireframe;
     }
     
     void SetDirectionalLight(const DirectionalLight& light)
@@ -740,7 +745,7 @@ namespace Quanta::Renderer3D
     {
         DEBUG_ASSERT(state != nullptr);
 
-        if(material.GetOpacity() < 1.0f || material.GetOpacitySampler() != nullptr)
+        if(material.opacity < 1.0f || material.opacitySampler != nullptr)
         {
             state->transparentDraws.emplace_back(&mesh, &material, transform);
         }
@@ -752,21 +757,20 @@ namespace Quanta::Renderer3D
     
     void DrawModel(const Model& model, const glm::mat4& transform)
     {
-        for(const auto& part : model.GetParts())
+        for(const auto& part : model.parts)
         {
-            DrawMesh(part.mesh, model.GetMaterials()[part.materialIndex], transform * part.transform);
+            DrawMesh(part.mesh, model.materials[part.materialIndex], transform * part.transform);
         }
     }
 
     static void OpaquePass()
     {
-        if(state->opaqueDraws.size() == 0) return;
+        if (state->opaqueDraws.size() == 0) return;
 
-        state->opaquePipeline->SetViewport(state->viewport);
-
+        GraphicsDevice::SetViewport(state->viewport);
         GraphicsDevice::SetRasterPipeline(state->opaquePipeline.get());
 
-        for(const auto& draw : state->opaqueDraws)
+        for (const auto& draw : state->opaqueDraws)
         {
             DEBUG_ASSERT(draw.mesh != nullptr && draw.material != nullptr);
 
@@ -787,11 +791,11 @@ namespace Quanta::Renderer3D
 
             ShaderMaterial materialData;
 
-            materialData.albedo = material.GetAlbedo();
-            materialData.diffuse = material.GetDiffuse();
-            materialData.specular = material.GetSpecular();
-            materialData.shininess = material.GetShininess();
-            materialData.opacity = material.GetOpacity();
+            materialData.albedo = material.albedo;
+            materialData.diffuse = material.diffuse;
+            materialData.specular = material.specular;
+            materialData.shininess = material.shininess;
+            materialData.opacity = material.opacity;
 
             state->uniformMaterial->SetData(&materialData, sizeof(materialData));
 
@@ -799,19 +803,19 @@ namespace Quanta::Renderer3D
             auto specular = state->defaultSpecularSampler.get();
             auto normal = state->defaultNormalSampler.get();
 
-            if(material.GetAlbedoSampler())
+            if (material.albedoSampler)
             {
-                albedo = material.GetAlbedoSampler().get();
+                albedo = material.albedoSampler.get();
             }
 
-            if(material.GetSpecularSampler())
+            if (material.specularSampler)
             {
-                specular = material.GetSpecularSampler().get();
+                specular = material.specularSampler.get();
             }
 
-            if(material.GetNormalSampler())
+            if (material.normalSampler)
             {
-                normal = material.GetNormalSampler().get();
+                normal = material.normalSampler.get();
             }
 
             GraphicsDevice::BindSampler(albedo, 0);
@@ -830,13 +834,12 @@ namespace Quanta::Renderer3D
     
     static void TransparentPass()
     {
-        if(state->transparentDraws.size() == 0) return;
+        if (state->transparentDraws.size() == 0) return;
 
-        state->transparentPipeline->SetViewport(state->viewport);
-
+        GraphicsDevice::SetViewport(state->viewport);
         GraphicsDevice::SetRasterPipeline(state->transparentPipeline.get());
 
-        for(const DrawCall& draw : state->transparentDraws)
+        for (const auto& draw : state->transparentDraws)
         {
             DEBUG_ASSERT(draw.mesh != nullptr && draw.material != nullptr);
 
@@ -857,11 +860,11 @@ namespace Quanta::Renderer3D
 
             ShaderMaterial materialData;
 
-            materialData.albedo = material.GetAlbedo();
-            materialData.diffuse = material.GetDiffuse();
-            materialData.specular = material.GetSpecular();
-            materialData.shininess = material.GetShininess();
-            materialData.opacity = material.GetOpacity();
+            materialData.albedo = material.albedo;
+            materialData.diffuse = material.diffuse;
+            materialData.specular = material.specular;
+            materialData.shininess = material.shininess;
+            materialData.opacity = material.opacity;
 
             state->uniformMaterial->SetData(&materialData, sizeof(materialData));
 
@@ -870,24 +873,24 @@ namespace Quanta::Renderer3D
             auto normalSampler = state->defaultNormalSampler.get();
             auto opacitySampler = state->defaultOpacitySampler.get();
 
-            if(material.GetAlbedoSampler())
+            if (material.albedoSampler)
             {
-                albedoSampler = material.GetAlbedoSampler().get();
+                albedoSampler = material.albedoSampler.get();
             }
 
-            if(material.GetSpecularSampler())
+            if (material.specularSampler)
             {
-                specularSampler = material.GetSpecularSampler().get();
+                specularSampler = material.specularSampler.get();
             }
 
-            if(material.GetNormalSampler())
+            if (material.normalSampler)
             {
-                normalSampler = material.GetNormalSampler().get();
+                normalSampler = material.normalSampler.get();
             }
 
-            if(material.GetOpacitySampler())
+            if (material.opacitySampler)
             {
-                opacitySampler = material.GetOpacitySampler().get();
+                opacitySampler = material.opacitySampler.get();
             }
 
             GraphicsDevice::BindSampler(albedoSampler, 0);
@@ -917,7 +920,7 @@ namespace Quanta::Renderer3D
 
         auto sampler = state->defaultEnvironmentSampler.get();
 
-        if(state->environmentSampler != nullptr)
+        if (state->environmentSampler != nullptr)
         {
             sampler = state->environmentSampler.get();
         }

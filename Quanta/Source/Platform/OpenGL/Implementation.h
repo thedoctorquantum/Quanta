@@ -8,11 +8,10 @@
 
 namespace Quanta::OpenGL
 {
-    class Implementation final : public Quanta::GraphicsDevice::Implementation
+    struct Implementation : public Quanta::GraphicsDevice::Implementation
     {
-    public:
         Implementation(const Window& window);
-    public: 
+        
         void ClearBackBuffer(const glm::vec4& color, float depth, std::int32_t stencil) override;
 
         void SetRasterPipeline(const Quanta::RasterPipeline*) override;
@@ -21,6 +20,9 @@ namespace Quanta::OpenGL
         void BindSampler(const Quanta::Sampler* sampler, std::size_t index) override;
 
         void DispatchDraw(const DrawCommand& command) override;
+
+        void SetViewport(const glm::uvec4&) override;
+        void SetScissorViewport(const glm::uvec4&) override;
     private:
         const VertexArray* vertexArray = nullptr;
         const RasterPipeline* rasterPipeline = nullptr;

@@ -39,7 +39,7 @@ namespace Quanta
 
         Log::AddCallback([&](const auto level, const auto& text) 
         {
-            this->messages.push_back({ text, level });
+            this->messages.push_back({ text.data(), level });
         });
     }
 

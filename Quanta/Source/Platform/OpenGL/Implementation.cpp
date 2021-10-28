@@ -99,7 +99,7 @@ namespace Quanta::OpenGL
     
     void Implementation::SetRasterPipeline(const Quanta::RasterPipeline* const value)
     {
-        if (!value)
+        if (value == nullptr)
         {
             rasterPipeline = nullptr;
 
@@ -134,7 +134,7 @@ namespace Quanta::OpenGL
 
         if (rasterPipeline != glPipeline)
         {
-            const auto& frameBuffer = value->GetFrameBuffer();
+            const auto& frameBuffer = value->framebuffer;
 
             if (frameBuffer != nullptr)
             {
@@ -158,9 +158,9 @@ namespace Quanta::OpenGL
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
             }
 
-            for (size_t i = 0; i < value->GetUniformBufferCount(); i++)
+            for (std::size_t i = 0; i < value->uniformBuffers.size(); i++)
             {
-                const auto& buffer = value->GetUniformBuffer(i);
+                const auto& buffer = value->uniformBuffers[i];
 
                 GraphicsBuffer* glBuffer = nullptr;
 
@@ -178,9 +178,9 @@ namespace Quanta::OpenGL
                 glBindBufferBase(GL_UNIFORM_BUFFER, i, glBuffer->GetHandle());
             }
             
-            for(size_t i = 0; i < value->GetStorageBufferCount(); i++)
+            for (std::size_t i = 0; i < value->storageBuffers.size(); i++)
             {
-                const auto& buffer = value->GetStorageBuffer(i);
+                const auto& buffer = value->storageBuffers[i];
 
                 GraphicsBuffer* glBuffer = nullptr;
 
@@ -198,10 +198,10 @@ namespace Quanta::OpenGL
                 glBindBufferBase(GL_SHADER_STORAGE_BUFFER, i, glBuffer->GetHandle());
             }
 
-            glUseProgram(glPipeline->GetHandle());
+            glUseProgram(glPipeline->handle);
         }
 
-        switch(value->GetPolygonFillMode())
+        switch (value->polygonFillMode)
         {
         case PolygonFillMode::Solid:
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -218,11 +218,11 @@ namespace Quanta::OpenGL
             break;
         }
 
-        if(value->GetDepthTestMode() != DepthTestMode::None)
+        if (value->depthTestMode != DepthTestMode::None)
         {
             glEnable(GL_DEPTH_TEST);
 
-            switch(value->GetDepthTestMode())
+            switch (value->depthTestMode)
             {
             case DepthTestMode::Always:
                 glDepthFunc(GL_ALWAYS);
@@ -263,9 +263,9 @@ namespace Quanta::OpenGL
             glDisable(GL_DEPTH_TEST);
         }
 
-        glDepthMask(value->GetEnableDepthWriting());
+        glDepthMask(value->enableDepthWriting);
 
-        if(value->GetEnableScissorTesting())
+        if(value->enableScissorTesting)
         {
             glEnable(GL_SCISSOR_TEST);
         }
@@ -274,11 +274,11 @@ namespace Quanta::OpenGL
             glDisable(GL_SCISSOR_TEST);
         }
 
-        if(value->GetBlendMode() != BlendMode::None)
+        if(value->blendMode != BlendMode::None)
         {
             glEnable(GL_BLEND);
 
-            switch(value->GetBlendMode())
+            switch(value->blendMode)
             {
             case BlendMode::Add:
                 glBlendEquation(GL_FUNC_ADD);
@@ -299,7 +299,7 @@ namespace Quanta::OpenGL
             glDisable(GL_BLEND);
         }
         
-        switch(value->GetBlendFactor())
+        switch(value->blendFactor)
         {
         case BlendFactor::Zero:
             glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
@@ -327,11 +327,11 @@ namespace Quanta::OpenGL
             break;
         }
 
-        if(value->GetFaceCullMode() != FaceCullMode::None)
+        if(value->faceCullMode != FaceCullMode::None)
         {
             glEnable(GL_CULL_FACE);
 
-            switch(value->GetFaceCullMode())
+            switch(value->faceCullMode)
             {
             case FaceCullMode::Back:
                 glCullFace(GL_BACK);
@@ -348,7 +348,7 @@ namespace Quanta::OpenGL
             glDisable(GL_CULL_FACE);
         }
         
-        switch(value->GetGeometryLayout())
+        switch(value->geometryLayout)
         {
         case GeometryLayout::Triangle:
             geometryLayout = GL_TRIANGLES;
@@ -368,7 +368,7 @@ namespace Quanta::OpenGL
             break;
         }
         
-        switch(value->GetGeometryWinding())
+        switch(value->geometryWinding)
         {
         case GeometryWinding::CounterClockwise:
             glFrontFace(GL_CCW);
@@ -469,5 +469,15 @@ namespace Quanta::OpenGL
             command.StartVertex,
             command.StartInstance
         );
+    }
+
+    void Implementation::SetViewport(const glm::uvec4& value)
+    {
+        glViewport(value.x, value.y, value.z, value.w);
+    }
+
+    void Implementation::SetScissorViewport(const glm::uvec4& value)
+    {
+        glScissor(value.x, value.y, value.z, value.w);
     }
 }

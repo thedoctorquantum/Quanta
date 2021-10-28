@@ -5,9 +5,8 @@
 
 namespace Quanta::OpenAL
 {
-    class AudioSource final : public Quanta::AudioSource
+    struct AudioSource final : public Quanta::AudioSource
     {
-    public:
         AudioSource();
         ~AudioSource();
 

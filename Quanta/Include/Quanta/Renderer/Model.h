@@ -9,9 +9,8 @@
 
 namespace Quanta
 {
-    class Model final
+    struct Model
     {
-    public:
         struct Part
         {
             Mesh mesh;
@@ -22,8 +21,7 @@ namespace Quanta
 
         static Model FromFile(const std::string& filepath);
 
-        Model();
-        ~Model();
+        Model() = default;
 
         Model(Model&&);
         
@@ -31,17 +29,8 @@ namespace Quanta
 
         Model(const Model&) = delete;
 
-        Model& operator=(const Model&) = delete;
-        
-        const std::vector<Part>& GetParts() const;
-        const std::vector<Material>& GetMaterials() const; 
+        Model& operator=(const Model&) = delete;        
 
-        std::vector<Part>& GetParts();
-        std::vector<Material>& GetMaterials(); 
-
-        size_t GetPartCount() const;
-        size_t GetMaterialCount() const;
-    private:
         std::vector<Part> parts;
         std::vector<Material> materials;
     };

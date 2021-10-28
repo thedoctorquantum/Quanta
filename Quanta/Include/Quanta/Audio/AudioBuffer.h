@@ -7,9 +7,8 @@
 
 namespace Quanta
 {
-    class AudioBuffer
+    struct AudioBuffer
     {
-    public:
         static std::shared_ptr<AudioBuffer> Create();
 
         static std::shared_ptr<AudioBuffer> FromFile(const std::string& filepath);

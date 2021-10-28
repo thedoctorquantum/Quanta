@@ -4,20 +4,22 @@
 #include <Quanta/Quanta.h>
 #include <Quanta/Memory/Span.h>
 #include <Quanta/Memory/Pointer.h>
+#include <Quanta/CLI/Log/Log.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <imgui.h>
 
-class Sandbox final : public Quanta::Application
+using namespace Quanta;
+
+struct Sandbox : public Quanta::Application
 {
-public:
     Sandbox();
     ~Sandbox();
 
     void OnUpdate(float frameTime) override;
-private:
+
     std::shared_ptr<Quanta::Texture> skybox;
     std::shared_ptr<Quanta::Sampler> brickSampler;
     std::shared_ptr<Quanta::Sampler> brickNormalSampler;
@@ -41,14 +43,24 @@ Sandbox::Sandbox()
     window->SetState(Quanta::WindowState::Maximized);
     
     Quanta::ImGuiRenderer::Create(window);
-    Quanta::Renderer3D::Create(*window);
     
-    view.matrix = glm::lookAt(glm::vec3(0.0), glm::vec3(0.0), { 0.0f, 1.0f, 0.0f });
+    Quanta::Renderer3D::Create(*window, nullptr);
 
+    view.matrix = glm::lookAt(glm::vec3(0.0), glm::vec3(0.0), { 0.0f, 1.0f, 0.0f });
     view.fieldOfView = 60.0f;
     view.far = 10000.0f;
+    view.width = 1080;
+    view.height = 1917;
 
-    skybox = Quanta::Texture::Create(Quanta::TextureType::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
+    std::ostringstream output;
+
+    output << window->GetFrameBufferSize().x;
+    output << ", ";
+    output << window->GetFrameBufferSize().y;
+
+    Log::Write(Log::Level::Debug, output.str());
+
+    skybox = Quanta::Texture::Create(Quanta::Texture::Type::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
 
     std::shared_ptr<Quanta::Image32> images[] 
     {
@@ -60,9 +72,9 @@ Sandbox::Sandbox()
         Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
     };
 
-    for(size_t i = 0; i < 6; i++)
+    for(std::size_t i = 0; i < 6; i++)
     {
-        Quanta::Image32& image = *images[i];
+        const auto& image = *images[i];
 
         skybox->SetData(image.GetData(), 0, 0, i);
     }
@@ -77,11 +89,11 @@ Sandbox::Sandbox()
 
     backpack = Quanta::Model::FromFile("Resources/Models/test_scene_01.fbx");
 
-    brickMaterial.SetAlbedoSampler(brickSampler);
-    brickMaterial.SetNormalSampler(brickNormalSampler);   
+    brickMaterial.albedoSampler = brickSampler;
+    brickMaterial.normalSampler = brickNormalSampler;   
 
-    brickMaterial.SetSpecular(glm::vec3(0.8f));
-    brickMaterial.SetShininess(200.0f);
+    brickMaterial.specular = glm::vec3(0.8f);
+    brickMaterial.shininess = 200.0f;
     
     glm::vec3 pos { 0.0f, 0.0f, 0.0f }; 
     glm::vec3 rot { 0.0f, 0.0f, 0.0f };
@@ -107,7 +119,7 @@ Sandbox::~Sandbox()
     Quanta::Renderer3D::Destroy();
 }
 
-void Sandbox::OnUpdate(float frameTime)
+void Sandbox::OnUpdate(const float frameTime)
 {
     Quanta::GraphicsDevice::ClearBackBuffer({ 0.0f, 0.0f, 0.0f, 0.0f }, 1.0f, 0);
 
@@ -120,8 +132,6 @@ void Sandbox::OnUpdate(float frameTime)
     Quanta::Renderer3D::BeginPass(view);
     {
         Quanta::Renderer3D::SetPointLights(lights.data(), lights.size());
-        
-        Quanta::Renderer3D::DrawModel(sponza, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));
 
         Quanta::Renderer3D::DrawModel(backpack, backpackTransform);
 
@@ -138,12 +148,8 @@ void Sandbox::OnUpdate(float frameTime)
         ImGui::DragFloat3("Pos", &position.x);
         ImGui::DragFloat3("Rot", &rotation.x);
 
-        float opacity = backpack.GetMaterials()[0].GetOpacity();
-
-        ImGui::DragFloat("Opacity", &opacity, 0.025f);
-
-        backpack.GetMaterials()[0].SetOpacity(opacity);
-
+        ImGui::DragFloat("Opacity", &backpack.GetMaterials()[0].opacity, 0.025f);
+        
         ImGui::Spacing();
 
         for(size_t i = 0; i < lights.size(); i++)
@@ -162,9 +168,6 @@ void Sandbox::OnUpdate(float frameTime)
         }
 
         ImGui::Spacing();
-
-        //ImGui::DragFloat3("CamPos", &view.position.x, 0.125f);
-        //ImGui::DragFloat3("CamRot", &view.rotation.x, 0.125f);
     }
     Quanta::ImGuiRenderer::End();
 
@@ -173,9 +176,9 @@ void Sandbox::OnUpdate(float frameTime)
 
 int main()
 {
-    auto sandbox = std::make_unique<Sandbox>();
+    Sandbox sandbox;
 
-    sandbox->Run();
+    sandbox.Run();
 
     return 0;
 }

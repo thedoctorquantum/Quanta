@@ -4,9 +4,8 @@
 
 namespace Quanta::OpenGL
 {
-    class VertexArray final : public Quanta::VertexArray
+    struct VertexArray : public Quanta::VertexArray
     {
-    public:
         VertexArray();
         ~VertexArray();
 

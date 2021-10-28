@@ -4,7 +4,7 @@
 
 namespace Quanta::Log
 {
-    enum class LevelMask : U8
+    enum struct LevelMask : U8
     {
         None = 0b00000000,
         All = 0b11111111,

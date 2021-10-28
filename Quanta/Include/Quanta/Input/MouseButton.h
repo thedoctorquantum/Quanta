@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class MouseButton : U8
+    enum struct MouseButton : U8
     {
         One,
         Two,

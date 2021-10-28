@@ -39,19 +39,19 @@ namespace Quanta
 
         ApplyEditorStyle(style);
         
-        const auto skybox = Texture::Create(Texture::Type::CubeMap, Quanta::TexelFormat::Rgba8I, 1024, 1024, 1);
+        const auto skybox = Texture::Create(Texture::Type::CubeMap, TexelFormat::Rgba8I, 1024, 1024, 1);
 
-        std::shared_ptr<Quanta::Image32> images[] 
+        std::shared_ptr<Image32> images[] 
         {
-            Quanta::Image32::FromFile("Resources/Textures/Skybox/right.png"),
-            Quanta::Image32::FromFile("Resources/Textures/Skybox/left.png"),
-            Quanta::Image32::FromFile("Resources/Textures/Skybox/top.png"),
-            Quanta::Image32::FromFile("Resources/Textures/Skybox/bottom.png"),
-            Quanta::Image32::FromFile("Resources/Textures/Skybox/back.png"),
-            Quanta::Image32::FromFile("Resources/Textures/Skybox/front.png")
+            Image32::FromFile("Resources/Textures/Skybox/right.png"),
+            Image32::FromFile("Resources/Textures/Skybox/left.png"),
+            Image32::FromFile("Resources/Textures/Skybox/top.png"),
+            Image32::FromFile("Resources/Textures/Skybox/bottom.png"),
+            Image32::FromFile("Resources/Textures/Skybox/back.png"),
+            Image32::FromFile("Resources/Textures/Skybox/front.png")
         };
 
-        for (size_t i = 0; i < 6; i++)
+        for (std::size_t i = 0; i < 6; i++)
         {
             const auto& image = *images[i];
 
@@ -137,14 +137,32 @@ namespace Quanta
 
         lightEntity.Get<ModelRendererComponent>().model = lightSphere;
 
-        Shell::AddCommand("set_wireframe", Shell::PrimitiveType::Void, { Shell::PrimitiveType::Int }, []()
+        Shell::AddCommand("set_wireframe", Shell::PrimitiveType::Void, { Shell::PrimitiveType::Bool }, []()
         {   
-            const auto enable = Shell::GetArgInt(0);
+            const auto enable = Shell::GetArgBool(0);
 
             Renderer3D::EnableWireframe(enable);
 
             return true;
         });
+
+        Shell::AddCommand("get_wireframe", Shell::PrimitiveType::Bool, { }, []()
+        {
+            Shell::SetReturnBool(Renderer3D::IsWireframe());
+            
+            return true;
+        });
+
+        Shell::AddCommand("add", Shell::PrimitiveType::Void, { Shell::PrimitiveType::Int, Shell::PrimitiveType::Int }, []()
+        {
+            const auto res = Shell::GetArgInt(0) + Shell::GetArgInt(1);
+
+            Shell::SetReturnInt(res);
+
+            return true;
+        });
+                
+        Log::Write(Log::Level::Debug, "hello, world!");
     }
 
     Editor::~Editor()
@@ -267,7 +285,7 @@ namespace Quanta
                         ImGui::PushID(id);
 
                         ImGui::Text("Entity %u", id);   
-
+                        
                         ImGui::DragFloat3("Translation", &transform.translation.x);
                         ImGui::DragFloat3("Scale", &transform.scale.x);
                         ImGui::DragFloat3("Rotation", &transform.rotation.x);

@@ -68,6 +68,20 @@ namespace Quanta::GraphicsDevice
     
         state.implementation->DispatchDraw(command);
     }
+
+    void SetViewport(const glm::uvec4& value)
+    {
+        DEBUG_ASSERT(state.implementation != nullptr);
+
+        state.implementation->SetViewport(value);
+    }
+
+    void SetScissorViewport(const glm::uvec4& value)
+    {
+        DEBUG_ASSERT(state.implementation != nullptr);
+
+        state.implementation->SetScissorViewport(value);
+    }
     
     GraphicsApi GetApi()
     {

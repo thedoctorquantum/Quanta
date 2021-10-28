@@ -19,7 +19,7 @@
 
 namespace Quanta
 {
-    enum class OperatingSystem : U8
+    enum struct OperatingSystem : U8
     {
         Unknown = QUANTA_OPERATING_SYSTEM_UNKNOWN,
         Windows = QUANTA_OPERATING_SYSTEM_WINDOWS,

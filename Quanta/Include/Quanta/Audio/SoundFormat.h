@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class SoundFormat : uint8_t
+    enum struct SoundFormat : uint8_t
     {
         Mono8,
         Mono16,

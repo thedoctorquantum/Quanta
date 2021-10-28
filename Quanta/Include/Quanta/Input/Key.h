@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class Key : U8
+    enum struct Key : U8
     {
         Unknown,
         Space,

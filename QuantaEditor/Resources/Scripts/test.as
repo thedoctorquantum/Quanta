@@ -14,7 +14,7 @@ funcdef int AddCallback(int, int);
 
 int Main() 
 {
-    auto str = "" + nameof(Main);
+    Std::String str = "" + nameof(Main);
     
     str += ", world! ";
 

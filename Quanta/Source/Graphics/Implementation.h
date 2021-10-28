@@ -17,5 +17,8 @@ namespace Quanta::GraphicsDevice
         virtual void BindSampler(const Sampler* sampler, std::size_t index) = 0;
 
         virtual void DispatchDraw(const DrawCommand& command) = 0;
+        
+        virtual void SetViewport(const glm::uvec4&) = 0;
+        virtual void SetScissorViewport(const glm::uvec4&) = 0;
     };
 }

@@ -5,9 +5,8 @@
 
 namespace Quanta::OpenGL
 {
-    class Texture final : public Quanta::Texture
+    struct Texture : public Quanta::Texture
     {
-    public:
         Texture(Type type, TexelFormat format, USize width, USize height, USize depth);
         ~Texture();
 

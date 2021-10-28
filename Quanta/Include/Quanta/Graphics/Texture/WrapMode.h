@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class WrapMode : U8
+    enum struct WrapMode : U8
     {
         Repeat,
         MirroredRepeat,

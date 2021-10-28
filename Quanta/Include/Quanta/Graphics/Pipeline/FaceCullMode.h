@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class FaceCullMode : U8
+    enum struct FaceCullMode : U8
     {
         None,
         Front,

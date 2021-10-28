@@ -4,9 +4,8 @@
 
 namespace Quanta
 {
-    struct VertexElement final
+    struct VertexElement
     {
-    public:
         BufferPrimitive primitve = BufferPrimitive::Float;
         U32 count = 0;
         USize size = 0;

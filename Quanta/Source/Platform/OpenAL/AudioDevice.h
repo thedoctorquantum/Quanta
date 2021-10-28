@@ -6,9 +6,8 @@
 
 namespace Quanta::OpenAL
 {
-    class AudioDevice final : public Quanta::AudioDevice
+    struct AudioDevice : public Quanta::AudioDevice
     {
-    public:
         AudioDevice();
         ~AudioDevice();
 

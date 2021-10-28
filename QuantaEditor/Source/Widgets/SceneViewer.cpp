@@ -90,14 +90,14 @@ namespace Quanta
 
         entityPipelineDesc.uniformBuffers.push_back(GraphicsBuffer::Create(BufferUsage::Static, sizeof(glm::mat4) * 2 + sizeof(glm::vec4)));
 
-        entityPipelineDesc.shaderModules.push_back(ShaderModule::Create(ShaderType::Vertex, entityVertexCode));
-        entityPipelineDesc.shaderModules.push_back(ShaderModule::Create(ShaderType::Pixel, entityFragmentCode));
+        entityPipelineDesc.vertexShader = ShaderModule::Create(ShaderType::Vertex, entityVertexCode);
+        entityPipelineDesc.fragmentShader = ShaderModule::Create(ShaderType::Pixel, entityFragmentCode);
 
         entityPipeline = RasterPipeline::Create(entityPipelineDesc);
 
-        entityPipeline->SetDepthTestMode(DepthTestMode::LessOrEqual);
-        entityPipeline->SetEnableDepthWriting(true);
-        entityPipeline->SetFaceCullMode(FaceCullMode::Back);
+        entityPipeline->depthTestMode = DepthTestMode::LessOrEqual;
+        entityPipeline->enableDepthWriting = true;
+        entityPipeline->faceCullMode = FaceCullMode::Back;
 
         view.width = frameBuffer->GetWidth();
         view.height = frameBuffer->GetHeight();
@@ -123,16 +123,16 @@ namespace Quanta
             const std::int32_t clearVal = -1;
             const float clearDepth = 1.0f;
 
-            entityPipeline->GetFrameBuffer()->Clear({}, 1.0f, 0);
+            entityPipeline->framebuffer->Clear({}, 1.0f, 0);
 
-            entityPipeline->GetFrameBuffer()->GetColorTexture(0)->Clear(&clearVal);
+            entityPipeline->framebuffer->GetColorTexture(0)->Clear(&clearVal);
 
             const auto viewProjection = glm::perspective(
                 glm::radians(view.fieldOfView), 
                 static_cast<float>(view.width) / static_cast<float>(view.height), 
                 view.near, view.far) * view.matrix;
 
-            entityPipeline->GetUniformBuffer(0)->SetData(&viewProjection, sizeof(viewProjection), sizeof(glm::mat4));
+            entityPipeline->uniformBuffers[0]->SetData(&viewProjection, sizeof(viewProjection), sizeof(glm::mat4));
 
             const auto components = scene.view<TransformComponent, ModelRendererComponent>();
 
@@ -140,15 +140,15 @@ namespace Quanta
 
             for (const auto [entity, transform, model] : components.each())
             {
-                entityPipeline->GetUniformBuffer(0)->SetData(&entity, sizeof(entity), sizeof(glm::mat4) * 2);
+                entityPipeline->uniformBuffers[0]->SetData(&entity, sizeof(entity), sizeof(glm::mat4) * 2);
 
-                for (const auto& part : model.model->GetParts())
+                for (const auto& part : model.model->parts)
                 {
                     GraphicsDevice::SetVertexArray(part.mesh.GetVertexArray().get());
 
                     const auto localTransform = transform.CreateMatrix();
 
-                    entityPipeline->GetUniformBuffer(0)->SetData(&localTransform, sizeof(localTransform));
+                    entityPipeline->uniformBuffers[0]->SetData(&localTransform, sizeof(localTransform));
 
                     DrawCommand command;
                     
@@ -233,13 +233,13 @@ namespace Quanta
 
                 const glm::uvec2 frameCoordinates
                 {
-                    static_cast<std::uint32_t>(std::floor(normalizedWindowPos.x * entityPipeline->GetFrameBuffer()->GetWidth())),
-                    static_cast<std::uint32_t>(std::floor(normalizedWindowPos.y * entityPipeline->GetFrameBuffer()->GetHeight()))
+                    static_cast<std::uint32_t>(std::floor(normalizedWindowPos.x * entityPipeline->framebuffer->GetWidth())),
+                    static_cast<std::uint32_t>(std::floor(normalizedWindowPos.y * entityPipeline->framebuffer->GetHeight()))
                 };
 
                 std::int32_t pixelValue = 0;
 
-                entityPipeline->GetFrameBuffer()->GetPixel(0, &pixelValue, frameCoordinates.x, frameCoordinates.y);
+                entityPipeline->framebuffer->GetPixel(0, &pixelValue, frameCoordinates.x, frameCoordinates.y);
 
                 selectedEntity = static_cast<entt::entity>(pixelValue);
             }

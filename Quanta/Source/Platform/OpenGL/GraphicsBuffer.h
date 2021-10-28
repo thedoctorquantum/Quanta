@@ -4,9 +4,8 @@
 
 namespace Quanta::OpenGL
 {
-    class GraphicsBuffer final : public Quanta::GraphicsBuffer
+    struct GraphicsBuffer final : public Quanta::GraphicsBuffer
     {
-    public:
         GraphicsBuffer(BufferUsage usage, USize size);
         ~GraphicsBuffer();
 

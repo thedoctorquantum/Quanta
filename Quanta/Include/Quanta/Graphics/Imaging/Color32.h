@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    struct Color32 final
+    struct Color32
     {
         union 
         {

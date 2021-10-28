@@ -5,9 +5,8 @@
 
 namespace Quanta::Glfw
 {
-    class Window final : public Quanta::Window
+    struct Window : public Quanta::Window
     {
-    public:
         Window(GraphicsApi graphicsApi);
         ~Window();
 

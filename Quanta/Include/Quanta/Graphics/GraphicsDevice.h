@@ -23,5 +23,8 @@ namespace Quanta::GraphicsDevice
 
     void DispatchDraw(const DrawCommand& command);
 
+    void SetViewport(const glm::uvec4&);
+    void SetScissorViewport(const glm::uvec4&);
+
     GraphicsApi GetApi();
 }

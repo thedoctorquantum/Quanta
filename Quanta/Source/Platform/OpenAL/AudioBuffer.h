@@ -5,9 +5,8 @@
 
 namespace Quanta::OpenAL
 {
-    class AudioBuffer final : public Quanta::AudioBuffer
+    struct AudioBuffer : public Quanta::AudioBuffer
     {
-    public:
         AudioBuffer();
         ~AudioBuffer();
 

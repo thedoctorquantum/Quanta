@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    struct Vertex final
+    struct Vertex
     {
         glm::vec3 Translation = glm::vec3(0.0f);
         glm::vec3 Normal = glm::vec3(0.0f);

@@ -6,9 +6,8 @@
 
 namespace Quanta
 {
-    class Sampler
+    struct Sampler
     {
-    public:
         static std::shared_ptr<Sampler> Create(const std::shared_ptr<Texture>& texture);
 
         virtual ~Sampler() = default;

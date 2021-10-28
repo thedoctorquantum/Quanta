@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class GeometryWinding : U8
+    enum struct GeometryWinding : U8
     {
         Clockise,
         CounterClockwise

@@ -1,6 +1,5 @@
 #include <Quanta/Scripting/Script.h>
 #include <Quanta/Scripting/ScriptRuntime.h>
-#include <Quanta/IO/FileStream.h>
 #include <Quanta/Text/CPreProcessor.h>
 #include <fstream>
 #include <ostream>

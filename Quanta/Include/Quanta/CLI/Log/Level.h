@@ -4,7 +4,7 @@
 
 namespace Quanta::Log
 {
-    enum class Level : U8
+    enum struct Level : U8
     {
         Trace = 0b00000001,
         Information = 0b00000010,

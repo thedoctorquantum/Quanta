@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class WindowState : U8
+    enum struct WindowState : U8
     {
         Maximized,
         Minimized

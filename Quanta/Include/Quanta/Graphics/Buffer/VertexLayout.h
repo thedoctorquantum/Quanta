@@ -6,9 +6,8 @@
 
 namespace Quanta
 {    
-    struct VertexLayout final
+    struct VertexLayout
     {
-    public:
         const VertexElement& operator[](USize index) const;
 
         void Add(const VertexElement& element);

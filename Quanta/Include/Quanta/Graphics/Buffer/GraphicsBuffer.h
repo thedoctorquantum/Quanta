@@ -6,9 +6,8 @@
 
 namespace Quanta
 {
-    class GraphicsBuffer 
+    struct GraphicsBuffer 
     {
-    public:
         static std::shared_ptr<GraphicsBuffer> Create(BufferUsage usage, USize size);
         
         virtual ~GraphicsBuffer() = default;

@@ -4,9 +4,8 @@
 
 namespace Quanta
 {
-    class Application 
+    struct Application 
     {
-    public:
         Application();
         virtual ~Application(); 
 

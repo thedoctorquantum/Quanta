@@ -4,7 +4,7 @@
 
 namespace Quanta::Shell
 {
-    enum class PermissionMask : U8
+    enum struct PermissionMask : U8
     {
         None = 0,
         All = 1,

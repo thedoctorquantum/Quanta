@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class PolygonFillMode : U8
+    enum struct PolygonFillMode : U8
     {
         Solid,
         Wireframe,

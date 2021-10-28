@@ -6,9 +6,8 @@
 
 namespace Quanta
 {
-    class AudioDevice
+    struct AudioDevice
     {
-    public:
         static void Create(AudioApi api);
         static void Destroy(); 
         

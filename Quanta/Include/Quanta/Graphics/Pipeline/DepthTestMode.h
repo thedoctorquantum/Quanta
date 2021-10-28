@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class DepthTestMode : U8
+    enum struct DepthTestMode : U8
     {
         None,
         Always,

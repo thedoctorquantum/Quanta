@@ -4,9 +4,8 @@
 
 namespace Quanta::OpenGL
 {
-    class FrameBuffer final : public Quanta::FrameBuffer
+    struct FrameBuffer final : public Quanta::FrameBuffer
     {
-    public:
         FrameBuffer(const Description& description);
         ~FrameBuffer();
 

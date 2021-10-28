@@ -8,10 +8,9 @@
 
 namespace Quanta
 {
-    class Texture
+    struct Texture
     {
-    public:
-        enum class Type : U8
+        enum struct Type : U8
         {
             Texture1D,
             Texture2D,

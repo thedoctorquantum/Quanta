@@ -4,7 +4,7 @@
 
 namespace Quanta
 {
-    enum class Mode : U8
+    enum struct Mode : U8
     {
         Loud,
         Silent
