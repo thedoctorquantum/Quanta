@@ -1,10 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <fstream>
 #include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
 #include <Quanta/Graphics/GraphicsDevice.h>
 #include <Quanta/CLI/Log/Log.h>
@@ -61,7 +61,7 @@ namespace Quanta
         skyboxSampler = Sampler::Create(skybox);
 
         Renderer3D::SetEnvironmentSampler(skyboxSampler);
-        
+                
         ScriptRuntime::Create();
 
         std::ifstream source("Resources/Scripts/test.as");

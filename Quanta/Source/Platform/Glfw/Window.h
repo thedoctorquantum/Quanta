@@ -55,8 +55,8 @@ namespace Quanta::Glfw
         const char* GetClipboardText() const override;
         void SetClipboardText(const char*) override;
 
-        const std::string& GetTitle() const override;
-        void SetTitle(const std::string&) override;
+        const std::string_view& GetTitle() const override;
+        void SetTitle(const std::string_view&) override;
 
         double GetTime() const override; 
 
@@ -68,7 +68,7 @@ namespace Quanta::Glfw
         GLFWwindow* handle = nullptr;
         GraphicsApi graphicsApi;
 
-        std::string title;
+        std::string_view title;
 
         glm::uvec2 position { 0u };
         glm::uvec2 size { 640u, 480u };

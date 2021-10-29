@@ -446,16 +446,16 @@ namespace Quanta::Glfw
         glfwSetClipboardString(handle, value);
     }
 
-    const std::string& Window::GetTitle() const
+    const std::string_view& Window::GetTitle() const
     {
         return title;
     }
     
-    void Window::SetTitle(const std::string& value)
+    void Window::SetTitle(const std::string_view& value)
     {
         title = value;
 
-        glfwSetWindowTitle(handle, title.c_str());
+        glfwSetWindowTitle(handle, title.data());
     }
 
     double Window::GetTime() const

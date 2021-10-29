@@ -4,7 +4,7 @@
 
 namespace Quanta::OpenGL
 {
-    struct Sampler final : public Quanta::Sampler
+    struct Sampler : public Quanta::Sampler
     {
         Sampler(const std::shared_ptr<Quanta::Texture>& texture);
         ~Sampler();

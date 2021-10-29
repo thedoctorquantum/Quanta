@@ -1,7 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <Quanta/Quanta.h>
+#include <Quanta/Renderer/Renderer3D.h>
+#include <Quanta/Core/Application.h>
+#include <Quanta/Gui/DearImGui/ImGuiRenderer.h>
+#include <Quanta/Graphics/GraphicsDevice.h>
 #include <Quanta/Memory/Span.h>
 #include <Quanta/Memory/Pointer.h>
 #include <Quanta/CLI/Log/Log.h>
@@ -148,7 +151,7 @@ void Sandbox::OnUpdate(const float frameTime)
         ImGui::DragFloat3("Pos", &position.x);
         ImGui::DragFloat3("Rot", &rotation.x);
 
-        ImGui::DragFloat("Opacity", &backpack.GetMaterials()[0].opacity, 0.025f);
+        ImGui::DragFloat("Opacity", &backpack.materials[0].opacity, 0.025f);
         
         ImGui::Spacing();
 

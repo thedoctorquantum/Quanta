@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 #include <memory>
 #include <glm/glm.hpp>
 
@@ -62,8 +62,8 @@ namespace Quanta
 
         virtual double GetTime() const = 0;
 
-        virtual const std::string& GetTitle() const = 0;
-        virtual void SetTitle(const std::string&) = 0;
+        virtual const std::string_view& GetTitle() const = 0;
+        virtual void SetTitle(const std::string_view&) = 0;
         
         virtual GraphicsApi GetGraphicsApi() const = 0;
     };

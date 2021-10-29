@@ -5,7 +5,7 @@
 
 namespace Quanta::OpenAL
 {
-    struct AudioSource final : public Quanta::AudioSource
+    struct AudioSource : public Quanta::AudioSource
     {
         AudioSource();
         ~AudioSource();
@@ -17,10 +17,10 @@ namespace Quanta::OpenAL
         const glm::vec3& GetTranslation() const override;
         void SetTranslation(const glm::vec3&) override;
 
-        uint32_t GetHandle() const;
+        std::uint32_t GetHandle() const;
     private:
         glm::vec3 translation = glm::vec3(0.0f);
         
-        uint32_t handle = 0;
+        std::uint32_t handle = 0;
     };
 }
