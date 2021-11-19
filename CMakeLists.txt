@@ -7,5 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory("Quanta")
+add_subdirectory("QuantaPkg")
 add_subdirectory("QuantaEditor")
 add_subdirectory("Sandbox")

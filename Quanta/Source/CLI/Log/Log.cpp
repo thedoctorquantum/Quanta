@@ -1,7 +1,7 @@
 #include <Quanta/CLI/Log/Log.h>
 #include <vector>
-#include <iostream>
 #include <cstdarg>
+#include <cstdio>
 
 #include "../../Debugging/Validation.h"
 
@@ -121,7 +121,7 @@ namespace Quanta::Log
             DEBUG_ASSERT(begin != nullptr);
             DEBUG_ASSERT(end != nullptr);
 
-            std::cout << begin << "[Log] " << '[' << LevelToString(level) << "]: " << message.data() << end;
+            std::fprintf(stderr, "%s[Log] [%s]: %s%s", begin, LevelToString(level), message.data(), end);
         }
         
         for (std::size_t i = 0; i < log.callbacks.size(); i++)

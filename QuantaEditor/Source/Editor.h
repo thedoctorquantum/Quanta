@@ -10,17 +10,12 @@
 #include "Widgets/TextEditor/TextEditor.h"
 #include "Widgets/LogWidget.h"
 #include "Widgets/SceneViewer.h"
+#include "Widgets/TerminalEmulator.h"
 
 namespace Quanta
 {
-    class Editor final : public Application
+    struct Editor : public Application
     {
-    public:
-        Editor();
-        ~Editor();
-
-        void OnUpdate(float frameTime) override;
-    private:
         std::unique_ptr<SceneViewer> sceneViewer = nullptr;
         bool sceneViewerOpen = true;
 
@@ -36,11 +31,16 @@ namespace Quanta
 
         Entity sponza;
 
+        TerminalEmulator terminal;
         LogWidget log;
-        bool logOpen = true;
 
         Scene scene;
 
         bool entityViewOpen = true; 
+
+        Editor();
+        ~Editor();
+
+        void OnUpdate(float frameTime) override;
     };
 }

@@ -35,22 +35,20 @@ namespace Quanta
 
     LogWidget::LogWidget()
     {
-        std::memset(input, '\0', sizeof(input));
-
         Log::AddCallback([&](const auto level, const auto& text) 
         {
             this->messages.push_back({ text.data(), level });
         });
     }
 
-    void LogWidget::Render(const char* const title, bool* const open)
+    void LogWidget::Render(const char* const title)
     {   
-        if (!*open)
+        if (!open)
         {
             return;
         }     
 
-        if (ImGui::Begin(title, open))
+        if (ImGui::Begin(title, &open))
         {
             if (ImGui::SmallButton("Clear"))           
             { 

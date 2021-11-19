@@ -163,6 +163,8 @@ namespace Quanta
         });
                 
         Log::Write(Log::Level::Debug, "hello, world!");
+
+        terminal.shell = "/bin/bash";
     }
 
     Editor::~Editor()
@@ -205,12 +207,17 @@ namespace Quanta
 
                     if (ImGui::MenuItem("Log"))
                     {
-                        logOpen = !logOpen;
+                        log.open = !log.open;
                     }
 
                     if (ImGui::MenuItem("Scene View"))
                     {
                         sceneViewerOpen = !sceneViewerOpen;
+                    }
+
+                    if (ImGui::MenuItem("Terminal"))
+                    {
+                        terminal.open = !terminal.open;
                     }
 
                     ImGui::EndMenu();
@@ -219,12 +226,15 @@ namespace Quanta
                 ImGui::EndMainMenuBar();
             }
 
-            log.Render("Log", &logOpen);
+            terminal.Render();
+            log.Render("Log");
 
             if (textEditorOpen)
             {
                 if (ImGui::Begin("Text Editor", &textEditorOpen))
                 {
+                    textEditor.Render("Text");
+
                     static const auto runScript = [](const TextEditor& editor)
                     {
                         std::ofstream file("Resources/Scripts/test.as");
@@ -263,8 +273,6 @@ namespace Quanta
 
                         ImGui::EndMenu();
                     }
-
-                    textEditor.Render("Text");
                 }
 
                 ImGui::End();

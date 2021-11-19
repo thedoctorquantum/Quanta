@@ -1,19 +1,13 @@
 #pragma once
 
 #include <Quanta/CLI/Log/Log.h>
-
 #include <vector>
 #include <string>
 
 namespace Quanta
 {
-    class LogWidget final 
+    struct LogWidget 
     {
-    public:
-        LogWidget();
-
-        void Render(const char* title, bool* open = nullptr);
-    private:
         struct Message final
         {
             std::string text;
@@ -24,6 +18,12 @@ namespace Quanta
         
         Log::LevelMask mask = Log::LevelMask::All;
 
-        char input[100];
+        char input[100] { }; 
+
+        bool open = true;
+
+        LogWidget();
+
+        void Render(const char* title);
     };
 }
