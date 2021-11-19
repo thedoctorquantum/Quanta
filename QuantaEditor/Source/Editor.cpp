@@ -61,7 +61,7 @@ namespace Quanta
         skyboxSampler = Sampler::Create(skybox);
 
         Renderer3D::SetEnvironmentSampler(skyboxSampler);
-                
+
         ScriptRuntime::Create();
 
         std::ifstream source("Resources/Scripts/test.as");
